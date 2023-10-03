@@ -1,0 +1,72 @@
+/* Add this CSS to a separate .css file or include it in your HTML file inside <style> tags */
+
+/* Style for the form container */
+.form-container {
+    background-color: #e6e6fa; /* Light violet background color */
+    padding: 20px;
+    border-radius: 10px;
+    box-shadow: 0 0 10px rgba(0, 0, 0, 0.2); /* Add a subtle shadow effect */
+}
+
+/* Style for form labels */
+.form-label {
+    font-weight: bold;
+}
+
+/* Style for form inputs */
+.form-control {
+    width: 100%;
+    padding: 10px;
+    margin-bottom: 15px;
+    border: 1px solid #ccc;
+    border-radius: 5px;
+}
+
+/* Style for buttons */
+.btn {
+    padding: 10px 20px;
+    border: none;
+    border-radius: 5px;
+    cursor: pointer;
+    transition: background-color 0.3s ease;
+}
+
+.btn-primary {
+    background-color: #007bff; /* Blue primary button color */
+    color: #fff;
+}
+
+.btn-primary:hover {
+    background-color: #0056b3; /* Darker blue on hover */
+}
+
+.btn-danger {
+    background-color: #dc3545; /* Red danger button color */
+    color: #fff;
+}
+
+.btn-danger:hover {
+    background-color: #c82333; /* Darker red on hover */
+}
+/* Center the form within the container */
+.container {
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    height: 100vh;
+}
+
+/* CSS for the Back Button */
+.back-button {
+    background-color: #007BFF; /* Background color */
+    color: #fff; /* Text color */
+    padding: 10px 20px; /* Padding around the button */
+    border: none; /* Remove border */
+    cursor: pointer; /* Add a pointer cursor on hover */
+    border-radius: 5px; /* Rounded corners */
+}
+
+.back-button:hover {
+    background-color: #0056b3; /* Background color on hover */
+}
+

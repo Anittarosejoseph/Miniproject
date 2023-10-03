@@ -1,0 +1,79 @@
+{% load static %}
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap@5.5.2/dist/css/bootstrap.min.css">
+    <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.5.2/dist/js/bootstrap.min.js"></script>
+    <link rel="stylesheet" href="{% static 'css/loginstyle.css' %}">
+    <title>Login Form</title>
+</head>
+<body>
+    <form method="POST" onsubmit="return validateForm()">
+        {% csrf_token %}
+        <div class="login-container">
+            <div class="left-side">
+                <div class="form-container">
+                    <div class="title">
+                        <h1>HOROFIX</h1>
+                    </div>
+                    <div class="input-container">
+                        <input type="text" placeholder="USERNAME" name="username" required onchange="validateUsername(this)">
+                        <input type="password" placeholder="PASSWORD" name="password" required onchange="validatePassword(this)">
+                        <button>LOGIN</button>
+                        <p class="forgot-password"><a href="{% url 'reset_password' %}">Forgot Password?</a></p>
+                        <p class="signup">Don't have an account? <a href="/register_user">Signup</a></p>
+                        <button class="google-login-button">Login with Google</button>
+                    </div>
+                </div>
+            </div>
+            <div class="right-side">
+                <div class="image-container">
+                    <img class="background-image" src="{% static 'images/w2.png' %}" alt="Background Image">
+                </div>
+            </div>
+        </div>
+    </form>
+
+    <script>
+        function validateUsername(input) {
+            const username = input.value;
+
+            if (username.length < 5) {
+                alert("Username must be at least 5 characters long.");
+                input.value = "";
+                return;
+            }
+
+            const regex = /^[a-zA-Z]+$/; // Allow only alphabets
+            if (!regex.test(username)) {
+                alert("Username must contain only alphabets.");
+                input.value = "";
+            }
+        }
+
+        function validatePassword(input) {
+            const password = input.value;
+            const regex = /^(?=.*[a-zA-Z])(?=.*\d)(?=.*[@#$%^&+=]).{6,}$/;
+
+            if (!regex.test(password)) {
+                alert("Password must contain alphabets, numbers, and special symbols and be at least 6 characters long.");
+                input.value = "";
+            }
+        }
+
+        function validateForm() {
+            const usernameInput = document.getElementsByName("username")[0];
+            const passwordInput = document.getElementsByName("password")[0];
+
+            if (!usernameInput.value || !passwordInput.value) {
+                alert("Please fill in both username and password fields.");
+                return false;
+            }
+
+            return true;
+        }
+    </script>
+</body>
+</html>

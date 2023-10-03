@@ -1,0 +1,256 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Registration Form</title>
+    <!-- Include Bootstrap CSS -->
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap/dist/css/bootstrap.min.css" rel="stylesheet">
+    <!-- Include Font Awesome for icons -->
+    <link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0-beta3/css/all.min.css" rel="stylesheet">
+    <style>
+        body {
+            background-color: rgb(255, 255, 255);
+            color: #333; /* Dark Text Color */
+        }
+
+        .container-bg {
+            background-image: url('path-to-your-watch-image.jpg'); /* Set the path to your watch image */
+            background-size: cover;
+            background-repeat: no-repeat;
+            background-position: center;
+            min-height: 100vh;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+        }
+
+        .card {
+            max-width: 500px;
+            margin: 0 auto;
+            box-shadow: 0px 0px 10px rgba(0, 0, 0, 0.2);
+        }
+
+        .card-header {
+            background-color: #f8f9fa; /* Light Gray Background */
+            border-bottom: none;
+        }
+
+        .card-body {
+            background-color: white;
+        }
+
+        .form-label {
+            font-weight: normal; /* Normal font weight */
+        }
+
+        .form-control {
+            font-size: 18px; /* Larger font size */
+        }
+
+        .btn {
+            font-size: 20px; /* Larger button font size */
+        }
+    </style>
+</head>
+<body>
+
+<div class="container-bg">
+    <div class="container mt-5">
+        <div class="card">
+            <div class="card-header text-center">
+                <h2 class="mb-0">Register</h2>
+            </div>
+            <div class="card-body">
+                <form onsubmit="return validateForm()" method="POST" action="">
+                    {% csrf_token %}
+                    <div class="mb-4">
+                        <div class="form-outline flex-fill mb-0">
+                            <i class="fas fa-user fa-lg me-3 fa-fw"></i>
+                            <label class="form-label" for="name">Name</label>
+                            <input type="text" id="name" class="form-control" name="name" required oninput="validateName(this)" />
+                            <span id="nameError" class="text-danger"></span>
+                        </div>
+                    </div>
+                    <div class="mb-4">
+                        <div class="form-outline flex-fill mb-0">
+                            <i class="fas fa-user fa-lg me-3 fa-fw"></i>
+                            <label class="form-label" for="username">Username</label>
+                            <input type="text" id="username" class="form-control" name="username" required oninput="validateUsername(this)" />
+                            <span id="usernameError" class="text-danger"></span>
+                        </div>
+                    </div>
+                    <div class="mb-4">
+                        <div class="form-outline flex-fill mb-0">
+                            <i class="fas fa-envelope fa-lg me-3 fa-fw"></i>
+                            <label class="form-label" for="email">Email</label>
+                            <input type="email" id="email" class="form-control" name="email" required oninput="validateEmail(this)" />
+                            <span id="emailError" class="text-danger"></span>
+                        </div>
+                    </div>
+                    <div class="mb-4">
+                        <div class="form-outline flex-fill mb-0">
+                            <i class="fas fa-phone fa-lg me-3 fa-fw"></i>
+                            <label class="form-label" for="phone">Phone Number</label>
+                            <input type="tel" id="phone" class="form-control" name="phone" required oninput="validatePhone(this)" />
+                            <span id="phoneError" class="text-danger"></span>
+                        </div>
+                    </div>
+                    <div class="mb-4">
+                        <div class="form-outline flex-fill mb-0">
+                            <i class="fas fa-lock fa-lg me-3 fa-fw"></i>
+                            <label class="form-label" for="password">Password</label>
+                            <input type="password" id="password" class="form-control" name="password" required oninput="validatePassword(this)" />
+                            <span id="passwordError" class="text-danger"></span>
+                        </div>
+                    </div>
+                    <div class="mb-4">
+                        <div class="form-outline flex-fill mb-0">
+                            <i class="fas fa-lock fa-lg me-3 fa-fw"></i>
+                            <label class="form-label" for="confirm">Confirm Password</label>
+                            <input type="password" id="confirm" class="form-control" name="confirm" required oninput="validateConfirm(this)" />
+                            <span id="confirmError" class="text-danger"></span>
+                        </div>
+                    </div>
+                    <div class="form-check d-flex justify-content-center mb-5">
+                        <input class="form-check-input me-2" type="checkbox" value="" id="form2Example3c" required />
+                        <label class="form-check-label" for="form2Example3c">
+                            I agree to all statements in <a href="#">Terms of Service</a>
+                        </label>
+                    </div>
+                    <div class="text-center mt-4">
+                        <button type="submit" class="btn btn-primary btn-lg">Register</button>
+                    </div>
+                </form>
+            </div>
+        </div>
+    </div>
+</div>
+
+<!-- Include Bootstrap JS -->
+<script src="https://cdn.jsdelivr.net/npm/bootstrap/dist/js/bootstrap.bundle.min.js"></script>
+
+<script>
+    function validateName(inputElement) {
+        var name = inputElement.value;
+        var nameError = document.getElementById("nameError");
+
+        // Reset error message
+        nameError.innerHTML = "";
+
+        // Validate Name (required)
+        if (name.trim() === "") {
+            nameError.innerHTML = "Name is required";
+        } else if (!/^[a-zA-Z\s]+$/.test(name)) {
+            nameError.innerHTML = "Name should only contain alphabets";
+        }
+    }
+
+    function validateUsername(inputElement) {
+        var username = inputElement.value;
+        var usernameError = document.getElementById("usernameError");
+
+        // Reset error message
+        usernameError.innerHTML = "";
+
+        // Validate Username (required)
+        if (username.trim() === "") {
+            usernameError.innerHTML = "Username is required";
+        } else if (!/^[a-zA-Z0-9\s!@#$%^&*()-_+=<>?]+$/.test(username)) {
+            usernameError.innerHTML = "Username should contain alphabets, numbers, and special symbols";
+        }
+    }
+
+    function validateEmail(inputElement) {
+        var email = inputElement.value;
+        var emailError = document.getElementById("emailError");
+
+        // Reset error message
+        emailError.innerHTML = "";
+
+        // Validate Email (required)
+        if (email.trim() === "") {
+            emailError.innerHTML = "Email is required";
+        } else {
+            // Simple email format check
+            var emailRegex = /^\S+@\S+\.\S+$/;
+            if (!email.match(emailRegex)) {
+                emailError.innerHTML = "Invalid email format";
+            } else {
+                // Check if the email ends with one of the allowed domains
+                var allowedDomains = ["@gmail.com", "@yahoo.com", "@hotmail.com", "@mca.ajce.in"];
+                var validDomain = false;
+
+                for (var i = 0; i < allowedDomains.length; i++) {
+                    if (email.endsWith(allowedDomains[i])) {
+                        validDomain = true;
+                        break;
+                    }
+                }
+
+                if (!validDomain) {
+                    emailError.innerHTML = "Email must end with @gmail.com, @yahoo.com, @hotmail.com, or @ajce.in";
+                }
+            }
+        }
+    }
+
+    function validatePhone(inputElement) {
+        var phone = inputElement.value;
+        var phoneError = document.getElementById("phoneError");
+
+        // Reset error message
+        phoneError.innerHTML = "";
+
+        // Validate Phone Number (required)
+        if (phone.trim() === "") {
+            phoneError.innerHTML = "Phone number is required";
+        } else {
+            // Simple check for numeric value, length, and starting with 6-9
+            var phoneRegex = /^[6-9]\d{9}$/;
+            if (!phone.match(phoneRegex)) {
+                phoneError.innerHTML = "Invalid phone number";
+            }
+        }
+    }
+
+    function validatePassword(inputElement) {
+        var password = inputElement.value;
+        var passwordError = document.getElementById("passwordError");
+
+        // Reset error message
+        passwordError.innerHTML = "";
+
+        // Validate Password (required)
+        if (password.trim() === "") {
+            passwordError.innerHTML = "Password is required";
+        } else if (password.length < 6) {
+            passwordError.innerHTML = "Password must be at least 6 characters";
+        }
+    }
+
+    function validateConfirm(inputElement) {
+        var confirm = inputElement.value;
+        var confirmError = document.getElementById("confirmError");
+        var password = document.getElementById("password").value;
+
+        // Reset error message
+        confirmError.innerHTML = "";
+
+        // Validate Confirm Password (required)
+        if (confirm.trim() === "") {
+            confirmError.innerHTML = "Please confirm your password";
+        } else if (confirm !== password) {
+            confirmError.innerHTML = "Passwords do not match";
+        }
+    }
+
+    function validateForm() {
+        // This function can be used to perform any final validation before submitting the form.
+        // You can add more complex validation logic here if needed.
+        return true; // Return true to allow form submission.
+    }
+</script>
+
+</body>
+</html>
