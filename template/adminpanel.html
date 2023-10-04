@@ -1,0 +1,92 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Admin Dashboard</title>
+    <style>
+        /* Reset some default styles */
+        body, html {
+            margin: 0;
+            padding: 0;
+            font-family: Arial, sans-serif;
+        }
+
+        /* Sidebar Styles */
+        .sidebar {
+            height: 510%;
+            width: 250px;
+            position: fixed;
+            top: 0;
+            left: 0;
+            background-color:#5b5497;
+            padding-top: 20px;
+        }
+
+        .sidebar a {
+            padding: 15px;
+            text-decoration: none;
+            font-size: 20px;
+            color: rgb(247, 240, 240);
+            display: block;
+        }
+
+        .sidebar a:hover {
+            background-color: #5b5497;
+        }
+
+        /* Content Styles */
+        .content {
+            margin-left:230px;
+            padding: 10px;
+        }
+
+        /* Header Styles */
+        .header {
+            background-color: #7166d3;
+            padding: 10px;
+            color: white;
+            text-align: right;
+        }
+
+        /* Sample Card Styles */
+        .card {
+            background-color: white;
+            padding: 20px;
+            margin: 20px;
+            box-shadow: 0 4px 8px rgba(0, 0, 0, 0.2);
+        }
+    </style>
+</head>
+<body>
+    <div class="sidebar">
+        <a href="#">Dashboard</a>
+        <a href="#">Users</a>
+        <a href="{% url 'add_product' %}">Add Product</a>
+        <a href="{% url 'view_products' %}">View Products</a>
+        <a href="#">Technicians</a>
+        <a href="#">Delivery Boys</a>
+        <a href="#">Repair Request</a>
+        <a href="#">Orders</a>
+        <a href="#">My Orders</a>
+        <a href="#">Settings</a>
+    </div>
+
+    <div class="content">
+        <div class="header">
+            <h1>Welcome, Admin!</h1>
+            <a href="#">Logout</a>
+        </div>
+
+        <div class="card">
+            <h2>Recent Orders</h2>
+            <p>Display recent order data here...</p>
+        </div>
+
+        <div class="card">
+            <h2>User Statistics</h2>
+            <p>Display user statistics here...</p>
+        </div>
+    </div>
+</body>
+</html>

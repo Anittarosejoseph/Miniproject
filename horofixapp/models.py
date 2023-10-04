@@ -145,4 +145,31 @@ class CustomerProfile(models.Model):
 
     def str(self):
         return self.user.email 
-        
+
+
+# class Category(models.Model):
+#     # Other fields
+#     name = models.CharField(max_length=255)
+#     # Add a default value for the 'id' field
+#     id = models.AutoField(primary_key=True, default=1)  # Assuming you want the default 'id' to be 1
+
+
+#     def __str__(self):
+#         return self.name
+
+
+
+
+class WatchProduct(models.Model):
+    product_name = models.CharField(max_length=255)
+    product_quantity = models.IntegerField()
+    product_price = models.DecimalField(max_digits=10, decimal_places=2)
+    product_sale_price = models.DecimalField(max_digits=10, decimal_places=2)
+    discount = models.DecimalField(max_digits=5, decimal_places=2)
+    #category = models.ForeignKey(Category, on_delete=models.CASCADE, default=None)
+    watch_description = models.TextField()
+    watch_image = models.ImageField(upload_to='watch_images/')
+
+    def __str__(self):
+        return self.product_name
+

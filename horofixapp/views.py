@@ -6,6 +6,7 @@ from django.contrib.sessions.models import Session
 from django.contrib.auth import authenticate ,login as auth_login,logout 
 from django.contrib import messages
 from .models import CustomUser
+from .models import WatchProduct
 
  #from django.contrib.auth.models import User
  #from .mode
@@ -72,7 +73,7 @@ def login_user(request):
                 #     return redirect(reverse('therapist'))
                 elif request.user.user_types == CustomUser.ADMIN:
                     print("user is admin")                   
-                    return redirect('http://127.0.0.1:8000/admin/')
+                    return redirect('adminpanel')
                 # else:
                 #     print("user is normal")
                 #     return redirect('')
@@ -83,13 +84,6 @@ def login_user(request):
             messages.success(request,("Please fill out all fields."))
         
     return render(request, 'login.html')
-
-
-
-
-
-
-
 
 
 
@@ -143,3 +137,40 @@ def custom_logout(request):
         del request.session['is_authenticated'] 
         logout(request)
         return redirect('index')
+
+def adminpanel(request):
+    return render(request, 'adminpanel.html')
+
+
+def add_product(request):
+    if request.method == 'POST':
+        product_name = request.POST.get('productName')
+        product_quantity = request.POST.get('productQuantity')
+        product_price = request.POST.get('productPrice')
+        product_sale_price = request.POST.get('productSalePrice')
+        discount = request.POST.get('discount')
+        #category = request.POST.get('Categoryid')
+
+        
+        watch_description = request.POST.get('watchDescription')
+        watch_image = request.FILES.get('watchImage')
+
+        product = WatchProduct(
+            product_name=product_name,
+            product_quantity=product_quantity,
+            product_price=product_price,
+            product_sale_price=product_sale_price,
+            discount=discount,
+            #Categoryid=Categoryid,
+            watch_description=watch_description,
+            watch_image=watch_image
+        )
+        product.save()
+
+        return redirect('view_products')  # Redirect to the product list view
+    else:
+        return render(request, 'add_product.html')
+
+def view_products(request):
+    products = WatchProduct.objects.all()
+    return render(request, 'view_products.html', {'products': products})

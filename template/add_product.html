@@ -1,0 +1,112 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Add Watch Product</title>
+    <style>
+        /* Add your CSS styles here */
+        body {
+            font-family: Arial, sans-serif;
+            margin: 0;
+            padding: 0;
+        }
+        .container {
+            max-width: 600px;
+            margin: 0 auto;
+            padding: 40px;
+            border: 1px solid #5b5497;
+            border-radius: 5px;
+            box-shadow: 0 0 10px rgba(0, 0, 0, 0.1);
+        }
+        label {
+            display: block;
+            margin-bottom: 1px;
+        }
+        input[type="text"],
+        input[type="number"],
+        input[type="file"], /* Add the file input type */
+        textarea {
+            width: 70%;
+            padding: 10px;
+            margin-bottom: 15px;
+            border: 1px solid #ccc;
+            border-radius: 3px;
+            font-size: 16px;
+        }
+        input[type="submit"] {
+            background-color: #5b5497;
+            color: #fff;
+            border: none;
+            padding: 10px 20px;
+            border-radius: 3px;
+            cursor: pointer;
+        }
+        /* Header styles */
+        header {
+            background-color:#5b5497;
+            color: #fff;
+            padding: 1px;
+            text-align: center;
+        }
+        /* Footer styles */
+        footer {
+            background-color: #5b5497;
+            color: #fff;
+            padding: 5px 0;
+            text-align: center;
+        }
+    </style>
+</head>
+<body>
+    <header>
+        <h1>HOROFIX</h1>
+    </header>
+
+    <div class="container">
+        <h1>Add Watch Product</h1>
+        
+
+            <!-- Your form content goes here (as in your previous code) -->
+            <form action="{% url 'add_product' %}" method="post" enctype="multipart/form-data">
+             {% csrf_token %}
+               
+    
+                <label for="productName">Product Name:</label>
+                <input type="text" id="productName" name="productName" required>
+    
+                <label for="productQuantity">Product Quantity:</label>
+                <input type="number" id="productQuantity" name="productQuantity" required>
+    
+                <label for="productPrice">Product Price:</label>
+                <input type="number" id="productPrice" name="productPrice" step="0.01" required>
+    
+                <label for="productSalePrice">Product Sale Price:</label>
+                <input type="number" id="productSalePrice" name="productSalePrice" step="0.01" required>
+    
+                <label for="discount">Discount:</label>
+                <input type="number" id="discount" name="discount" step="0.01" required>
+
+                <!-- <label for="Category">Category</label>
+<input type="text" id="Category" name="category" required> -->
+
+
+    
+                <label for="watchDescription">Watch Description:</label>
+                <textarea id="watchDescription" name="watchDescription" rows="4" required></textarea>
+    
+                <label for="watchImage">Watch Image:</label>
+                <input type="file" id="watchImage" name="watchImage" accept="image/*" required>
+                <!-- 'accept="image/*"' restricts file selection to image files -->
+    <br>
+                <input type="submit" value="Add Product">
+                <input type="button" value="Cancel">
+            </form>
+        
+    </div>
+
+    <footer>
+        &copy; horofix@gmail.com
+    </footer>
+</body>
+</html>

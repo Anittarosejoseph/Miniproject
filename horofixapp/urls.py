@@ -15,6 +15,8 @@ urlpatterns = [
      #path('', views.index, name="index"),
     path('register_user/',views.register_user,name="register_user"),
     path('about/',views.about,name="about"),
+    path('adminpanel/',views.adminpanel,name="adminpanel"),
+    #path('user_list/',views.user_list,name="user_list"),
    
 path('Customer_Profile/', views.Customer_Profile, name='Customer_Profile'),  # Add this line,
     path('logout/', views.custom_logout, name='logout'),
@@ -22,7 +24,10 @@ path('Customer_Profile/', views.Customer_Profile, name='Customer_Profile'),  # A
     #path('forgotpassword',views.forgotpassword,name="forgotpassword"),
   
     #path('userhome/logout',view.userlogout,name="logout")
+    path('add_product/',views.add_product,name='add_product'),
+    path('view_products/',views.view_products,name='view_products'),
 
+    
 path('reset_password/', auth_views.PasswordResetView.as_view(), name="reset_password"),
     path('reset_password_sent/', auth_views.PasswordResetDoneView.as_view(), name="password_reset_done"),
     path('reset/<uidb64>/<token>/', auth_views.PasswordResetConfirmView.as_view(), name="password_reset_confirm"),
