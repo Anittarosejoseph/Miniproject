@@ -34,7 +34,8 @@
             border-radius: 3px;
             font-size: 16px;
         }
-        input[type="submit"] {
+        input[type="submit"],
+        input[type="button"] {
             background-color: #5b5497;
             color: #fff;
             border: none;
@@ -60,7 +61,12 @@
 </head>
 <body>
     <header>
-        <h1>HOROFIX</h1>
+        <div class="collapse navbar-collapse" id="navbarSupportedContent">
+            <ul class="navbar-nav  ">
+              <li class="nav-item active">
+                <button><center><a class="nav-link" href="{% url 'view_products' %}">VIEW PRODUCTS </a></button>
+              </li>
+              
     </header>
 
     <div class="container">
@@ -100,7 +106,7 @@
                 <!-- 'accept="image/*"' restricts file selection to image files -->
     <br>
                 <input type="submit" value="Add Product">
-                <input type="button" value="Cancel">
+                <a href="{% url 'adminpanel' %}"><input type="button" value="Cancel"></a>
             </form>
         
     </div>

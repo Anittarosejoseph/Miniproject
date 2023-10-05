@@ -56,14 +56,52 @@
             margin: 20px;
             box-shadow: 0 4px 8px rgba(0, 0, 0, 0.2);
         }
+
+        /* Dropdown Styles */
+        .dropdown {
+            position: relative;
+            display: inline-block;
+        }
+
+        .dropdown-content {
+            display: none;
+            position: absolute;
+            background-color: #5b5497;
+            min-width: 160px;
+            z-index: 1;
+        }
+
+        .dropdown-content a {
+            padding: 12px 16px;
+            text-decoration: none;
+            display: block;
+            color: white;
+        }
+
+        .dropdown-content a:hover {
+            background-color: #7166d3;
+        }
+
+        .dropdown:hover .dropdown-content {
+            display: block;
+        }
     </style>
 </head>
 <body>
     <div class="sidebar">
         <a href="#">Dashboard</a>
         <a href="#">Users</a>
-        <a href="{% url 'add_product' %}">Add Product</a>
-        <a href="{% url 'view_products' %}">View Products</a>
+        
+        <!-- Product Actions Dropdown -->
+        <div class="dropdown">
+            <a href="#" class="dropbtn">Product</a>
+            <div class="dropdown-content">
+                <a href="{% url 'add_product' %}">Add Product</a>
+                <a href="{% url 'view_products' %}">View Products</a>
+                <a href="#">Edit Product</a>
+            </div>
+        </div>
+
         <a href="#">Technicians</a>
         <a href="#">Delivery Boys</a>
         <a href="#">Repair Request</a>
@@ -75,7 +113,7 @@
     <div class="content">
         <div class="header">
             <h1>Welcome, Admin!</h1>
-            <a href="#">Logout</a>
+            <a href="{% url 'index' %}">Logout</a>
         </div>
 
         <div class="card">

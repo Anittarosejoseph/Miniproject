@@ -4,8 +4,8 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>View Products</title>
+
     <style>
-        /* Add your CSS styles here */
         body {
             font-family: Arial, sans-serif;
         }
@@ -30,12 +30,43 @@
         img {
             max-width: 100px; /* Set a maximum width for the images */
         }
+        .action-buttons {
+            display: flex;
+            justify-content: space-between;
+        }
     </style>
 </head>
 <body>
+    <div class="sidebar">
+        <a href="#">Dashboard</a>
+        <a href="#">Users</a>
+        
+        <!-- Product Actions Dropdown -->
+        <div class="dropdown">
+            <a href="#" class="dropbtn">Product</a>
+            <div class="dropdown-content">
+                <a href="{% url 'add_product' %}">Add Product</a>
+                <a href="{% url 'view_products' %}">View Products</a>
+                <a href="#">Edit Product</a>
+            </div>
+        </div>
+
+        <a href="#">Technicians</a>
+        <a href="#">Delivery Boys</a>
+        <a href="#">Repair Request</a>
+        <a href="#">Orders</a>
+        <a href="#">My Orders</a>
+        <a href="#">Settings</a>
+    </div>
+
+    <div class="content">
+        <!-- <div class="header">
+            <h1>Welcome, Admin!</h1>
+            <a href="{% url 'index' %}">Logout</a>
+        </div> -->
     <div class="container">
         <h1>View Products</h1>
-        <table>
+        <table border="2px">
             <thead>
                 <tr>
                     <th>Product Name</th>
@@ -45,14 +76,32 @@
                     <th>Discount</th>
                     <th>Watch Image</th>
                     <th>Watch Description</th>
+                    <th>Action</th>
                 </tr>
             </thead>
             <tbody>
-                <!-- Example product data, replace with actual data from your backend -->
-               
-                <!-- Add more rows for additional products -->
+                {% for product in products %}
+                <tr>
+                    <td>{{ product.product_name }}</td>
+                    <td>{{ product.product_quantity }}</td>
+                    <td>${{ product.product_price }}</td>
+                    <td>${{ product.product_sale_price }}</td>
+                    <td>{{ product.discount }}%</td>
+                    <td><img src="{{ product.watch_image.url }}" alt="{{ product.product_name }}"></td>
+                    <td>{{ product.watch_description }}</td>
+                    <td class="action-buttons">
+                        <button>Edit</button>
+                        
+                    <form method="post" action="{% url 'delete_product' product.id %}">
+                        {% csrf_token %}
+                        <button class="btn btn-danger" type="submit">Delete</button>
+                    </form>
+                    </td>
+                </tr>
+                {% endfor %}
             </tbody>
         </table>
     </div>
 </body>
 </html>
+

@@ -1,6 +1,6 @@
 /* Reset default margin and padding for all elements */
 * {
-    margin: 0;
+    margin: 10;
     padding: 0;
     box-sizing: border-box;
 }
@@ -8,7 +8,7 @@
 /* Set a background color for the entire page */
 body {
     font-family: Arial, sans-serif;
-    background-color: #c48bb1;
+    background-color: #580246;
 }
 
 /* Center the login container vertically and horizontally */

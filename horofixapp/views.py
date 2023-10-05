@@ -1,7 +1,7 @@
 from django.shortcuts import render,redirect
 from .models import CustomUser,UserProfile
 from .models import CustomerProfile  # Import the correct model
-#from django.contrib.auth.decorators import login_required
+from django.contrib.auth.decorators import login_required
 from django.contrib.sessions.models import Session
 from django.contrib.auth import authenticate ,login as auth_login,logout 
 from django.contrib import messages
@@ -171,6 +171,67 @@ def add_product(request):
     else:
         return render(request, 'add_product.html')
 
+# def view_products(request):
+#     products = WatchProduct.objects.all()
+#     return render(request, 'view_products.html', {'products': products})
+
 def view_products(request):
-    products = WatchProduct.objects.all()
+    products = WatchProduct.objects.all()  # Retrieve all products from the database
     return render(request, 'view_products.html', {'products': products})
+
+
+
+def customer_product_view(request):
+    products = WatchProduct.objects.all()
+    return render(request, 'customer_product.html', {'products': products})
+
+# Django view to delete the product
+from django.shortcuts import render, redirect
+
+def delete_product(request, product_id):
+    if request.method == 'POST':
+        # Delete the product from the database
+        try:
+            product = WatchProduct.objects.get(pk=product_id)
+            product.delete()
+            return redirect('view_products')
+        except WatchProduct.DoesNotExist:
+            pass
+    return redirect('view_products')  # Redirect back to the product list view
+
+
+
+# views.py
+
+from django.shortcuts import render, redirect, get_object_or_404
+
+def edit_product(request, product_id):
+    # Retrieve the product to edit
+    product = get_object_or_404(WatchProduct, id=product_id)
+
+    if request.method == 'POST':
+        # Handle form submission to update the product
+        product_name = request.POST.get('productName')
+        product_quantity = request.POST.get('productQuantity')
+        product_price = request.POST.get('productPrice')
+        product_sale_price = request.POST.get('productSalePrice')
+        discount = request.POST.get('discount')
+        watch_description = request.POST.get('watchDescription')
+        watch_image = request.FILES.get('watchImage')
+
+        # Update the product fields here
+        product.product_name = product_name
+        product.product_quantity = product_quantity
+        product.product_price = product_price
+        product.product_sale_price = product_sale_price
+        product.discount = discount
+        product.watch_description = watch_description
+        if watch_image:
+            product.watch_image = watch_image
+        product.save()
+
+        return redirect('view_products')  # Redirect to the product list view
+
+    return render(request, 'edit_product.html', {'product': product})
+
+

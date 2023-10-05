@@ -1,3 +1,4 @@
+{% load static %}
 <!DOCTYPE html>
 <html lang="en">
 <head>
@@ -9,49 +10,56 @@
     <!-- Include Font Awesome for icons -->
     <link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0-beta3/css/all.min.css" rel="stylesheet">
     <style>
-        body {
-            background-color: rgb(255, 255, 255);
-            color: #333; /* Dark Text Color */
-        }
+      
+    body {
+        background-image: url('{% static "regwatch.jpg" %}');
+        background-size: cover;
+        background-repeat: no-repeat;
+        background-position: center;
+        margin: 0;
+        padding: 0;
+        color: #333; /* Dark Text Color */
+    }
 
-        .container-bg {
-            background-image: url('path-to-your-watch-image.jpg'); /* Set the path to your watch image */
-            background-size: cover;
-            background-repeat: no-repeat;
-            background-position: center;
-            min-height: 100vh;
-            display: flex;
-            justify-content: center;
-            align-items: center;
-        }
+    .container-bg {
+        background-image: url('{% static "regwatch.jpg" %}');
+        background-size: cover;
+        background-repeat: no-repeat;
+        background-position: center;
+        min-height: 100vh;
+        display: flex;
+        justify-content: center;
+        align-items: center;
+    }
 
-        .card {
-            max-width: 500px;
-            margin: 0 auto;
-            box-shadow: 0px 0px 10px rgba(0, 0, 0, 0.2);
-        }
+    .card {
+        max-width: 500px;
+        margin: 0 auto;
+        box-shadow: 0px 0px 10px rgba(0, 0, 0, 0.2);
+    }
 
-        .card-header {
-            background-color: #f8f9fa; /* Light Gray Background */
-            border-bottom: none;
-        }
+    .card-header {
+        background-color: #f8f9fa; /* Light Gray Background */
+        border-bottom: none;
+    }
 
-        .card-body {
-            background-color: white;
-        }
+    /* .card-body {
+        background-color: white;
+    } */
 
-        .form-label {
-            font-weight: normal; /* Normal font weight */
-        }
+    .form-label {
+        font-weight: normal; /* Normal font weight */
+    }
 
-        .form-control {
-            font-size: 18px; /* Larger font size */
-        }
+    .form-control {
+        font-size: 18px; /* Larger font size */
+    }
 
-        .btn {
-            font-size: 20px; /* Larger button font size */
-        }
-    </style>
+    .btn {
+        font-size: 20px; /* Larger button font size */
+    }
+</style>
+
 </head>
 <body>
 
@@ -120,6 +128,9 @@
                     </div>
                     <div class="text-center mt-4">
                         <button type="submit" class="btn btn-primary btn-lg">Register</button>
+                        <p class="signin">Already have an account? <a href="/login">Signin</a></p>
+
+
                     </div>
                 </form>
             </div>
@@ -156,51 +167,64 @@
         // Validate Username (required)
         if (username.trim() === "") {
             usernameError.innerHTML = "Username is required";
-        } else if (!/^[a-zA-Z0-9\s!@#$%^&*()-_+=<>?]+$/.test(username)) {
-            usernameError.innerHTML = "Username should contain alphabets, numbers, and special symbols";
+        } else if (!/^[a-zA-Z\s]+$/.test(username)) {
+            usernameError.innerHTML = "Username should contain alphabets";
+        } else if (username.length < 5) {
+            usernameError.innerHTML = "Username must be at least 5 characters long";
         }
     }
 
+
     function validateEmail(inputElement) {
-        var email = inputElement.value;
-        var emailError = document.getElementById("emailError");
+    var email = inputElement.value;
+    var emailError = document.getElementById("emailError");
 
-        // Reset error message
-        emailError.innerHTML = "";
+    // Reset error message
+    emailError.innerHTML = "";
 
-        // Validate Email (required)
-        if (email.trim() === "") {
-            emailError.innerHTML = "Email is required";
+    // Validate Email (required)
+    if (email.trim() === "") {
+        emailError.innerHTML = "Email is required";
+    } else {
+        // Simple email format check
+        var emailRegex = /^\S+@\S+\.\S+$/;
+        if (!email.match(emailRegex)) {
+            emailError.innerHTML = "Invalid email format";
+        } else if (/\d/.test(email)) { // Check if the email contains numbers
+            emailError.innerHTML = "Email cannot contain numbers";
         } else {
-            // Simple email format check
-            var emailRegex = /^\S+@\S+\.\S+$/;
-            if (!email.match(emailRegex)) {
-                emailError.innerHTML = "Invalid email format";
-            } else {
-                // Check if the email ends with one of the allowed domains
-                var allowedDomains = ["@gmail.com", "@yahoo.com", "@hotmail.com", "@mca.ajce.in"];
-                var validDomain = false;
+            // Check if the email ends with one of the allowed domains
+            var allowedDomains = ["@gmail.com", "@yahoo.com", "@hotmail.com", "@mca.ajce.in"];
+            var validDomain = false;
 
-                for (var i = 0; i < allowedDomains.length; i++) {
-                    if (email.endsWith(allowedDomains[i])) {
-                        validDomain = true;
-                        break;
-                    }
+            for (var i = 0; i < allowedDomains.length; i++) {
+                if (email.endsWith(allowedDomains[i])) {
+                    validDomain = true;
+                    break;
                 }
+            }
 
-                if (!validDomain) {
-                    emailError.innerHTML = "Email must end with @gmail.com, @yahoo.com, @hotmail.com, or @ajce.in";
-                }
+            if (!validDomain) {
+                emailError.innerHTML = "Email must end with @gmail.com, @yahoo.com, @hotmail.com, or @ajce.in";
             }
         }
     }
+}
+
+    
+    // Define a global variable to keep track of the previous character
+    var prevChar = "";
+    // Define a counter for consecutive repeated numbers
+    var repeatCounter = 0;
 
     function validatePhone(inputElement) {
         var phone = inputElement.value;
         var phoneError = document.getElementById("phoneError");
 
-        // Reset error message
+        // Reset error message and counters
         phoneError.innerHTML = "";
+        prevChar = "";
+        repeatCounter = 0;
 
         // Validate Phone Number (required)
         if (phone.trim() === "") {
@@ -210,9 +234,28 @@
             var phoneRegex = /^[6-9]\d{9}$/;
             if (!phone.match(phoneRegex)) {
                 phoneError.innerHTML = "Invalid phone number";
+            } else {
+                // Check for consecutive repeated numbers
+                for (var i = 0; i < phone.length; i++) {
+                    var currentChar = phone.charAt(i);
+                    if (currentChar === prevChar) {
+                        repeatCounter++;
+                        if (repeatCounter > 4) {
+                            phoneError.innerHTML = "Consecutive repeated numbers are not allowed.";
+                            inputElement.value = "";
+                            return;
+                        }
+                    } else {
+                        repeatCounter = 0;
+                    }
+                    prevChar = currentChar;
+                }
             }
         }
     }
+
+
+
 
     function validatePassword(inputElement) {
         var password = inputElement.value;

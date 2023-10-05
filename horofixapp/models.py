@@ -173,3 +173,15 @@ class WatchProduct(models.Model):
     def __str__(self):
         return self.product_name
 
+# views.py (Admin Panel)
+def delete_product(request, product_id):
+    try:
+        product = WatchProduct.objects.get(pk=product_id)
+        product.delete()
+        return redirect('view_products')  # Redirect back to the product list view
+    except WatchProduct.DoesNotExist:
+        # Handle the case where the product doesn't exist
+        return redirect('adminpanel')  # Redirect back to the admin panel
+
+# In your admin panel template, add a button or link to trigger the delete_product view.
+
