@@ -88,7 +88,7 @@ def login_user(request):
 
 
 
-#login_required
+
 def Customer_Profile(request):
     # Ensure that the user is authenticated
     if not request.user.is_authenticated:
@@ -137,50 +137,18 @@ def custom_logout(request):
         del request.session['is_authenticated'] 
         logout(request)
         return redirect('index')
-
+@login_required
 def adminpanel(request):
     return render(request, 'adminpanel.html')
 
 
-def add_product(request):
-    if request.method == 'POST':
-        product_name = request.POST.get('productName')
-        product_quantity = request.POST.get('productQuantity')
-        product_price = request.POST.get('productPrice')
-        product_sale_price = request.POST.get('productSalePrice')
-        discount = request.POST.get('discount')
-        #category = request.POST.get('Categoryid')
-
-        
-        watch_description = request.POST.get('watchDescription')
-        watch_image = request.FILES.get('watchImage')
-
-        product = WatchProduct(
-            product_name=product_name,
-            product_quantity=product_quantity,
-            product_price=product_price,
-            product_sale_price=product_sale_price,
-            discount=discount,
-            #Categoryid=Categoryid,
-            watch_description=watch_description,
-            watch_image=watch_image
-        )
-        product.save()
-
-        return redirect('view_products')  # Redirect to the product list view
-    else:
-        return render(request, 'add_product.html')
-
-# def view_products(request):
-#     products = WatchProduct.objects.all()
-#     return render(request, 'view_products.html', {'products': products})
 
 def view_products(request):
     products = WatchProduct.objects.all()  # Retrieve all products from the database
     return render(request, 'view_products.html', {'products': products})
 
 
-
+@login_required
 def customer_product_view(request):
     products = WatchProduct.objects.all()
     return render(request, 'customer_product.html', {'products': products})
@@ -203,35 +171,108 @@ def delete_product(request, product_id):
 
 # views.py
 
-from django.shortcuts import render, redirect, get_object_or_404
+from django.shortcuts import render, get_object_or_404, redirect
+from .models import WatchProduct
 
 def edit_product(request, product_id):
-    # Retrieve the product to edit
+    # Get the existing product object
     product = get_object_or_404(WatchProduct, id=product_id)
 
     if request.method == 'POST':
-        # Handle form submission to update the product
-        product_name = request.POST.get('productName')
-        product_quantity = request.POST.get('productQuantity')
-        product_price = request.POST.get('productPrice')
-        product_sale_price = request.POST.get('productSalePrice')
-        discount = request.POST.get('discount')
-        watch_description = request.POST.get('watchDescription')
-        watch_image = request.FILES.get('watchImage')
+        # Retrieve the data from the form
+        product_name = request.POST['product_name']
+        product_quantity = request.POST['product_quantity']
+        product_price = request.POST['product_price']
+        product_sale_price = request.POST['product_sale_price']
+        discount = request.POST['discount']
+        watch_description = request.POST['watch_description']
 
-        # Update the product fields here
+        # Update the fields of the existing product object
         product.product_name = product_name
         product.product_quantity = product_quantity
         product.product_price = product_price
         product.product_sale_price = product_sale_price
         product.discount = discount
         product.watch_description = watch_description
-        if watch_image:
-            product.watch_image = watch_image
+
+        # Save the changes
         product.save()
 
-        return redirect('view_products')  # Redirect to the product list view
+        return redirect('view_products')
 
     return render(request, 'edit_product.html', {'product': product})
 
 
+
+
+
+def add_product(request):
+    if request.method == 'POST':
+        product_name = request.POST['productName']
+        product_quantity = request.POST['productQuantity']
+        product_price = request.POST['productPrice']
+        product_sale_price = request.POST['productSalePrice']
+        discount = request.POST['discount']
+        watch_description = request.POST['watchDescription']
+        watch_image = request.FILES['watchImage']
+
+        # Check if a product with the same name already exists
+        if WatchProduct.objects.filter(product_name=product_name).exists():
+            messages.error(request, f"A product with the name '{product_name}' already exists.")
+        else:
+            try:
+                # Ensure the numerical fields are valid numbers before saving
+                product_quantity = int(product_quantity)
+                product_price = float(product_price)
+                product_sale_price = float(product_sale_price)
+                discount = float(discount)
+                
+                # Create a new WatchProduct instance and save it
+                WatchProduct.objects.create(
+                    product_name=product_name,
+                    product_quantity=product_quantity,
+                    product_price=product_price,
+                    product_sale_price=product_sale_price,
+                    discount=discount,
+                    watch_description=watch_description,
+                    watch_image=watch_image
+                )
+                messages.success(request, "Product added successfully.")
+            except (ValueError, TypeError):
+                messages.error(request, "Invalid numerical input.")
+
+        return redirect('view_products')
+    
+    return render(request, 'add_product.html')
+
+
+from django.shortcuts import render, get_object_or_404, redirect
+from .models import WatchProduct
+
+def edit_product(request, product_id):
+    # Get the existing product object
+    product = get_object_or_404(WatchProduct, id=product_id)
+
+    if request.method == 'POST':
+        # Retrieve the data from the form
+        product_name = request.POST['product_name']
+        product_quantity = request.POST['product_quantity']
+        product_price = request.POST['product_price']
+        product_sale_price = request.POST['product_sale_price']
+        discount = request.POST['discount']
+        watch_description = request.POST['watch_description']
+
+        # Update the fields of the existing product object
+        product.product_name = product_name
+        product.product_quantity = product_quantity
+        product.product_price = product_price
+        product.product_sale_price = product_sale_price
+        product.discount = discount
+        product.watch_description = watch_description
+
+        # Save the changes
+        product.save()
+
+        return redirect('view_products')
+
+    return render(request, 'edit_product.html', {'product': product})

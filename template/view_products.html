@@ -34,6 +34,85 @@
             display: flex;
             justify-content: space-between;
         }
+        body, html {
+            margin: 0;
+            padding: 0;
+            font-family: Arial, sans-serif;
+        }
+
+        /* Sidebar Styles */
+        .sidebar {
+            height: 510%;
+            width: 250px;
+            position: fixed;
+            top: 0;
+            left: 0;
+            background-color:#5b5497;
+            padding-top: 20px;
+        }
+
+        .sidebar a {
+            padding: 15px;
+            text-decoration: none;
+            font-size: 20px;
+            color: rgb(247, 240, 240);
+            display: block;
+        }
+
+        .sidebar a:hover {
+            background-color: #5b5497;
+        }
+
+        /* Content Styles */
+        .content {
+            margin-left:230px;
+            padding: 10px;
+        }
+
+        /* Header Styles */
+        .header {
+            background-color: #7166d3;
+            padding: 10px;
+            color: white;
+            text-align: right;
+        }
+
+        /* Sample Card Styles */
+        .card {
+            background-color: white;
+            padding: 20px;
+            margin: 20px;
+            box-shadow: 0 4px 8px rgba(0, 0, 0, 0.2);
+        }
+
+        /* Dropdown Styles */
+        .dropdown {
+            position: relative;
+            display: inline-block;
+        }
+
+        .dropdown-content {
+            display: none;
+            position: absolute;
+            background-color: #5b5497;
+            min-width: 160px;
+            z-index: 1;
+        }
+
+        .dropdown-content a {
+            padding: 12px 16px;
+            text-decoration: none;
+            display: block;
+            color: white;
+        }
+
+        .dropdown-content a:hover {
+            background-color: #7166d3;
+        }
+
+        .dropdown:hover .dropdown-content {
+            display: block;
+        }
     </style>
 </head>
 <body>
@@ -58,12 +137,31 @@
         <a href="#">My Orders</a>
         <a href="#">Settings</a>
     </div>
-
     <div class="content">
-        <!-- <div class="header">
-            <h1>Welcome, Admin!</h1>
-            <a href="{% url 'index' %}">Logout</a>
-        </div> -->
+        <div class="header">
+            <!-- Home button -->
+            <a href="{% url 'adminpanel' %}">
+                <button class="btn btn-primary">Home</button>
+            </a>
+            
+            <!-- Add Product button -->
+            <a href="{% url 'add_product' %}">
+                <button class="btn btn-success">Add Product</button>
+            </a>
+            
+            <!-- Logout button -->
+            <a href="{% url 'index' %}">
+                <button class="btn btn-danger">Logout</button>
+            </a>
+            
+            
+        </div>
+    </div>
+    
+    </style>
+</head>
+<body>
+    
     <div class="container">
         <h1>View Products</h1>
         <table border="2px">
@@ -90,13 +188,17 @@
                     <td><img src="{{ product.watch_image.url }}" alt="{{ product.product_name }}"></td>
                     <td>{{ product.watch_description }}</td>
                     <td class="action-buttons">
-                        <button>Edit</button>
+                        <td class="action-buttons">
+                            <a href="{% url 'edit_product' product.id %}">Edit</a>
+                            <form method="post" id="deleteForm-{{ product.id }}" action="{% url 'delete_product' product.id %}">
+                                {% csrf_token %}
+                                <button class="btn btn-danger" type="button" onclick="confirmDelete({{ product.id }})">Delete</button>
+                            </form>
+                        </td>
                         
-                    <form method="post" action="{% url 'delete_product' product.id %}">
-                        {% csrf_token %}
-                        <button class="btn btn-danger" type="submit">Delete</button>
-                    </form>
+                       
                     </td>
+                    
                 </tr>
                 {% endfor %}
             </tbody>
@@ -105,3 +207,16 @@
 </body>
 </html>
 
+<!-- Add this JavaScript code to your HTML file, just before the closing </body> tag -->
+<script>
+    // Function to show a confirmation dialog
+    function confirmDelete(productId) {
+        if (confirm("Do you want to delete this product?")) {
+            // If the user clicks "OK" in the confirmation dialog,
+            // submit the form to delete the product
+            document.getElementById("deleteForm-" + productId).submit();
+        }
+    }
+</script>
+</body>
+</html>

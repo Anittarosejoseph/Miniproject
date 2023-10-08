@@ -8,17 +8,19 @@
         /* Add your CSS styles here */
         body {
             font-family: Arial, sans-serif;
-            margin: 0;
-            padding: 0;
+            margin: 50;
+            padding: 40;
         }
+        
         .container {
             max-width: 600px;
-            margin: 0 auto;
-            padding: 40px;
+            margin: 0 auto; /* Set margin to "auto" horizontally to center the container */
+            padding: 10px;
             border: 1px solid #5b5497;
             border-radius: 5px;
-            box-shadow: 0 0 10px rgba(0, 0, 0, 0.1);
+            box-shadow: 0 0 1px rgba(0, 0, 0, 0.1);
         }
+
         label {
             display: block;
             margin-bottom: 1px;
@@ -27,12 +29,12 @@
         input[type="number"],
         input[type="file"], /* Add the file input type */
         textarea {
-            width: 70%;
+            width: 60%;
             padding: 10px;
-            margin-bottom: 15px;
+            margin-bottom: 5px;
             border: 1px solid #ccc;
-            border-radius: 3px;
-            font-size: 16px;
+            border-radius: 1px;
+            font-size: 14px;
         }
         input[type="submit"],
         input[type="button"] {
@@ -43,13 +45,15 @@
             border-radius: 3px;
             cursor: pointer;
         }
-        /* Header styles */
-        header {
-            background-color:#5b5497;
-            color: #fff;
-            padding: 1px;
+        
+        .header {
+            background-color: #7166d3;
+            padding: 20px 0;
+            color: white;
             text-align: center;
+            margin-bottom: 1px; /* Add margin to separate the header from the content */
         }
+
         /* Footer styles */
         footer {
             background-color: #5b5497;
@@ -57,20 +61,168 @@
             padding: 5px 0;
             text-align: center;
         }
+       
+        .container {
+            max-width: 450px;
+            margin: 0 auto;
+            padding: 10px;
+        }
+        table {
+            width: 100%;
+            border-collapse: collapse;
+            margin-top: 20px;
+        }
+        th, td {
+            padding: 10px;
+            text-align: left;
+            border-bottom: 1px solid #ddd;
+        }
+        th {
+            background-color: #f2f2f2;
+        }
+        img {
+            max-width: 100px; /* Set a maximum width for the images */
+        }
+        .action-buttons {
+            display: flex;
+            justify-content: space-between;
+        }
+        body, html {
+            margin: 0;
+            padding: 0;
+            font-family: Arial, sans-serif;
+        }
+
+        /* Sidebar Styles */
+        .sidebar {
+            height: 100%;
+            width: 250px;
+            position: fixed;
+            top: 0;
+            left: 0;
+            background-color:#5b5497;
+            padding-top: 20px;
+        }
+
+        .sidebar a {
+            padding: 10px;
+            text-decoration: none;
+            font-size: 20px;
+            color: rgb(247, 240, 240);
+            display: block;
+        }
+
+        .sidebar a:hover {
+            background-color: #5b5497;
+        }
+
+        /* Content Styles */
+        .content {
+            margin-left:230px;
+            padding: 10px;
+        }
+
+        /* Header Styles */
+        .header {
+            background-color: #7166d3;
+            padding: 15px 0;
+            color: white;
+            text-align: right;
+        }
+
+        /* Sample Card Styles */
+        .card {
+            background-color: white;
+            padding: 20px;
+            margin: 20px;
+            box-shadow: 0 4px 8px rgba(0, 0, 0, 0.2);
+        }
+
+        /* Dropdown Styles */
+        .dropdown {
+            position: relative;
+            display: inline-block;
+        }
+
+        .dropdown-content {
+            display: none;
+            position: absolute;
+            background-color: #5b5497;
+            min-width: 160px;
+            z-index: 1;
+        }
+
+        .dropdown-content a {
+            padding: 12px 16px;
+            text-decoration: none;
+            display: block;
+            color: white;
+        }
+
+        .dropdown-content a:hover {
+            background-color: #7166d3;
+        }
+
+        .dropdown:hover .dropdown-content {
+            display: block;
+        }
+
+        .content {
+             margin-left: 250px; /* Adjust the margin-left to match the width of the sidebar */
+             padding: 10px;
+        }
     </style>
 </head>
 <body>
-    <header>
-        <div class="collapse navbar-collapse" id="navbarSupportedContent">
-            <ul class="navbar-nav  ">
-              <li class="nav-item active">
-                <button><center><a class="nav-link" href="{% url 'view_products' %}">VIEW PRODUCTS </a></button>
-              </li>
-              
-    </header>
+    <div class="sidebar">
+        <a href="#">Dashboard</a>
+        <a href="#">Users</a>
+        
+        <!-- Product Actions Dropdown -->
+        <div class="dropdown">
+            <a href="#" class="dropbtn">Product</a>
+            <div class="dropdown-content">
+                <a href="{% url 'add_product' %}">Add Product</a>
+                <a href="{% url 'view_products' %}">View Products</a>
+                <a href="#">Edit Product</a>
+            </div>
+        </div>
+
+        <a href="#">Technicians</a>
+        <a href="#">Delivery Boys</a>
+        <a href="#">Repair Request</a>
+        <a href="#">Orders</a>
+        <a href="#">My Orders</a>
+        <a href="#">Settings</a>
+    </div>
+    <div class="content">
+        <div class="header">
+            <!-- Home button -->
+            <a href="{% url 'adminpanel' %}">
+                <button class="btn btn-primary">Home</button>
+            </a>
+            
+            <!-- Add Product button -->
+            <a href="{% url 'view_products' %}">
+                <button class="btn btn-success">View Product</button>
+            </a>
+            
+            <!-- Logout button -->
+            <a href="{% url 'index' %}">
+                <button class="btn btn-danger">Logout</button>
+            </a>
+            
+            
+        </div>
+    </div>
+    
+    </style>
+</head>
+<body>
+   
 
     <div class="container">
-        <h1>Add Watch Product</h1>
+        <h1>Our Product</h1>
         
 
             <!-- Your form content goes here (as in your previous code) -->
@@ -82,21 +234,19 @@
                 <input type="text" id="productName" name="productName" required>
     
                 <label for="productQuantity">Product Quantity:</label>
-                <input type="number" id="productQuantity" name="productQuantity" required>
+                <input type="number" id="productQuantity" name="productQuantity" step="1" min="1" required>
     
                 <label for="productPrice">Product Price:</label>
-                <input type="number" id="productPrice" name="productPrice" step="0.01" required>
+                <input type="number" id="productPrice" name="productPrice" step="0.01" min="1" required>
     
                 <label for="productSalePrice">Product Sale Price:</label>
-                <input type="number" id="productSalePrice" name="productSalePrice" step="0.01" required>
+                <input type="number" id="productSalePrice" name="productSalePrice" step="0.01" min="1" readonly>
     
-                <label for="discount">Discount:</label>
-                <input type="number" id="discount" name="discount" step="0.01" required>
+                <label for="discount">Discount Percentage:</label>
+                <input type="number" id="discount" name="discount" step="0.01" min="0" max="100" required>
 
                 <!-- <label for="Category">Category</label>
-<input type="text" id="Category" name="category" required> -->
-
-
+                <input type="text" id="Category" name="category" required> -->
     
                 <label for="watchDescription">Watch Description:</label>
                 <textarea id="watchDescription" name="watchDescription" rows="4" required></textarea>
@@ -104,7 +254,7 @@
                 <label for="watchImage">Watch Image:</label>
                 <input type="file" id="watchImage" name="watchImage" accept="image/*" required>
                 <!-- 'accept="image/*"' restricts file selection to image files -->
-    <br>
+                <br>
                 <input type="submit" value="Add Product">
                 <a href="{% url 'adminpanel' %}"><input type="button" value="Cancel"></a>
             </form>
@@ -114,5 +264,42 @@
     <footer>
         &copy; horofix@gmail.com
     </footer>
+
+    
+
+<script>
+    // JavaScript to calculate the sale price based on product price and discount percentage
+    document.getElementById("discount").addEventListener("input", function () {
+        var productPrice = parseFloat(document.getElementById("productPrice").value);
+        var discountPercentage = parseFloat(this.value);
+        var salePrice = productPrice - (productPrice * (discountPercentage / 100));
+        document.getElementById("productSalePrice").value = salePrice.toFixed(2);
+    });
+
+    // JavaScript to validate input fields and prevent negative values
+    document.getElementById("productQuantity").addEventListener("input", function () {
+        var quantity = parseInt(this.value);
+        if (quantity < 0) {
+            this.value = "0";
+        }
+    });
+
+    document.getElementById("productPrice").addEventListener("input", function () {
+        var price = parseFloat(this.value);
+        if (price < 0) {
+            this.value = "0.00";
+        }
+    });
+
+    document.getElementById("discount").addEventListener("input", function () {
+        var discount = parseFloat(this.value);
+        if (discount < 0) {
+            this.value = "0.00";
+        } else if (discount > 100) {
+            this.value = "100.00";
+        }
+    });
+</script>
+
 </body>
 </html>

@@ -1,36 +1,258 @@
-<!-- edit_product.html -->
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Add Watch Product</title>
+    <style>
+        
+        /* Add your CSS styles here */
+        body {
+            font-family: Arial, sans-serif;
+            margin: 50;
+            padding: 40;
+        }
+        
+        .container {
+            max-width: 600px;
+            margin: 0 auto; /* Set margin to "auto" horizontally to center the container */
+            padding: 10px;
+            border: 1px solid #5b5497;
+            border-radius: 5px;
+            box-shadow: 0 0 1px rgba(0, 0, 0, 0.1);
+        }
 
-{% extends "add_product.html" %}  <!-- Extend your base template if you have one -->
+        label {
+            display: block;
+            margin-bottom: 1px;
+        }
+        input[type="text"],
+        input[type="number"],
+        input[type="file"], /* Add the file input type */
+        textarea {
+            width: 60%;
+            padding: 10px;
+            margin-bottom: 5px;
+            border: 1px solid #ccc;
+            border-radius: 1px;
+            font-size: 14px;
+        }
+        input[type="submit"],
+        input[type="button"] {
+            background-color: #5b5497;
+            color: #fff;
+            border: none;
+            padding: 10px 20px;
+            border-radius: 3px;
+            cursor: pointer;
+        }
+        
+        .header {
+            background-color: #7166d3;
+            padding: 20px 0;
+            color: white;
+            text-align: center;
+            margin-bottom: 1px; /* Add margin to separate the header from the content */
+        }
 
-{% block content %}
-<div class="container">
-    <h1>Edit Product</h1>
-    <form method="post" enctype="multipart/form-data">
-        {% csrf_token %}
+        /* Footer styles */
+        footer {
+            background-color: #5b5497;
+            color: #fff;
+            padding: 5px 0;
+            text-align: center;
+        }
+       
+        .container {
+            max-width: 450px;
+            margin: 0 auto;
+            padding: 10px;
+        }
+        table {
+            width: 100%;
+            border-collapse: collapse;
+            margin-top: 20px;
+        }
+        th, td {
+            padding: 10px;
+            text-align: left;
+            border-bottom: 1px solid #ddd;
+        }
+        th {
+            background-color: #f2f2f2;
+        }
+        img {
+            max-width: 100px; /* Set a maximum width for the images */
+        }
+        .action-buttons {
+            display: flex;
+            justify-content: space-between;
+        }
+        body, html {
+            margin: 0;
+            padding: 0;
+            font-family: Arial, sans-serif;
+        }
 
-        <label for="product_name">Product Name:</label>
-        <input type="text" id="product_name" name="product_name" value="{{ product.product_name }}" required>
+        /* Sidebar Styles */
+        .sidebar {
+            height: 100%;
+            width: 250px;
+            position: fixed;
+            top: 0;
+            left: 0;
+            background-color:#5b5497;
+            padding-top: 20px;
+        }
 
-        <label for="product_quantity">Product Quantity:</label>
-        <input type="number" id="product_quantity" name="product_quantity" value="{{ product.product_quantity }}" required>
+        .sidebar a {
+            padding: 10px;
+            text-decoration: none;
+            font-size: 20px;
+            color: rgb(247, 240, 240);
+            display: block;
+        }
 
-        <label for="product_price">Product Price:</label>
-        <input type="number" id="product_price" name="product_price" step="0.01" value="{{ product.product_price }}" required>
+        .sidebar a:hover {
+            background-color: #5b5497;
+        }
 
-        <label for="product_sale_price">Product Sale Price:</label>
-        <input type="number" id="product_sale_price" name="product_sale_price" step="0.01" value="{{ product.product_sale_price }}" required>
+        /* Content Styles */
+        .content {
+            margin-left:230px;
+            padding: 10px;
+        }
 
-        <label for="discount">Discount:</label>
-        <input type="number" id="discount" name="discount" step="0.01" value="{{ product.discount }}" required>
+        /* Header Styles */
+        .header {
+            background-color: #7166d3;
+            padding: 15px 0;
+            color: white;
+            text-align: right;
+        }
 
-        <label for="watch_description">Watch Description:</label>
-        <textarea id="watch_description" name="watch_description" rows="4" required>{{ product.watch_description }}</textarea>
+        /* Sample Card Styles */
+        .card {
+            background-color: white;
+            padding: 20px;
+            margin: 20px;
+            box-shadow: 0 4px 8px rgba(0, 0, 0, 0.2);
+        }
 
-        <label for="watch_image">Watch Image:</label>
-        <input type="file" id="watch_image" name="watch_image" accept="image/*">
+        /* Dropdown Styles */
+        .dropdown {
+            position: relative;
+            display: inline-block;
+        }
 
-        <button type="submit" class="btn btn-primary">Update Product</button>
-        <a href="{% url 'view_products' %}" class="btn btn-secondary">Cancel</a>
-    </form>
-</div>
-{% endblock %}
+        .dropdown-content {
+            display: none;
+            position: absolute;
+            background-color: #5b5497;
+            min-width: 160px;
+            z-index: 1;
+        }
+
+        .dropdown-content a {
+            padding: 12px 16px;
+            text-decoration: none;
+            display: block;
+            color: white;
+        }
+
+        .dropdown-content a:hover {
+            background-color: #7166d3;
+        }
+
+        .dropdown:hover .dropdown-content {
+            display: block;
+        }
+
+        .content {
+             margin-left: 250px; /* Adjust the margin-left to match the width of the sidebar */
+             padding: 10px;
+        }
+    </style>
+</head>
+<body>
+    <div class="sidebar">
+        <a href="#">Dashboard</a>
+        <a href="#">Users</a>
+        
+        <!-- Product Actions Dropdown -->
+        <div class="dropdown">
+            <a href="#" class="dropbtn">Product</a>
+            <div class="dropdown-content">
+                <a href="{% url 'add_product' %}">Add Product</a>
+                <a href="{% url 'view_products' %}">View Products</a>
+                <a href="#">Edit Product</a>
+            </div>
+        </div>
+
+        <a href="#">Technicians</a>
+        <a href="#">Delivery Boys</a>
+        <a href="#">Repair Request</a>
+        <a href="#">Orders</a>
+        <a href="#">My Orders</a>
+        <a href="#">Settings</a>
+    </div>
+    <div class="content">
+        <div class="header">
+            <!-- Home button -->
+            <a href="{% url 'adminpanel' %}">
+                <button class="btn btn-primary">Home</button>
+            </a>
+            
+            <!-- Add Product button -->
+            <a href="{% url 'view_products' %}">
+                <button class="btn btn-success">View Product</button>
+            </a>
+            
+            <!-- Logout button -->
+            <a href="{% url 'index' %}">
+                <button class="btn btn-danger">Logout</button>
+            </a>
+            
+            
+        </div>
+    </div>
+    
+    </style>
+
+</head>
+<body>
+    <div class="container">
+        <h1>Edit Product</h1>
+        <form method="post">
+            {% csrf_token %}
+            <label for="product_name">Product Name:</label>
+            <input type="text" id="product_name" name="product_name" value="{{ product.product_name }}" required>
+
+            <label for="product_quantity">Product Quantity:</label>
+            <input type="number" id="product_quantity" name="product_quantity" value="{{ product.product_quantity }}" step="1" min="0" required>
+
+            <label for="product_price">Product Price:</label>
+            <input type="number" id="product_price" name="product_price" value="{{ product.product_price }}" step="0.01" min="0" required>
+
+            <label for="product_sale_price">Product Sale Price:</label>
+            <input type="number" id="product_sale_price" name="product_sale_price" value="{{ product.product_sale_price }}" step="0.01" min="0" required>
+
+            <label for="discount">Discount Percentage:</label>
+            <input type="number" id="discount" name="discount" value="{{ product.discount }}" step="0.01" min="0" max="100" required>
+
+            <label for="watch_description">Watch Description:</label>
+            <textarea id="watch_description" name="watch_description" rows="4" required>{{ product.watch_description }}</textarea>
+
+            <label for="product_image">Product Image:</label>
+            <input type="file" id="product_image" name="product_image" accept="image/*">
+            <!-- You can add more fields here if needed -->
+            <input type="submit" value="Save Changes">
+        </form>
+    </div>
+
+    <footer>
+        &copy; horofix@gmail.com
+    </footer>
+</body>
+
+</html>
