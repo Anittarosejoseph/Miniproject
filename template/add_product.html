@@ -221,42 +221,46 @@
 <body>
    
 
+    <!DOCTYPE html>
+<html lang="en">
+<head>
+    <!-- ... Your existing head content ... -->
+</head>
+<body>
+    <!-- ... Your existing HTML content ... -->
+
     <div class="container">
         <h1>Our Product</h1>
-        
+        <form action="{% url 'add_product' %}" method="post" enctype="multipart/form-data">
+            {% csrf_token %}
 
-            <!-- Your form content goes here (as in your previous code) -->
-            <form action="{% url 'add_product' %}" method="post" enctype="multipart/form-data">
-             {% csrf_token %}
-               
-    
-                <label for="productName">Product Name:</label>
-                <input type="text" id="productName" name="productName" required>
-    
-                <label for="productQuantity">Product Quantity:</label>
-                <input type="number" id="productQuantity" name="productQuantity" step="1" min="1" required>
-    
-                <label for="productPrice">Product Price:</label>
-                <input type="number" id="productPrice" name="productPrice" step="0.01" min="1" required>
-    
-                <label for="productSalePrice">Product Sale Price:</label>
-                <input type="number" id="productSalePrice" name="productSalePrice" step="0.01" min="1" readonly>
-    
-                <label for="discount">Discount Percentage:</label>
-                <input type="number" id="discount" name="discount" step="0.01" min="0" max="100" required>
+            <label for="productName">Product Name:</label>
+            <input type="text" id="productName" name="productName" required onchange="validateProductName()">
 
-                <!-- <label for="Category">Category</label>
-                <input type="text" id="Category" name="category" required> -->
-    
-                <label for="watchDescription">Watch Description:</label>
-                <textarea id="watchDescription" name="watchDescription" rows="4" required></textarea>
-    
-                <label for="watchImage">Watch Image:</label>
-                <input type="file" id="watchImage" name="watchImage" accept="image/*" required>
-                <!-- 'accept="image/*"' restricts file selection to image files -->
-                <br>
-                <input type="submit" value="Add Product">
-                <a href="{% url 'adminpanel' %}"><input type="button" value="Cancel"></a>
+            <label for="productQuantity">Product Quantity:</label>
+            <input type="number" id="productQuantity" name="productQuantity" step="1" min="1" required onchange="validateProductQuantity()">
+
+            <label for="productPrice">Product Price:</label>
+            <input type="number" id="productPrice" name="productPrice" step="0.01" min="1" required onchange="validateProductPrice()">
+
+            <label for="productSalePrice">Product Sale Price:</label>
+            <input type="number" id="productSalePrice" name="productSalePrice" step="0.01" min="1" readonly>
+
+            <label for="discount">Discount Percentage:</label>
+            <input type="number" id="discount" name="discount" step="0.01" min="0" max="100" required onchange="validateDiscount()">
+
+            <label for="watchDescription">Watch Description:</label>
+            <textarea id="watchDescription" name="watchDescription" rows="4" required onchange="validateWatchDescription()"></textarea>
+
+            <label for="watchImage">Watch Image:</label>
+            <input type="file" id="watchImage" name="watchImage" accept="image/*" required onchange="validateWatchImage()">
+            <br>
+            <input type="submit" value="Add Product">
+            <a href="{% url 'adminpanel' %}"><input type="button" value="Cancel"></a>
+        </form>
+    </div>
+
+
             </form>
         
     </div>

@@ -1,14 +1,17 @@
 /* Reset default margin and padding for all elements */
 * {
-    margin: 10;
+    margin: 0;
     padding: 0;
     box-sizing: border-box;
 }
 
-/* Set a background color for the entire page */
+/* Set a background image for the entire page */
 body {
     font-family: Arial, sans-serif;
-    background-color: #580246;
+    background-image: url('watches.jpg'); /* Replace 'your-image-path.jpg' with the path to your background image */
+    background-size: cover;
+    background-repeat: no-repeat;
+    background-attachment: fixed;
 }
 
 /* Center the login container vertically and horizontally */
@@ -21,7 +24,7 @@ body {
 
 /* Style the left-side container */
 .left-side {
-    background-color: #fff;
+    background-color: rgba(255, 255, 255, 0.8); /* Use rgba for a semi-transparent white background */
     padding: 20px;
     box-shadow: 0 0 10px rgba(0, 0, 0, 0.2);
     border-radius: 5px;
@@ -93,9 +96,5 @@ body {
     max-width: 100%;
     height: auto;
 }
+
 /* loginstyle.css */
-
-     /* Set the background color to light violet */
-
-
-

@@ -61,7 +61,7 @@ class CustomUser(AbstractUser):
     #last_name = models.CharField(max_length=50)
     #USERNAME_FIELD = 'email'
     email = models.EmailField(max_length=100, unique=True)
-    phone = models.CharField(max_length=12, blank=True)
+    phone = models.CharField(max_length=10,blank=True,unique=True)
     password = models.CharField(max_length=128)
    # confirmPassword = models.CharField(max_length=128)
     #role = models.PositiveSmallIntegerField(choices=ROLE_CHOICE, blank=True, null=True,default='1')
@@ -147,15 +147,6 @@ class CustomerProfile(models.Model):
         return self.user.email 
 
 
-# class Category(models.Model):
-#     # Other fields
-#     name = models.CharField(max_length=255)
-#     # Add a default value for the 'id' field
-#     id = models.AutoField(primary_key=True, default=1)  # Assuming you want the default 'id' to be 1
-
-
-#     def __str__(self):
-#         return self.name
 
 
 

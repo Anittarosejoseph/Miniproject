@@ -41,6 +41,7 @@ def register_user(request):
                 user.save()
                 user_profile = UserProfile(user=user)
                 user_profile.save()
+
                 # activateEmail(request, user, email)
                 return redirect('login')  
             
@@ -51,13 +52,7 @@ def login_user(request):
     if request.method == 'POST':
         username = request.POST["username"]
         password = request.POST["password"]
-        # if user is not None:
-        #     auth_login(request, user)
-        #     return redirect('/userhome')
-        # else:
-        #    messages.success(request,("Invalid credentials."))
-        # print(username)  # Print the email for debugging
-        # print(password)  # Print the password for debugging
+        
 
         if username and password:
             user = authenticate(request, username =username , password=password)

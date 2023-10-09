@@ -196,25 +196,12 @@
 <br><br>
 <!-- Pincode -->
 <div class="col-md-6">
-    <label class="form-label">Pincode *</label>
-    <input type="text" class="form-control" id="pincode" name="pincode" placeholder="Enter your Pincode" value="{% if form_submitted %}{{ request.POST.pincode }}{% else %}{{ user_profile.pincode }}{% endif %}" required
-           onchange="validatePincode(this.value)">
-    <div id="pincode_error" class="text-danger"></div>
+  <label class="form-label">Pincode *</label>
+  <input type="text" class="form-control" id="pincode" name="pincode" placeholder="Enter your Pincode" value="{% if form_submitted %}{{ request.POST.pincode }}{% else %}{{ user_profile.pincode }}{% endif %}" required
+         onchange="validatePincode(this.value)" onkeypress="return isNumberKey(event)">
+  <div id="pincode_error" class="text-danger"></div>
 </div>
 
-<script>
-    // JavaScript function to validate the pincode field
-    function validatePincode(pincode) {
-        // Remove any non-digit characters (e.g., spaces, hyphens)
-        pincode = pincode.replace(/\D/g, '');
-
-        if (pincode.length !== 6) {
-            document.getElementById('pincode_error').textContent = 'Pincode must have exactly 6 digits';
-        } else {
-            document.getElementById('pincode_error').textContent = ''; // Clear error message
-        }
-    }
-</script>
 
                             <!-- Mobile number -->
                 <div class="col-md-6">
@@ -243,6 +230,31 @@
             document.getElementById('mobile_number_error').textContent = ''; // Clear error message
         }
     }
+    function validatePincode(pincode) {
+        // Remove any non-digit characters (e.g., spaces, hyphens)
+        pincode = pincode.replace(/\D/g, '');
+
+        if (pincode.length !== 6) {
+            document.getElementById('pincode_error').textContent = 'Pincode must have exactly 6 digits';
+        } else {
+            document.getElementById('pincode_error').textContent = ''; // Clear error message
+        }
+    }
+
+    // JavaScript function to allow only numeric input in the Pincode field
+    function isNumberKey(evt) {
+        var charCode = (evt.which) ? evt.which : event.keyCode;
+        if (charCode > 31 && (charCode < 48 || charCode > 57)) {
+            return false;
+        }
+        return true;
+    }
+
+
+
+
+
+
 </script>
 
 
