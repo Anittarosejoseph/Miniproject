@@ -1,0 +1,59 @@
+body {
+    font-family: Arial, sans-serif;
+    margin: 0;
+    padding: 0;
+}
+
+header {
+    background-color: white;
+    color: #fff;
+    text-align: center;
+    padding: 20px 0;
+}
+
+.container {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    padding: 20px;
+}
+
+.customization-section,
+.repair-section {
+    width: 45%;
+    padding: 20px;
+    border: 1px solid #ccc;
+    border-radius: 5px;
+    margin: 10px;
+}
+
+.customization-section {
+    float: left;
+}
+
+.repair-section {
+    float: right;
+    cursor: pointer; /* Add a pointer cursor to indicate it's clickable */
+    transition: background-color 0.3s; /* Add a smooth transition effect */
+}
+
+.repair-section:hover {
+    background-color: #f0f0f0; /* Change background color on hover */
+}
+
+h2 {
+    text-align: center;
+}
+
+p {
+    text-align: center;
+}
+
+/* Clear floats to ensure proper layout */
+.container::after {
+    content: "";
+    display: table;
+    clear: both;
+}
+
+

@@ -63,7 +63,14 @@
 
 </head>
 <body>
-
+    {% if messages %}
+    {% for message in messages %}
+        <div class="alert" role="alert">
+        {{ message }}
+        </div>
+    {% endfor %}
+    {% endif %}
+    
 <div class="container-bg">
     <div class="container mt-5">
         <div class="card">
@@ -167,21 +174,25 @@
 
 
     function validateUsername(inputElement) {
-        var username = inputElement.value;
-        var usernameError = document.getElementById("usernameError");
+    var username = inputElement.value;
+    var usernameError = document.getElementById("usernameError");
 
-        // Reset error message
-        usernameError.innerHTML = "";
+    // Remove spaces from the username
+    username = username.replace(/\s/g, '');
 
-        // Validate Username (required)
-        if (username.trim() === "") {
-            usernameError.innerHTML = "Username is required";
-        } else if (!/^[a-zA-Z\s]+$/.test(username)) {
-            usernameError.innerHTML = "Username should contain alphabets";
-        } else if (username.length < 5) {
-            usernameError.innerHTML = "Username must be at least 5 characters long";
-        }
+    // Reset error message
+    usernameError.innerHTML = "";
+
+    // Validate Username (required)
+    if (username.trim() === "") {
+        usernameError.innerHTML = "Username is required";
+    } else if (!/^[a-zA-Z]+$/.test(username)) {
+        usernameError.innerHTML = "Username should contain only alphabets";
+    } else if (username.length < 5) {
+        usernameError.innerHTML = "Username must be at least 5 characters long";
     }
+}
+
 
 
     function validateEmail(inputElement) {
@@ -267,19 +278,20 @@
 
 
     function validatePassword(inputElement) {
-        var password = inputElement.value;
-        var passwordError = document.getElementById("passwordError");
+    var password = inputElement.value;
+    var passwordError = document.getElementById("passwordError");
 
-        // Reset error message
-        passwordError.innerHTML = "";
+    // Reset error message
+    passwordError.innerHTML = "";
 
-        // Validate Password (required)
-        if (password.trim() === "") {
-            passwordError.innerHTML = "Password is required";
-        } else if (password.length < 6) {
-            passwordError.innerHTML = "Password must be at least 6 characters";
-        }
+    // Validate Password (required)
+    if (password.trim() === "") {
+        passwordError.innerHTML = "Password is required";
+    } else if (!/^(?=.*[a-zA-Z])(?=.*\d)(?=.*[@$!%*?&])[A-Za-z\d@$!%*?&]{6,}$/.test(password)) {
+        passwordError.innerHTML = "Password must contain at least one alphabet, one number, and one special symbol. It should be at least 6 characters long.";
     }
+}
+
 
     function validateConfirm(inputElement) {
         var confirm = inputElement.value;

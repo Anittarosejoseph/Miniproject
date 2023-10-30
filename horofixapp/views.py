@@ -2,8 +2,9 @@ from django.shortcuts import render,redirect
 from .models import CustomUser,UserProfile
 from .models import CustomerProfile  # Import the correct model
 from django.contrib.auth.decorators import login_required
-from django.contrib.sessions.models import Session
+# from django.contrib.sessions.models import Session
 from django.contrib.auth import authenticate ,login as auth_login,logout 
+from django.views.decorators.cache import never_cache
 from django.contrib import messages
 from .models import CustomUser
 from .models import WatchProduct
@@ -11,14 +12,22 @@ from .models import WatchProduct
  #from django.contrib.auth.models import User
  #from .mode
 # Create your views here.
+#session started
 
+@never_cache
 def index(request):
     return render(request, 'index.html')
+def service(request):
+    return render(request, 'service.html')
+def repair(request):
+    return render(request, 'repair.html')
 
 
 def about(request):
+    
     return render(request, 'about.html')
 
+@never_cache
 def register_user(request):
     if request.method == 'POST':
         name = request.POST.get('name', None)
@@ -29,8 +38,13 @@ def register_user(request):
         confirm_password = request.POST.get('confirm', None)
         # role = CustomUser.CUSTOMER
         if name and username and email and phone and password:
-            if CustomUser.objects.filter(email=email,username=username).exists():
+            if CustomUser.objects.filter(email=email).exists():
                 messages.success(request,("Email is already registered."))
+                return redirect('register_user')
+            elif  CustomUser.objects.filter(username=username).exists():
+                messages.success(request,("Username is already registered."))
+                return redirect('register_user')
+
             
             elif password!=confirm_password:
                 messages.success(request,("Password's Don't Match, Enter correct Password"))
@@ -47,7 +61,7 @@ def register_user(request):
             
     return render(request, 'register_user.html')
 
-
+@never_cache
 def login_user(request):
     if request.method == 'POST':
         username = request.POST["username"]
@@ -79,8 +93,6 @@ def login_user(request):
             messages.success(request,("Please fill out all fields."))
         
     return render(request, 'login.html')
-
-
 
 
 
@@ -126,7 +138,7 @@ def Customer_Profile(request):
 # def forgotpassword(request):
 #     return render(request, 'forgotpassword.html')
 
-
+@login_required(login_url='login')
 def custom_logout(request):
      if request.session.get('is_authenticated'):
         del request.session['is_authenticated'] 
@@ -137,7 +149,7 @@ def adminpanel(request):
     return render(request, 'adminpanel.html')
 
 
-
+@never_cache
 def view_products(request):
     products = WatchProduct.objects.all()  # Retrieve all products from the database
     return render(request, 'view_products.html', {'products': products})
@@ -200,7 +212,7 @@ def edit_product(request, product_id):
 
 
 
-
+@never_cache
 def add_product(request):
     if request.method == 'POST':
         product_name = request.POST['productName']
@@ -210,10 +222,11 @@ def add_product(request):
         discount = request.POST['discount']
         watch_description = request.POST['watchDescription']
         watch_image = request.FILES['watchImage']
+        category = request.POST['category']  # Get the category field from the form
 
-        # Check if a product with the same name already exists
-        if WatchProduct.objects.filter(product_name=product_name).exists():
-            messages.error(request, f"A product with the name '{product_name}' already exists.")
+        # Check if a product with the same name and category already exists
+        if WatchProduct.objects.filter(product_name=product_name, category=category).exists():
+            messages.error(request, f"A product with the name '{product_name}' in the category '{category}' already exists.")
         else:
             try:
                 # Ensure the numerical fields are valid numbers before saving
@@ -230,7 +243,8 @@ def add_product(request):
                     product_sale_price=product_sale_price,
                     discount=discount,
                     watch_description=watch_description,
-                    watch_image=watch_image
+                    watch_image=watch_image,
+                    category=category  # Set the category field
                 )
                 messages.success(request, "Product added successfully.")
             except (ValueError, TypeError):
@@ -244,30 +258,57 @@ def add_product(request):
 from django.shortcuts import render, get_object_or_404, redirect
 from .models import WatchProduct
 
+
 def edit_product(request, product_id):
-    # Get the existing product object
-    product = get_object_or_404(WatchProduct, id=product_id)
+    # Retrieve the product you want to edit (you need to fetch it from your database)
+    product = WatchProduct.objects.get(pk=product_id)
 
     if request.method == 'POST':
-        # Retrieve the data from the form
         product_name = request.POST['product_name']
         product_quantity = request.POST['product_quantity']
+        category = request.POST['category']  # Retrieve the category field
         product_price = request.POST['product_price']
         product_sale_price = request.POST['product_sale_price']
         discount = request.POST['discount']
         watch_description = request.POST['watch_description']
+        watch_image = request.FILES.get('product_image')  # Use get() to avoid errors
 
-        # Update the fields of the existing product object
+        # Update the product fields
         product.product_name = product_name
         product.product_quantity = product_quantity
+        product.category = category  # Update the category
         product.product_price = product_price
         product.product_sale_price = product_sale_price
         product.discount = discount
         product.watch_description = watch_description
 
-        # Save the changes
-        product.save()
+        if watch_image:
+            product.watch_image = watch_image
 
+        product.save()  # Save the updated product
+
+        # Redirect to the view product page or wherever you want
         return redirect('view_products')
 
     return render(request, 'edit_product.html', {'product': product})
+
+
+from django.shortcuts import render, redirect, get_object_or_404
+from .models import CustomUser
+
+
+def user_list(request):
+    users = CustomUser.objects.all()
+    return render(request, 'user_list.html', {'users': users})
+
+def activate_user(request, user_id):
+    user = get_object_or_404(CustomUser, id=user_id)
+    user.is_active = True
+    user.save()
+    return redirect('user_list')  # Redirect to a user list page or another suitable page
+
+def deactivate_user(request, user_id):
+    user = get_object_or_404(CustomUser, id=user_id)
+    user.is_active = False
+    user.save()
+    return redirect('user_list')  # Redirect to a user list page or another suitable page

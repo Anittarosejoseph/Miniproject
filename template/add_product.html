@@ -16,7 +16,7 @@
             max-width: 600px;
             margin: 0 auto; /* Set margin to "auto" horizontally to center the container */
             padding: 10px;
-            border: 1px solid #5b5497;
+            border: 1px solid blue;
             border-radius: 5px;
             box-shadow: 0 0 1px rgba(0, 0, 0, 0.1);
         }
@@ -29,16 +29,16 @@
         input[type="number"],
         input[type="file"], /* Add the file input type */
         textarea {
-            width: 60%;
+            width: 50%;
             padding: 10px;
             margin-bottom: 5px;
             border: 1px solid #ccc;
             border-radius: 1px;
-            font-size: 14px;
+            font-size: 10px;
         }
         input[type="submit"],
         input[type="button"] {
-            background-color: #5b5497;
+            background-color: blue;
             color: #fff;
             border: none;
             padding: 10px 20px;
@@ -47,16 +47,16 @@
         }
         
         .header {
-            background-color: #7166d3;
+            background-color:blue;
             padding: 20px 0;
             color: white;
             text-align: center;
-            margin-bottom: 1px; /* Add margin to separate the header from the content */
+            margin-bottom: 10px; /* Add margin to separate the header from the content */
         }
 
         /* Footer styles */
         footer {
-            background-color: #5b5497;
+            background-color: blue;
             color: #fff;
             padding: 5px 0;
             text-align: center;
@@ -100,20 +100,20 @@
             position: fixed;
             top: 0;
             left: 0;
-            background-color:#5b5497;
+            background-color:blue;
             padding-top: 20px;
         }
 
         .sidebar a {
             padding: 10px;
             text-decoration: none;
-            font-size: 20px;
+            font-size: 15px;
             color: rgb(247, 240, 240);
             display: block;
         }
 
         .sidebar a:hover {
-            background-color: #5b5497;
+            background-color:blue;
         }
 
         /* Content Styles */
@@ -124,7 +124,7 @@
 
         /* Header Styles */
         .header {
-            background-color: #7166d3;
+            background-color: blue;
             padding: 15px 0;
             color: white;
             text-align: right;
@@ -147,7 +147,7 @@
         .dropdown-content {
             display: none;
             position: absolute;
-            background-color: #5b5497;
+            background-color:blue;
             min-width: 160px;
             z-index: 1;
         }
@@ -160,7 +160,7 @@
         }
 
         .dropdown-content a:hover {
-            background-color: #7166d3;
+            background-color:blue;
         }
 
         .dropdown:hover .dropdown-content {
@@ -168,8 +168,12 @@
         }
 
         .content {
-             margin-left: 250px; /* Adjust the margin-left to match the width of the sidebar */
-             padding: 10px;
+             margin-left: 200px; /* Adjust the margin-left to match the width of the sidebar */
+             padding: 5px;
+        }
+        .error-message {
+            color: red;
+            font-size: 12px;
         }
     </style>
 </head>
@@ -219,57 +223,51 @@
     </style>
 </head>
 <body>
-   
+</div>
+<div class="container">
+    <h1>Add Watch Product</h1>
+    <form id="addProductForm" action="{% url 'add_product' %}" method="post" enctype="multipart/form-data">
+        {% csrf_token %}
+        <label for="productName">Watch Name:</label>
+<input type="text" id="productName" name="productName" pattern="^[a-zA-Z0-9]+$" required>
+<span class="error-message">Product name should only contain alphabets and numbers.</span>
 
-    <!DOCTYPE html>
-<html lang="en">
-<head>
-    <!-- ... Your existing head content ... -->
-</head>
-<body>
-    <!-- ... Your existing HTML content ... -->
+        <label for="productQuantity">Product Quantity:</label>
+        <input type="number" id="productQuantity" name="productQuantity" step="1" min="1" required>
 
-    <div class="container">
-        <h1>Our Product</h1>
-        <form action="{% url 'add_product' %}" method="post" enctype="multipart/form-data">
-            {% csrf_token %}
-
-            <label for="productName">Product Name:</label>
-            <input type="text" id="productName" name="productName" required onchange="validateProductName()">
-
-            <label for="productQuantity">Product Quantity:</label>
-            <input type="number" id="productQuantity" name="productQuantity" step="1" min="1" required onchange="validateProductQuantity()">
-
-            <label for="productPrice">Product Price:</label>
-            <input type="number" id="productPrice" name="productPrice" step="0.01" min="1" required onchange="validateProductPrice()">
-
-            <label for="productSalePrice">Product Sale Price:</label>
-            <input type="number" id="productSalePrice" name="productSalePrice" step="0.01" min="1" readonly>
-
-            <label for="discount">Discount Percentage:</label>
-            <input type="number" id="discount" name="discount" step="0.01" min="0" max="100" required onchange="validateDiscount()">
-
-            <label for="watchDescription">Watch Description:</label>
-            <textarea id="watchDescription" name="watchDescription" rows="4" required onchange="validateWatchDescription()"></textarea>
-
-            <label for="watchImage">Watch Image:</label>
-            <input type="file" id="watchImage" name="watchImage" accept="image/*" required onchange="validateWatchImage()">
-            <br>
-            <input type="submit" value="Add Product">
-            <a href="{% url 'adminpanel' %}"><input type="button" value="Cancel"></a>
-        </form>
-    </div>
+        <!-- Add this code below the "Watch Description" input field -->
+<label for="category">Category:</label>
+<select id="category" name="category" required>
+    <option value="Men">Men</option>
+    <option value="Women">Women</option>
+</select>
 
 
-            </form>
-        
-    </div>
 
-    <footer>
-        &copy; horofix@gmail.com
-    </footer>
+        <label for="productPrice">Product Price:</label>
+        <input type="number" id="productPrice" name="productPrice" step="0.01" min="1" required>
 
-    
+        <label for="productSalePrice">Product Sale Price:</label>
+        <input type="number" id="productSalePrice" name="productSalePrice" step="0.01" min="1" readonly>
+
+        <label for="discount">Discount Percentage:</label>
+        <input type="number" id="discount" name="discount" step="0.01" min="0" max="100" required>
+
+        <label for="watchDescription">Watch Description:</label>
+        <textarea id="watchDescription" name="watchDescription" rows="4" required></textarea>
+
+        <label for="watchImage">Watch Image (JPG or PNG only):</label>
+        <input type="file" id="watchImage" name="watchImage" accept=".jpg, .jpeg, .png" required>
+        <span class="error-message" id="imageError"></span>
+        <br>
+        <input type="submit" value="Add Product">
+        <a href="{% url 'adminpanel' %}"><input type="button" value="Cancel"></a>
+    </form>
+</div>
+
+<footer>
+    &copy; horofix@gmail.com
+</footer>
 
 <script>
     // JavaScript to calculate the sale price based on product price and discount percentage
@@ -280,30 +278,19 @@
         document.getElementById("productSalePrice").value = salePrice.toFixed(2);
     });
 
-    // JavaScript to validate input fields and prevent negative values
-    document.getElementById("productQuantity").addEventListener("input", function () {
-        var quantity = parseInt(this.value);
-        if (quantity < 0) {
-            this.value = "0";
-        }
-    });
+    // JavaScript to validate image file format
+    document.getElementById("watchImage").addEventListener("change", function () {
+        var allowedExtensions = /(\.jpg|\.jpeg|\.png)$/i;
+        var imageError = document.getElementById("imageError");
 
-    document.getElementById("productPrice").addEventListener("input", function () {
-        var price = parseFloat(this.value);
-        if (price < 0) {
-            this.value = "0.00";
-        }
-    });
-
-    document.getElementById("discount").addEventListener("input", function () {
-        var discount = parseFloat(this.value);
-        if (discount < 0) {
-            this.value = "0.00";
-        } else if (discount > 100) {
-            this.value = "100.00";
+        if (!allowedExtensions.exec(this.value)) {
+            imageError.textContent = "Invalid file format. Please select a JPG or PNG image.";
+            this.value = "";
+        } else {
+            imageError.textContent = "";
         }
     });
 </script>
-
 </body>
-</html>
+</html>   
+

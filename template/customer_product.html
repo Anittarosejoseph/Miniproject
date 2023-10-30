@@ -5,7 +5,6 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>horofix</title>
-    <link rel="stylesheet" type="text/css" href="{% static '/css/bootstrap.css' %}" />
 
     <!-- fonts style -->
     <link href="https://fonts.googleapis.com/css2?family=Roboto:wght@400;500;700;900&display=swap" rel="stylesheet">
@@ -27,10 +26,83 @@
           
           
       </script>
+      <style>
+      body {
+        font-family: Arial, sans-serif;
+        margin: 0;
+        padding: 0;
+        background-color: #f0f0f0;
+    }
+
+    /* Style the container */
+    .container {
+        max-width: 1200px;
+        margin: 0 auto;
+        padding: 20px;
+        background-color: #fff;
+    }
+
+    /* Style the heading */
+    h1 {
+        text-align: center;
+        color: #333;
+    }
+    .product-card {
+            background-color: #fff;
+            border: 1px solid #ddd;
+            padding: 20px;
+            text-align: center;
+            margin-bottom: 20px;
+            width: 31%; /* Set the width to approximately 31% for three products in one row */
+            display: inline-block; /* Display products side by side */
+            margin-right: 2%; /* Add some space between products */
+            box-sizing: border-box; /* Include padding and border in the width */
+        }
+
+        /* Style product images */
+        .product-card img {
+            max-width: 100%;
+            height: auto;
+            margin-bottom: 10px;
+        }
+
+        /* Style product titles */
+        .product-card h3 {
+            font-size: 1.5rem;
+            margin: 10px 0;
+            color: #333;
+        }
+
+        /* Style product details */
+        .product-card p {
+            font-size: 1rem;
+            margin: 5px 0;
+        }
+
+        /* Style buttons */
+        .btn {
+            padding: 10px 20px;
+            font-size: 1rem;
+            margin: 5px;
+            cursor: pointer;
+        }
+
+        .btn-primary {
+            background-color: #007bff;
+            color: #fff;
+            border: none;
+        }
+
+        .btn-success {
+            background-color: #28a745;
+            color: #fff;
+            border: none;
+        }
+    </style>
+
   </head>
   <body>
   <div class="hero_area">
-      <!-- header section strats -->
       <header class="header_section">
         <div class="container-fluid">
           <nav class="navbar navbar-expand-lg custom_nav-container ">
@@ -111,7 +183,7 @@
 
         /* Style the container */
         .container {
-            max-width: 1200px;
+            max-width: 1500px;
             margin: 0 auto;
             padding: 20px;
             background-color: #fff;
@@ -127,19 +199,19 @@
         .product-card {
             background-color: #fff;
             border: 1px solid #ddd;
-            padding: 20px;
+            padding: 10px;
             text-align: center;
             margin-bottom: 20px;
-            width: 45%; /* Set the width to 45% for two products in one row */
-            display: inline-block; /* Display products side by side */
-            margin-right: 5%; /* Add some space between products */
+            width: 55%; /* Set the width to 45% for two products in one row */
+            display:block; /* Display products side by side */
+            margin-right: 4%; /* Add some space between products */
         }
 
         /* Style product images */
         .product-card img {
             max-width: 100%;
             height: auto;
-            margin-bottom: 10px;
+            margin-bottom: 1px;
         }
 
         /* Style product titles */
@@ -152,7 +224,7 @@
         /* Style product details */
         .product-card p {
             font-size: 1rem;
-            margin: 5px 0;
+            margin: 10px 10px;
         }
 
         /* Style buttons */

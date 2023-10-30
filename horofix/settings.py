@@ -31,17 +31,19 @@ ALLOWED_HOSTS = []
 # Application definition
 
 INSTALLED_APPS = [
-     'jazzmin',
+    #  'jazzmin',
     'django.contrib.admin',
     'django.contrib.auth',
     'django.contrib.contenttypes',
     'django.contrib.sessions',
     'django.contrib.messages',
     'django.contrib.staticfiles',
-    'horofixapp'
+    'horofixapp',
+    
 ]
 
 MIDDLEWARE = [
+    
     'django.middleware.security.SecurityMiddleware',
     'django.contrib.sessions.middleware.SessionMiddleware',
     'django.middleware.common.CommonMiddleware',
@@ -167,11 +169,41 @@ SESSION_COOKIE_NAME = 'sessionid'
 SESSION_COOKIE_AGE = 600 # 2 weeks
 #SESSION_SAVE_EVERY_REQUEST = False
 #SESSION_EXPIRE_AT_BROWSER_CLOSE = False
-LOGIN_URL='login'
+# LOGIN_URL='login'
 
 
-JAZZMIN_SETTINGS = {
-    "show_ui_builder" : True
-}
+# JAZZMIN_SETTINGS = {
+#     "show_ui_builder" : True
+# }
 
 
+# settings.py
+
+
+
+# settings.py
+
+# SOCIALACCOUNT_PROVIDERS = {
+#     'google': {
+#         'SCOPE': [
+#             'profile',
+#             'email',
+#         ],
+#         'AUTH_PARAMS': {
+#             'access_type': 'online',
+#         },
+#         'APP': {
+#             'client_id': '904247176717-jhqga4eb0ion7126ettmh6pr2vfvp6vd.apps.googleusercontent.com',  # Replace with your actual client ID
+#             'secret': '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',  # Replace with your actual client secret
+#             # 'key': ''
+# }}
+# }
+
+
+# AUTHENTICATION_BACKENDS = [
+#     'django.contrib.auth.backends.ModelBackend',
+#     'allauth.account.auth_backends.AuthenticationBackend',
+# ]
+# SITE_ID = 1
+
+# SOCIALACCOUNT_LOGIN_ON_GET=True

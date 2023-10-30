@@ -1,0 +1,13 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <title>Deactivate User</title>
+</head>
+<body>
+    <h1>Deactivate User: {{ user.name }}</h1>
+    <form method="post">
+        {% csrf_token %}
+        <button type="submit">Deactivate User</button>
+    </form>
+</body>
+</html>

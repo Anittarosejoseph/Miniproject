@@ -1,0 +1,114 @@
+{% load static %}
+       
+    <!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <link rel="stylesheet" type="text/css" href="{% static 'css/stc.css' %}">
+    <title>Watch Customization & Repair</title>
+      <!-- bootstrap core css -->
+  <link rel="stylesheet" type="text/css" href="{% static '/css/bootstrap.css' %}" />
+
+  <!-- fonts style -->
+  <link href="https://fonts.googleapis.com/css2?family=Roboto:wght@400;500;700;900&display=swap" rel="stylesheet">
+
+  <!-- font awesome style -->
+  <link href="{% static '/css/font-awesome.min.css' %}" rel="stylesheet" />
+
+  <!-- Custom styles for this template -->
+  <link href="{% static '/css/style.css' %}" rel="stylesheet" />
+  <!-- responsive style -->
+  <link href="{% static '/css/responsive.css' %}" rel="stylesheet" />
+  <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.0.2/dist/css/bootstrap.min.css" rel="stylesheet" integrity="sha384-EVSTQN3/azprG1Anm3QDgpJLIm9Nao0Yz1ztcQTwFspd3yD65VohhpuuCOmLASjC" crossorigin="anonymous">
+  </head>
+    <script>
+        // JavaScript function to navigate to the index page
+        function goToIndex() {
+            window.location.href = '/'; // Replace '/' with the actual URL of your index page
+        }
+        
+        
+    </script>
+</head>
+<body>
+<div class="hero_area">
+    <!-- header section strats -->
+    <header class="header_section">
+      <div class="container-fluid">
+        <nav class="navbar navbar-expand-lg custom_nav-container ">
+          <a class="navbar-brand" href="index.html">
+            <span>
+              HandTime
+            </span>
+          </a>
+
+          <button class="navbar-toggler" type="button" data-toggle="collapse" data-target="#navbarSupportedContent" aria-controls="navbarSupportedContent" aria-expanded="false" aria-label="Toggle navigation">
+            <span class=""> </span>
+          </button>
+
+          <div class="collapse navbar-collapse" id="navbarSupportedContent">
+            <ul class="navbar-nav  ">
+              <li class="nav-item ">
+                <a class="nav-link" href="{% url 'index' %}">Home </a>
+              </li>
+              <li class="nav-item">
+                <a class="nav-link" href="{% url 'about' %}"> About</a>
+              </li>
+              <li class="nav-item">
+                <a class="nav-link" href="{% url 'customer_products' %}">Products</a>
+              </li>
+              <li class="nav-item">
+                <a class="nav-link" href="{% url 'service' %}">Services</a>
+            </li>
+              <li class="nav-item">
+                <a class="nav-link" href="testimonial.html">Testimonial</a>
+              </li>
+              <li class="nav-item">
+                <a class="nav-link" href="contact.html">Contact Us</a>
+              </li>
+
+            
+            
+              <div class="user_optio_box" >
+                {% if request.session.is_authenticated %}
+                  <!-- Display "Logout" button when the user is authenticated -->
+                  <a href="{% url 'logout' %}">
+                    <i class="fa fa-sign-out" aria-hidden="true"></i> Logout<span class="sr-only">(current)</span>
+                  </a>
+                {% else %}
+                  <!-- Display "Login" link when the user is not authenticated -->
+                  <a href="{% url 'login' %}">
+                    <i class="fa fa-sign-in" aria-hidden="true"></i> Login
+                  </a>
+                {% endif %}
+  
+
+<li class="nav-item" active>
+                <a class="nav-link" href="{% url 'Customer_Profile' %}"><i class="fa fa-user" aria-hidden="true"></i></a>
+             
+          </div>            
+              
+          </div>
+        </nav>
+      </div>
+    </header>
+</head>
+<body>
+    <div class="container">
+        <div class="customization-section">
+            <h2>Watch Customization</h2>
+            <p>Customize your watch to make it unique.</p>
+          
+        </div>
+        <a href="{% url 'repair' %}" class="repair-section">
+            <h2>Watch Repair</h2>
+            <p>We offer repair services for your watches. Click to learn more.</p>
+           <h4> Battery Replacement</h4>
+<h4>Strap Replacement</h6>
+<h4>Glass Replacement</h4>
+<h4>Repair Work</h4>
+        </a>
+    </div>
+</body>
+</html>

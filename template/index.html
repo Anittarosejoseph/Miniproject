@@ -55,17 +55,22 @@
                 <a class="nav-link" href="{% url 'index' %}">Home <span class="sr-only">(current)</span></a>
               </li>
               <li class="nav-item">
-                <a class="nav-link" href="about.html"> About</a>
+                <a class="nav-link" href="{% url 'about' %}"> About</a>
               </li>
               <li class="nav-item">
                 <a class="nav-link" href="{% url 'customer_products' %}">Products</a>
               </li>
+              <li class="nav-item">
+                <a class="nav-link" href="{% url 'service' %}">Services</a>
+            </li>
+            
               <li class="nav-item">
                 <a class="nav-link" href="testimonial.html">Testimonial</a>
               </li>
               <li class="nav-item">
                 <a class="nav-link" href="contact.html">Contact Us</a>
               </li>
+             
 
             
               <!-- <li class="nav-item">
@@ -78,6 +83,7 @@
               <!-- Inside your user_optio_box div -->
               <div class="user_optio_box">
                 {% if request.session.is_authenticated %}
+                <li>Welcome,{{user.username}}</li>
                   <!-- Display "Logout" button when the user is authenticated -->
                   <a href="{% url 'logout' %}">
                     <i class="fa fa-sign-out" aria-hidden="true"></i> Logout

@@ -14,47 +14,67 @@
 
         /* Sidebar Styles */
         .sidebar {
-            height: 510%;
-            width: 250px;
+            height: 400%;
+            width: 200px;
             position: fixed;
             top: 0;
             left: 0;
-            background-color:#5b5497;
+            background-color: blue;
             padding-top: 20px;
         }
 
         .sidebar a {
             padding: 15px;
             text-decoration: none;
-            font-size: 20px;
+            font-size: 15px;
             color: rgb(247, 240, 240);
             display: block;
         }
 
         .sidebar a:hover {
-            background-color: #5b5497;
+            background-color: blue;
         }
 
         /* Content Styles */
         .content {
-            margin-left:230px;
-            padding: 10px;
+            margin-left: 200px;
+            padding: 5px;
+            display: flex;
+            flex-wrap: wrap;
         }
 
         /* Header Styles */
         .header {
-            background-color: #7166d3;
+            background-color: blue;
             padding: 10px;
             color: white;
             text-align: right;
+            width: 100%; /* Take the full width of the content area */
+            display: flex;
+            flex-direction: column; /* Display items in a column layout */
+            align-items: flex-end; /* Align items to the right */
         }
 
-        /* Sample Card Styles */
-        .card {
+        /* Welcome Admin Styles */
+        .welcome-admin {
+            font-size: 15px;
+        }
+
+        /* Logout Button Styles */
+        .logout-button {
+            text-decoration: none;
+            color: white;
+            margin-top: 10px; /* Add margin to separate it from the welcome text */
+        }
+
+        /* Small Box Styles */
+        .small-box {
             background-color: white;
             padding: 20px;
             margin: 20px;
             box-shadow: 0 4px 8px rgba(0, 0, 0, 0.2);
+            flex: 1; /* Distribute available space equally among boxes */
+            min-width: 200px;
         }
 
         /* Dropdown Styles */
@@ -66,7 +86,7 @@
         .dropdown-content {
             display: none;
             position: absolute;
-            background-color: #5b5497;
+            background-color:blue;
             min-width: 160px;
             z-index: 1;
         }
@@ -79,7 +99,7 @@
         }
 
         .dropdown-content a:hover {
-            background-color: #7166d3;
+            background-color:blue;
         }
 
         .dropdown:hover .dropdown-content {
@@ -91,14 +111,13 @@
     <div class="sidebar">
         <a href="#">Dashboard</a>
         <a href="#">Users</a>
-        
+
         <!-- Product Actions Dropdown -->
         <div class="dropdown">
             <a href="#" class="dropbtn">Product</a>
             <div class="dropdown-content">
                 <a href="{% url 'add_product' %}">Add Product</a>
                 <a href="{% url 'view_products' %}">View Products</a>
-                
             </div>
         </div>
 
@@ -110,20 +129,63 @@
     </div>
 
     <div class="content">
+        <!-- Header -->
         <div class="header">
-            <h1>Welcome, Admin!</h1>
-            <a href="{% url 'index' %}">Logout</a>
+            <div class="welcome-admin">
+                <h1>Welcome, Admin!</h1>
+            </div>
+            <a href="{% url 'index' %}" class="logout-button">Logout</a>
         </div>
 
-        <div class="card">
-            <h2>Recent Orders</h2>
-            <p>Display recent order data here...</p>
-        </div>
-
-        <div class="card">
+        <!-- User Statistics Small Box -->
+        <div class="small-box">
             <h2>User Statistics</h2>
-            <p>Display user statistics here...</p>
+            <canvas id="userStatsChart"></canvas>
         </div>
+        <div class="small-box">
+            <h2>Add product Here</h2>
+            <a href="{% url 'add_product' %}">Add Product</a>
+
+        </div>
+        <!-- Recent Orders Small Box -->
+        <div class="small-box">
+            <h2>Recent Orders</h2>
+            <p>484 new Arrivals</p>
+
+        </div>
+        
     </div>
+
+    <!-- Add the JavaScript code for the user statistics chart here -->
+    <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+    <script>
+        // Sample user statistics data (replace with your actual data)
+        var userData = {
+            labels: ["Jan", "Feb", "Mar", "Apr", "May", "Jun"],
+            datasets: [{
+                label: "User Count",
+                data: [100, 150, 200, 250, 300, 350],
+                backgroundColor: "rgba(75, 192, 192, 0.2)",
+                borderColor: "rgba(75, 192, 192, 1)",
+                borderWidth: 1
+            }]
+        };
+    
+        // Get the canvas element by id
+        var ctx = document.getElementById('userStatsChart').getContext('2d');
+    
+        // Create a new chart using Chart.js
+        var userStatsChart = new Chart(ctx, {
+            type: 'bar', // You can choose the chart type (bar, line, pie, etc.)
+            data: userData,
+            options: {
+                scales: {
+                    y: {
+                        beginAtZero: true
+                    }
+                }
+            }
+        });
+    </script>
 </body>
 </html>

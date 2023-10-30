@@ -62,6 +62,9 @@
                 <a class="nav-link" href="{% url 'customer_products' %}">Products</a>
               </li>
               <li class="nav-item">
+                <a class="nav-link" href="{% url 'service' %}">Services</a>
+            </li>
+              <li class="nav-item">
                 <a class="nav-link" href="testimonial.html">Testimonial</a>
               </li>
               <li class="nav-item">
@@ -133,10 +136,9 @@
                     </div>
                     <!-- Street Address -->
                     <div class="col-md-6">
-                        <label class="form-label">Street Address *</label>
-                        <input type="text" class="form-control" id="street_address" name="street_address" placeholder="Enter your Street Address" value="{% if form_submitted %}{{ request.POST.street_address }}{% else %}{{ user_profile.street_address }}{% endif %}" required>
-                        <div id="street_address_error" class="text-danger"></div>
-                    </div>
+                        <label for="street_address" class="form-label">Street Address *</label>
+            <input type="text" class="form-control" id="street_address" name="street_address" placeholder="Enter your Street Address" required>
+        </div>
 <br>
                     <!-- Country Dropdown -->
                     <div class="col-md-6">
@@ -270,11 +272,16 @@
 
                 <!-- Add margin to move buttons up -->
                 <div class="mt-3"></div>
-
+                
+              
                 <div class="gap-3 d-md-flex justify-content-md-center text-center">
                     <button type="submit" class="btn btn-danger btn" id="save_button">Save</button>
-                    <button type="submit" class="btn btn-primary btn" id="update_button">Update</button>
+                    <button type="button" class="btn btn-primary btn" id="update_button">Update</button>
                     <!-- <a href="{% url 'index' %}" class="btn btn-secondary btn">Back</a> -->
+                    <!-- <div id="update-success-message" class="alert alert-success mt-3" style="display: none;">
+                      Profile updated successfully!
+                  </div> -->
+                  </div>
                     
                 </body>                </div>
                 
@@ -282,4 +289,19 @@
         </div>
     </div> <!-- Row END -->
 </form>
+<script>
+  // JavaScript function to show the pop-up message
+  function showSuccessMessage() {
+      alert("Profile updated successfully!");
+  }
+
+  // Add an event listener to the "Update" button
+  document.getElementById("update_button").addEventListener("click", function () {
+      // Perform your update logic here
+
+      // After a successful update, call the function to show the pop-up message
+      showSuccessMessage();
+  });
+</script>
+
 </html>

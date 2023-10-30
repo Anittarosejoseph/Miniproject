@@ -14,9 +14,10 @@ urlpatterns = [
     #path('', views.home, name="index"),
     #path('login_user/', views.login_user, name='login_user'),  # Use the new view name
     path('login/', views.login_user, name='login'),
+
      #path('', views.index, name="index"),
     path('register_user/',views.register_user,name="register_user"),
-    path('about/',views.about,name="about"),
+    path('about/',views.index,name="about"),
     path('adminpanel/',views.adminpanel,name="adminpanel"),
     #path('user_list/',views.user_list,name="user_list"),
    
@@ -28,9 +29,13 @@ path('Customer_Profile/', views.Customer_Profile, name='Customer_Profile'),  # A
     #path('userhome/logout',view.userlogout,name="logout")
     path('add_product/',views.add_product,name='add_product'),
     path('view_products/',views.view_products,name='view_products'),
+    path('service/', views.service, name='service'),
+    path('repair/', views.repair, name='repair'),
+    path('activate/<int:user_id>/', views.activate_user, name='activate_user'),
+    path('deactivate/<int:user_id>/', views.deactivate_user, name='deactivate_user'),
+
     
-    
-path('reset_password/', auth_views.PasswordResetView.as_view(), name="reset_password"),
+    path('reset_password/', auth_views.PasswordResetView.as_view(), name="reset_password"),
     path('reset_password_sent/', auth_views.PasswordResetDoneView.as_view(), name="password_reset_done"),
     path('reset/<uidb64>/<token>/', auth_views.PasswordResetConfirmView.as_view(), name="password_reset_confirm"),
     path('reset_password_complete/', auth_views.PasswordResetCompleteView.as_view(), name="password_reset_complete"),
