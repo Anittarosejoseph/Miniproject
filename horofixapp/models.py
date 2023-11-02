@@ -3,6 +3,9 @@ from django.contrib.auth.models import User
 
 from django.db import models
 from datetime import date
+from django.db.models.signals import post_save
+from django.dispatch import receiver
+
 from django.contrib.auth.models import AbstractUser, BaseUserManager
 
 # Create your models here.
@@ -140,7 +143,7 @@ class CustomerProfile(models.Model):
     country = models.CharField(max_length=15, default="India", blank=True, null=True)
     state = models.CharField(max_length=50, blank=True, null=True)
     pincode = models.CharField(max_length=50, blank=True, null=True)
-
+   
     phone = models.CharField(max_length=10,blank=True, null=True)
 
     def str(self):
@@ -148,20 +151,31 @@ class CustomerProfile(models.Model):
  
 from django.db import models
 
-CATEGORY_CHOICES = [
-    ('Men', 'Men'),
-    ('Women', 'Women'),
-]
-
 class WatchProduct(models.Model):
-    product_name = models.CharField(max_length=255)
-    product_quantity = models.IntegerField()
-    product_price = models.DecimalField(max_digits=10, decimal_places=2)
-    product_sale_price = models.DecimalField(max_digits=10, decimal_places=2)
-    discount = models.DecimalField(max_digits=5, decimal_places=2)
+    product_name = models.CharField(max_length=255, unique=True)  # Add unique=True to prevent duplicates
     watch_description = models.TextField()
-    watch_image = models.ImageField(upload_to='watch_images/')
-    category = models.CharField(max_length=10, choices=CATEGORY_CHOICES, default=None)
+    watch_image = models.ImageField(upload_to='watch_images/', null=True, blank=True)
+    product_price = models.DecimalField(max_digits=10, decimal_places=2, null=True)
+    product_sale_price = models.DecimalField(max_digits=10, decimal_places=2, null=True)
+    discount = models.DecimalField(max_digits=5, decimal_places=2, null=True)
+    category = models.CharField(max_length=10, choices=[('Men', 'Men'), ('Women', 'Women')], default=None)
+    stock = models.PositiveIntegerField(default=1, null=True)  # Add the 'stock' field
+
+    # Modify the STATUS_CHOICES
+    STATUS_CHOICES = [
+        ('In Stock', 'In Stock'),
+        ('Out of Stock', 'Out of Stock'),
+    ]
+
+    status = models.CharField(max_length=12, choices=STATUS_CHOICES, default='In Stock')
+
+    def save(self, *args, **kwargs):
+        # Update the status based on the stock value
+        if self.stock == 0:
+            self.status = 'Out of Stock'
+        else:
+            self.status = 'In Stock'
+        super(WatchProduct, self).save(*args, **kwargs)
 
     def __str__(self):
         return self.product_name
@@ -169,3 +183,12 @@ class WatchProduct(models.Model):
 
 
 
+class AddToCart(models.Model):
+    user = models.ForeignKey(CustomUser, on_delete=models.CASCADE)
+    product = models.ForeignKey(WatchProduct, on_delete=models.CASCADE)
+    quantity = models.PositiveIntegerField(default=1)
+    date_added = models.DateTimeField(auto_now_add=True)
+    is_active = models.BooleanField(default=True)
+
+    def __str__(self):
+        return f"{self.quantity} x {self.product.product_name} in {self.user.username}'s cart"

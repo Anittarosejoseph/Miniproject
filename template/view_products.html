@@ -168,7 +168,6 @@
             <thead>
                 <tr>
                     <th>Watch Name</th>
-                    <th>Product Quantity</th>
                     <th>Category</th>
 
                     <th>Product Price</th>
@@ -183,25 +182,22 @@
                 {% for product in products %}
                 <tr>
                     <td>{{ product.product_name }}</td>
-                    <td>{{ product.product_quantity }}</td>
-                    <td>{{ product.category }}</td> 
+<td>{{ product.category }}</td>
+<td>${{ product.product_price }}</td>
+<td>${{ product.product_sale_price }}</td>
+<td>{{ product.discount }}%</td>
+<td><img src="{{ product.watch_image.url }}" alt="{{ product.product_name }}"></td>
 
-                    <td>${{ product.product_price }}</td>
-                    <td>${{ product.product_sale_price }}</td>
-                    <td>{{ product.discount }}%</td>
-                    <td><img src="{{ product.watch_image.url }}" alt="{{ product.product_name }}"></td>
-                    <td>{{ product.watch_description }}</td>
-                    <td class="action-buttons">
-                        <td class="action-buttons">
-                            <a href="{% url 'edit_product' product.id %}">Edit</a>
-                            <form method="post" id="deleteForm-{{ product.id }}" action="{% url 'delete_product' product.id %}">
-                                {% csrf_token %}
-                                <button class="btn btn-danger" type="button" onclick="confirmDelete({{ product.id }})">Delete</button>
-                            </form>
-                        </td>
-                        
-                       
-                    </td>
+<td>{{ product.watch_description }}</td>
+<td>{{ product.status }}</td> <!-- Display the product's status -->
+<td class="action-buttons">
+    <a href="{% url 'edit_product' product.id %}">Edit</a>
+    <form method="post" id="deleteForm-{{ product.id }}" action="{% url 'delete_product' product.id %}">
+        {% csrf_token %}
+        <button class="btn btn-danger" type="button" onclick="confirmDelete({{ product.id }})">Delete</button>
+    </form>
+</td>
+
                     
                 </tr>
                 {% endfor %}

@@ -1,0 +1,44 @@
+/* Add custom styles to the shopping cart page */
+
+/* Set a background color for the body */
+body {
+    background-color: #f8f9fa;
+}
+
+/* Style the container */
+.container {
+    background-color: #ffffff;
+    padding: 20px;
+    border-radius: 5px;
+    box-shadow: 0 0 10px rgba(0, 0, 0, 0.1);
+}
+
+/* Style the table header */
+.table th {
+    background-color: #343a40;
+    color: #fff;
+}
+
+/* Style table rows */
+.table tbody tr {
+    border-bottom: 1px solid #dee2e6;
+}
+
+/* Style the "Place Order" button */
+.btn-success {
+    background-color: #28a745;
+    color: #fff;
+}
+
+/* Style the "Continue Shopping" button */
+.btn-primary {
+    background-color: #007bff;
+    color: #fff;
+}
+
+/* Style the total price text */
+p {
+    font-weight: bold;
+}
+
+/* Add any additional custom styles as needed */

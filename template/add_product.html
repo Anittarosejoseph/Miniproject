@@ -228,19 +228,20 @@
     <h1>Add Watch Product</h1>
     <form id="addProductForm" action="{% url 'add_product' %}" method="post" enctype="multipart/form-data">
         {% csrf_token %}
-        <label for="productName">Watch Name:</label>
-<input type="text" id="productName" name="productName" pattern="^[a-zA-Z0-9]+$" required>
-<span class="error-message">Product name should only contain alphabets and numbers.</span>
-
-        <label for="productQuantity">Product Quantity:</label>
-        <input type="number" id="productQuantity" name="productQuantity" step="1" min="1" required>
-
-        <!-- Add this code below the "Watch Description" input field -->
-<label for="category">Category:</label>
+        <label for="category">Category:</label>
 <select id="category" name="category" required>
     <option value="Men">Men</option>
     <option value="Women">Women</option>
 </select>
+     
+<label for="productName">Watch Name:</label>
+<input type="text" id="productName" name="productName" pattern="^[a-zA-Z0-9]+$" required>
+<span class="error-message">Product name should only contain alphabets and numbers.</span>
+<span class="error-message">{{ error_message }}</span>  <!-- Display the unique name error message here -->
+
+
+        <!-- Add this code below the "Watch Description" input field -->
+
 
 
 
@@ -256,6 +257,9 @@
         <label for="watchDescription">Watch Description:</label>
         <textarea id="watchDescription" name="watchDescription" rows="4" required></textarea>
 
+        <label for="stock">Stock:</label>
+        <input type="number" id="stock" name="stock" min="1" required>
+
         <label for="watchImage">Watch Image (JPG or PNG only):</label>
         <input type="file" id="watchImage" name="watchImage" accept=".jpg, .jpeg, .png" required>
         <span class="error-message" id="imageError"></span>
@@ -265,10 +269,6 @@
     </form>
 </div>
 
-<footer>
-    &copy; horofix@gmail.com
-</footer>
-
 <script>
     // JavaScript to calculate the sale price based on product price and discount percentage
     document.getElementById("discount").addEventListener("input", function () {
@@ -276,6 +276,22 @@
         var discountPercentage = parseFloat(this.value);
         var salePrice = productPrice - (productPrice * (discountPercentage / 100));
         document.getElementById("productSalePrice").value = salePrice.toFixed(2);
+        
+        var discountError = document.getElementById("discountError");
+        var productSalePrice = parseFloat(document.getElementById("productSalePrice").value);
+        
+        if (discountPercentage < 0 || discountPercentage > 100) {
+            discountError.textContent = "Discount should be between 0 and 100.";
+        } else {
+            discountError.textContent = "";
+        }
+        
+        var productSalePriceError = document.getElementById("productSalePriceError");
+        if (productSalePrice < 0) {
+            productSalePriceError.textContent = "Sale price should not be negative.";
+        } else {
+            productSalePriceError.textContent = "";
+        }
     });
 
     // JavaScript to validate image file format
@@ -290,7 +306,20 @@
             imageError.textContent = "";
         }
     });
-</script>
-</body>
-</html>   
+    document.getElementById("stock").addEventListener("input", function () {
+        var stockValue = parseFloat(this.value);
+        var stockError = document.getElementById("stockError");
 
+        if (isNaN(stockValue) || stockValue < 0 || stockValue > 1) {
+            stockError.textContent = "Stock should be a positive value between 0 and 1.";
+        } else {
+            stockError.textContent = "";
+        }
+    });
+</script>
+
+<footer>
+    &copy; horofix@gmail.com
+</footer>
+</body>
+</

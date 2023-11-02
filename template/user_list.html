@@ -1,12 +1,23 @@
-
-
-
 <!DOCTYPE html>
 <html lang="en">
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Registered Users</title>
+    <style>
+        table {
+            border-collapse: collapse;
+            width: 100%;
+        }
+        th, td {
+            border: 1px solid #000;
+            padding: 8px;
+            text-align: left;
+        }
+        th {
+            background-color: #f2f2f2;
+        }
+    </style>
 </head>
 <body>
     <h1>Registered Users</h1>
@@ -30,8 +41,11 @@
                 <td>{{ user.email }}</td>
                 <td>{{ user.phone }}</td>
                 <td>
-                    <a href="{% url 'activate_user' user.id %}">Activate</a> |
-                    <a href="{% url 'deactivate_user' user.id %}">Deactivate</a>
+                    {% if user.is_active %}
+                                <a href="{% url 'deactivate_user' user.id %}">Deactivate</a>
+                            {% else %}
+                                <a href="{% url 'activate_user' user.id %}">Activate</a>
+                            {% endif %}|
                 </td>
             </tr>
             {% endfor %}
@@ -39,4 +53,3 @@
     </table>
 </body>
 </html>
-

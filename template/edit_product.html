@@ -229,8 +229,7 @@
             <label for="product_name">Product Name:</label>
             <input type="text" id="product_name" name="product_name" value="{{ product.product_name }}" required>
 
-            <label for="product_quantity">Product Quantity:</label>
-            <input type="number" id="product_quantity" name="product_quantity" value="{{ product.product_quantity }}" step="1" min="0" required>
+            
             <label for="category">Category:</label>
             <select id="category" name="category">
                 <option value="Men" {% if product.category == 'Men' %}selected{% endif %}>Men</option>

@@ -1,12 +1,9 @@
 from django.contrib import admin
-from .models import CustomUser
-from .models import CustomerProfile# Register your models here.
-#from .models import Category
-from .models import WatchProduct
+from .models import *
 #admin.site.register(CustomUser)
 admin.site.register(CustomerProfile)
 admin.site.register(WatchProduct)
-
+# admin.site.register(CartProduct)
 
 from django.contrib.auth import get_user_model
 

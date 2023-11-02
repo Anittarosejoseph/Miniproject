@@ -9,11 +9,8 @@ from django.contrib import messages
 from .models import CustomUser
 from .models import WatchProduct
 
- #from django.contrib.auth.models import User
- #from .mode
-# Create your views here.
-#session started
 
+ 
 @never_cache
 def index(request):
     return render(request, 'index.html')
@@ -163,23 +160,22 @@ def customer_product_view(request):
 # Django view to delete the product
 from django.shortcuts import render, redirect
 
-def delete_product(request, product_id):
-    if request.method == 'POST':
-        # Delete the product from the database
-        try:
-            product = WatchProduct.objects.get(pk=product_id)
-            product.delete()
-            return redirect('view_products')
-        except WatchProduct.DoesNotExist:
-            pass
-    return redirect('view_products')  # Redirect back to the product list view
 
+
+
+
+from django.shortcuts import get_object_or_404
+
+def delete_product(request, product_id):
+    product = get_object_or_404(WatchProduct, pk=product_id)
+    product.status = 'disabled'  # Mark the product as deactivated
+    product.save()
+    return redirect('view_products')
 
 
 # views.py
 
 from django.shortcuts import render, get_object_or_404, redirect
-from .models import WatchProduct
 
 def edit_product(request, product_id):
     # Get the existing product object
@@ -188,7 +184,6 @@ def edit_product(request, product_id):
     if request.method == 'POST':
         # Retrieve the data from the form
         product_name = request.POST['product_name']
-        product_quantity = request.POST['product_quantity']
         product_price = request.POST['product_price']
         product_sale_price = request.POST['product_sale_price']
         discount = request.POST['discount']
@@ -196,7 +191,6 @@ def edit_product(request, product_id):
 
         # Update the fields of the existing product object
         product.product_name = product_name
-        product.product_quantity = product_quantity
         product.product_price = product_price
         product.product_sale_price = product_sale_price
         product.discount = discount
@@ -216,7 +210,6 @@ def edit_product(request, product_id):
 def add_product(request):
     if request.method == 'POST':
         product_name = request.POST['productName']
-        product_quantity = request.POST['productQuantity']
         product_price = request.POST['productPrice']
         product_sale_price = request.POST['productSalePrice']
         discount = request.POST['discount']
@@ -230,7 +223,6 @@ def add_product(request):
         else:
             try:
                 # Ensure the numerical fields are valid numbers before saving
-                product_quantity = int(product_quantity)
                 product_price = float(product_price)
                 product_sale_price = float(product_sale_price)
                 discount = float(discount)
@@ -238,7 +230,6 @@ def add_product(request):
                 # Create a new WatchProduct instance and save it
                 WatchProduct.objects.create(
                     product_name=product_name,
-                    product_quantity=product_quantity,
                     product_price=product_price,
                     product_sale_price=product_sale_price,
                     discount=discount,
@@ -256,7 +247,6 @@ def add_product(request):
 
 
 from django.shortcuts import render, get_object_or_404, redirect
-from .models import WatchProduct
 
 
 def edit_product(request, product_id):
@@ -265,7 +255,6 @@ def edit_product(request, product_id):
 
     if request.method == 'POST':
         product_name = request.POST['product_name']
-        product_quantity = request.POST['product_quantity']
         category = request.POST['category']  # Retrieve the category field
         product_price = request.POST['product_price']
         product_sale_price = request.POST['product_sale_price']
@@ -275,7 +264,6 @@ def edit_product(request, product_id):
 
         # Update the product fields
         product.product_name = product_name
-        product.product_quantity = product_quantity
         product.category = category  # Update the category
         product.product_price = product_price
         product.product_sale_price = product_sale_price
@@ -302,13 +290,110 @@ def user_list(request):
     return render(request, 'user_list.html', {'users': users})
 
 def activate_user(request, user_id):
-    user = get_object_or_404(CustomUser, id=user_id)
-    user.is_active = True
-    user.save()
-    return redirect('user_list')  # Redirect to a user list page or another suitable page
+    try:
+        user = CustomUser.objects.get(pk=user_id)
+        user.is_active = True  # Activate the user
+        user.save()
+        send_activation_email(user)  # Send activation email
+        return redirect('adminpanel')  # Redirect to a suitable page
+    except CustomUser.DoesNotExist:
+        return redirect('adminpanel')
 
 def deactivate_user(request, user_id):
-    user = get_object_or_404(CustomUser, id=user_id)
-    user.is_active = False
-    user.save()
-    return redirect('user_list')  # Redirect to a user list page or another suitable page
+    try:
+        user = CustomUser.objects.get(pk=user_id)
+        user.is_active = False  # Deactivate the user
+        user.save()
+        send_deactivation_email(user)  
+        return redirect('adminpanel') 
+    except CustomUser.DoesNotExist:
+        return redirect('adminpanel')
+
+
+
+
+
+
+
+from django.shortcuts import render, get_object_or_404, redirect
+from django.contrib import messages
+from .models import WatchProduct  # Import your WatchProduct model
+from .models import AddToCart
+
+def add_to_cart(request, product_id):
+    product = get_object_or_404(WatchProduct, id=product_id)
+    
+    # Check if the product is in stock
+    if product.stock <= 0:
+        messages.warning(request, f"{product.product_name} is out of stock.")
+    else:
+        # Get or create a cart item for the user and the selected product
+        cart_item, created = AddToCart.objects.get_or_create(user=request.user, product=product)
+        
+        if not created:
+            # If the cart item already exists, update its quantity and set it as active
+            cart_item.is_active = True
+            cart_item.quantity += 1
+            cart_item.save()
+        else:
+            # If it's a new item, set it as active
+            cart_item.is_active = True
+            cart_item.save()
+    
+    return redirect('view_cart')  
+
+from django.shortcuts import render, redirect, get_object_or_404
+from django.contrib import messages
+from .models import AddToCart, WatchProduct
+
+from django.contrib.auth.decorators import login_required
+
+@login_required
+def view_cart(request):
+    cart_items = AddToCart.objects.filter(user=request.user, is_active=True)
+    # Your view logic goes here
+
+    
+    # Calculate order summary
+    subtotal = sum(item.product.product_price * item.quantity for item in cart_items)
+    shipping = 10  # Adjust this value as needed
+    total = subtotal + shipping
+    
+    context = {
+        'cart_items': cart_items,
+        'subtotal': subtotal,
+        'shipping': shipping,
+        'total': total,
+    }
+    return render(request, 'view_cart.html', context)
+
+# View to remove an item from the cart
+def remove_from_cart(request, item_id):
+    cart_item = get_object_or_404(AddToCart, id=item_id)
+    
+    # Check if the item belongs to the current user
+    if cart_item.user == request.user:
+        cart_item.is_active = False
+        cart_item.save()
+        messages.success(request, f"{cart_item.product.product_name} has been removed from your cart.")
+    else:
+        messages.error(request, "You don't have permission to remove this item from your cart.")
+    
+    return redirect('view_cart')
+
+# View to place an order
+def place_order(request):
+    # Here, you can implement the logic to create an order based on the items in the cart.
+    # For example, create an Order model and related logic to finalize the order.
+    
+    # After creating the order, you can clear the cart.
+    AddToCart.objects.filter(user=request.user, is_active=True).update(is_active=False)
+    
+    messages.success(request, "Your order has been placed successfully.")
+    return redirect('view_cart')
+
+from django.http import HttpResponse
+
+def update_cart(request, item_id):
+    # Your view logic here
+    return HttpResponse("Update Cart View")

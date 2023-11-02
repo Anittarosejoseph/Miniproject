@@ -33,8 +33,9 @@ path('Customer_Profile/', views.Customer_Profile, name='Customer_Profile'),  # A
     path('repair/', views.repair, name='repair'),
     path('activate/<int:user_id>/', views.activate_user, name='activate_user'),
     path('deactivate/<int:user_id>/', views.deactivate_user, name='deactivate_user'),
+    path('user-list/', views.user_list, name='user_list'),
 
-    
+
     path('reset_password/', auth_views.PasswordResetView.as_view(), name="reset_password"),
     path('reset_password_sent/', auth_views.PasswordResetDoneView.as_view(), name="password_reset_done"),
     path('reset/<uidb64>/<token>/', auth_views.PasswordResetConfirmView.as_view(), name="password_reset_confirm"),
@@ -45,10 +46,16 @@ path('Customer_Profile/', views.Customer_Profile, name='Customer_Profile'),  # A
     path('edit_product/<int:product_id>/', views.edit_product, name='edit_product'),
 
 
-     path('delete_product/<int:product_id>/', views.delete_product, name='delete_product'),
+    path('delete_product/<int:product_id>/', views.delete_product, name='delete_product'),
+     path('view_cart/', views.view_cart, name='view_cart'),
 
-    path('customer_products/', views.customer_product_view, name='customer_products'),
+    path('place_order/', views.place_order, name='place_order'),
+     path('update_cart/<item_id>/', views.update_cart, name='update_cart'),
+
+path('remove_from_cart/<int:item_id>/', views.remove_from_cart, name='remove_from_cart'),
+    path('add_to_cart/<int:product_id>/', views.add_to_cart, name='add_to_cart'),
 ]
+
 
 
 

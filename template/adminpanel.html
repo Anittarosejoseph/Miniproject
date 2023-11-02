@@ -111,7 +111,11 @@
     <div class="sidebar">
         <a href="#">Dashboard</a>
         <a href="#">Users</a>
+        <div class="dropdown-content">
+            <a href="{% url 'activate_user' user.id %}">activate</a>
+<a href="{% url 'deactivate_user' user.id %}">deactivate</a>
 
+        </div>
         <!-- Product Actions Dropdown -->
         <div class="dropdown">
             <a href="#" class="dropbtn">Product</a>
@@ -119,6 +123,7 @@
                 <a href="{% url 'add_product' %}">Add Product</a>
                 <a href="{% url 'view_products' %}">View Products</a>
             </div>
+            
         </div>
 
         <a href="#">Technicians</a>
