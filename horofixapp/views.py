@@ -319,7 +319,9 @@ from django.shortcuts import render, get_object_or_404, redirect
 from django.contrib import messages
 from .models import WatchProduct  # Import your WatchProduct model
 from .models import AddToCart
+from django.contrib.auth.decorators import login_required
 
+@login_required 
 def add_to_cart(request, product_id):
     product = get_object_or_404(WatchProduct, id=product_id)
     
@@ -355,7 +357,7 @@ def view_cart(request):
 
     
     # Calculate order summary
-    subtotal = sum(item.product.product_price * item.quantity for item in cart_items)
+    subtotal = sum(item.product.product_sale_price * item.quantity for item in cart_items)
     shipping = 10  # Adjust this value as needed
     total = subtotal + shipping
     
@@ -367,19 +369,7 @@ def view_cart(request):
     }
     return render(request, 'view_cart.html', context)
 
-# View to remove an item from the cart
-def remove_from_cart(request, item_id):
-    cart_item = get_object_or_404(AddToCart, id=item_id)
-    
-    # Check if the item belongs to the current user
-    if cart_item.user == request.user:
-        cart_item.is_active = False
-        cart_item.save()
-        messages.success(request, f"{cart_item.product.product_name} has been removed from your cart.")
-    else:
-        messages.error(request, "You don't have permission to remove this item from your cart.")
-    
-    return redirect('view_cart')
+
 
 # View to place an order
 def place_order(request):
@@ -397,3 +387,70 @@ from django.http import HttpResponse
 def update_cart(request, item_id):
     # Your view logic here
     return HttpResponse("Update Cart View")
+
+
+from django.shortcuts import render, get_object_or_404
+from .models import WatchProduct  # Import the WatchProduct model
+
+def view_details(request, product_id):
+    # Retrieve the product details from the database
+    product = get_object_or_404(WatchProduct, pk=product_id)
+
+    # Render the product details template with the product data
+    return render(request, 'viewdetails.html', {'product': product})
+
+
+from django.shortcuts import render, get_object_or_404, redirect
+from django.contrib import messages
+from django.db import models
+from .models import AddToCart
+
+# Define the calculate_shipping_cost function
+def calculate_shipping_cost(request):
+    # Replace this logic with your own criteria for determining shipping costs
+    shipping_cost = 10  # Example: a flat rate of $10 for shipping
+    
+    return shipping_cost
+
+from django.shortcuts import render, get_object_or_404, redirect
+from django.contrib import messages
+from .models import AddToCart
+from django.db import models
+from decimal import Decimal  # Import Decimal
+import json  # Import json module
+
+# ... (other imports and views)
+
+def remove_from_cart(request, item_id):
+    cart_item = get_object_or_404(AddToCart, id=item_id)
+    
+    # Check if the item belongs to the current user
+    if cart_item.user == request.user:
+        product = cart_item.product
+
+        # Get all items with the same product in the user's cart
+        cart_items = AddToCart.objects.filter(product=product, user=request.user, is_active=True)
+
+        # Calculate the total quantity to be removed
+        total_removed_quantity = cart_items.aggregate(total_quantity=models.Sum('quantity'))['total_quantity'] or 0
+
+        # Remove all quantities of the product
+        cart_items.delete()
+        
+        messages.success(request, f"All {product.product_name} items have been removed from your cart.")
+
+        # Recalculate the updated subtotal and total
+        cart_items = AddToCart.objects.filter(user=request.user, is_active=True)
+        subtotal = sum(item.product.product_sale_price * item.quantity for item in cart_items)
+        shipping = calculate_shipping_cost(request)  # Use the calculate_shipping_cost function
+        total = subtotal + shipping
+
+        # Convert subtotal and total to float
+        subtotal = float(subtotal)
+        total = float(total)
+
+        # Update the subtotal and total in session or context as strings
+        request.session['cart_subtotal'] = json.dumps(subtotal)
+        request.session['cart_total'] = json.dumps(total)
+    
+    return redirect('view_cart')

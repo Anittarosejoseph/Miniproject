@@ -51,6 +51,8 @@ path('Customer_Profile/', views.Customer_Profile, name='Customer_Profile'),  # A
 
     path('place_order/', views.place_order, name='place_order'),
      path('update_cart/<item_id>/', views.update_cart, name='update_cart'),
+         path('product/<int:product_id>/', views.view_details, name='view_details'),
+
 
 path('remove_from_cart/<int:item_id>/', views.remove_from_cart, name='remove_from_cart'),
     path('add_to_cart/<int:product_id>/', views.add_to_cart, name='add_to_cart'),

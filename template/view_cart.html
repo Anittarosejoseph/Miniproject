@@ -175,6 +175,7 @@
           </nav>
         </div>
       </header>
+     
 
       <div class="container">
         <h1>Your Shopping Cart</h1>
@@ -189,28 +190,24 @@
                             <div class="col-md-8">
                                 <div class="card-body">
                                     <h5 class="card-title">{{ item.product.product_name }}</h5>
-                                    <form method="post" action="{% url 'update_cart' item.id %}">
-                                        {% csrf_token %}
-                                        <div class="form-group">
-                                            <label for="quantity">Quantity:</label>
-                                            <select name="quantity" id="quantity">
-                                                {% for quantity in "123456789"|make_list %}  {# This will generate numbers from 0 to 9 #}
-                                                    <option value="{{ quantity }}" {% if item.quantity == quantity %}selected{% endif %}>
-                                                        {{ quantity }}
-                                                    </option>
-                                                {% endfor %}
-                                            </select>
-                                        </div>
-                                        <p class="card-text">Price: ${{ item.product.product_price }}</p>
-                                        <p class="card-text">Sale Price: ${{ item.product.product_sale_price }}</p>
-                                        <p class="card-text">Discount: {{ item.product.discount }}%</p>
-    
-                                        <button type="submit" class="btn btn-primary">Update Quantity</button>
-                                    </form>
+                                    <div class="form-group">
+                                      <select name="quantity" id="quantity_{{ item.id }}" data-price="{{ item.product.product_price }}" data-sale-price="{{ item.product.product_sale_price }}">
+                                        {% for quantity in "123456789"|make_list %}
+                                            <option value="{{ quantity }}" {% if item.quantity == quantity %}selected{% endif %}>
+                                                {{ quantity }}
+                                            </option>
+                                        {% endfor %}
+                                    </select>
+                                    </div>
+                                    <p class="card-text">Price: $<span id="price_{{ item.id }}">{{ item.product.product_price }}</span></p>
+                                    <p class="card-text">Sale Price: ${{ item.product.product_sale_price }}</p>
+                                    <p class="card-text">Discount: {{ item.product.discount }}%</p>
+                                    
                                     <form method="post" action="{% url 'remove_from_cart' item.id %}">
                                         {% csrf_token %}
-                                        <button type="submit" class="btn btn-danger">Remove from Cart</button>
+                                        <button type="submit" class="btn btn-danger" data-item-id="{{ item.id }}">Remove from Cart</button>
                                     </form>
+                                    
                                 </div>
                             </div>
                         </div>
@@ -220,9 +217,9 @@
             <div class="col-md-4">
                 <div class="order-summary">
                     <h3>Order Summary</h3>
-                    <p>Subtotal: ${{ subtotal }}</p>
+                    <p>Subtotal: $<span id="subtotal">{{ subtotal }}</span></p>
                     <p>Shipping: ${{ shipping }}</p>
-                    <p>Total: ${{ total }}</p>
+                    <p>Total: $<span id="total">{{ total }}</span></p>
                     <form method="post" action="{% url 'place_order' %}">
                         {% csrf_token %}
                         <button type="submit" class="btn btn-success">Place Order</button>
@@ -231,26 +228,94 @@
             </div>
         </div>
     </div>
-    {% endblock %}
-
+    
     <script>
-        document.addEventListener('DOMContentLoaded', function () {
-            const itemIds = [{% for item in cart_items %}"{{ item.id }}"{% if not forloop.last %}, {% endif %}{% endfor %}];
-            
-            itemIds.forEach(itemId => {
-                const quantityDropdown = document.getElementById(`quantity_${itemId}`);
-                const priceSpan = document.getElementById(`price_${itemId}`);
-                
-                quantityDropdown.addEventListener('change', function () {
-                    const selectedQuantity = parseInt(quantityDropdown.value);
-                    const itemPrice = parseFloat(quantityDropdown.getAttribute('data-price'));
-                    const totalPrice = selectedQuantity * itemPrice;
-                    
-                    priceSpan.innerText = totalPrice.toFixed(2);
+    document.addEventListener('DOMContentLoaded', function () {
+        const itemIds = [{% for item in cart_items %}"{{ item.id }}"{% if not forloop.last %}, {% endif %}{% endfor %}];
+        const shippingCharge = parseFloat('{{ shipping }}');
+        let currentSubtotal = parseFloat('{{ subtotal }}');
+        let currentTotal = currentSubtotal + shippingCharge; // Initialize total based on subtotal and shipping
+    
+        // Add debugging statements
+        console.log("Initial subtotal: ", currentSubtotal);
+        console.log("Initial shippingCharge: ", shippingCharge);
+        console.log("Initial currentTotal: ", currentTotal);
+    
+        itemIds.forEach(itemId => {
+            const quantityDropdown = document.getElementById(`quantity_${itemId}`);
+    
+            quantityDropdown.addEventListener('change', function () {
+                const selectedQuantity = parseInt(quantityDropdown.value);
+                const itemPrice = parseFloat(quantityDropdown.getAttribute('data-price'));
+                const itemSalePrice = parseFloat(quantityDropdown.getAttribute('data-sale-price'));
+    
+                // Use sale price if available, otherwise use regular price
+                const totalPrice = selectedQuantity * (itemSalePrice ? itemSalePrice : itemPrice);
+    
+                // Update the individual product price
+                document.getElementById(`price_${itemId}`).innerText = totalPrice.toFixed(2);
+    
+                // Recalculate the subtotal when quantity changes
+                currentSubtotal = 0;
+                itemIds.forEach(id => {
+                    const itemQuantity = parseInt(document.getElementById(`quantity_${id}`).value);
+                    const itemPrice = parseFloat(document.getElementById(`quantity_${id}`).getAttribute('data-price'));
+                    currentSubtotal += itemQuantity * (itemPrice ? itemPrice : 0);
                 });
+    
+                // Update the subtotal
+                document.getElementById('subtotal').innerText = currentSubtotal.toFixed(2);
+    
+                // Update the total
+                currentTotal = currentSubtotal + shippingCharge;
+                document.getElementById('total').innerText = currentTotal.toFixed(2);
+    
+                // Add debugging statements
+                console.log("Updated subtotal: ", currentSubtotal);
+                console.log("Updated currentTotal: ", currentTotal);
             });
         });
-        </script>
+        
+        // Function to deduct sale price when a product is removed
+        function deductSalePrice(itemId) {
+            const itemSalePrice = parseFloat(document.getElementById(`quantity_${itemId}`).getAttribute('data-sale-price'));
+            if (itemSalePrice) {
+                currentTotal -= itemSalePrice;
+            }
+        }
+    
+        // Detect click on "Remove from Cart" buttons and deduct sale price
+        const removeButtons = document.querySelectorAll('.btn-danger');
+        removeButtons.forEach(button => {
+            button.addEventListener('click', function () {
+                const itemId = this.getAttribute('data-item-id');
+                deductSalePrice(itemId);
+    
+                // Update the total
+                document.getElementById('total').innerText = currentTotal.toFixed(2);
+            });
+        });
+    });
+
+    document.addEventListener('DOMContentLoaded', function () {
+        const placeOrderButton = document.getElementById('place-order-button');
+        const orderSummary = document.getElementById('order-summary');
+
+        placeOrderButton.addEventListener('click', function () {
+            // Toggle the visibility of the order summary
+            if (orderSummary.style.display === 'none') {
+                orderSummary.style.display = 'block';
+            } else {
+                orderSummary.style.display = 'none';
+            }
+        });
+    });
+    </script>
+    
+  
+
+      {% endblock %}
+      
         
         
         

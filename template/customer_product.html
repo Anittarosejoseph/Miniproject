@@ -246,34 +246,36 @@
     </style>
 </head>
 <body>
-  <div class="container">
+  {% load static %}
+
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <!-- Your head section here -->
+</head>
+<body>
+<div class="container">
     <h1><center>Our Products</center></h1>
     <div class="row">
         {% for product in products %}
             {% if product.status == 'In Stock' %}
                 <div class="col-md-6">
                     <div class="product-card">
-                        <img src="{{ product.watch_image.url }}" alt="{{ product.product_name }}">
+                        <!-- Make the product image a clickable link to viewdetails.html -->
+                        <a href="{% url 'view_details' product.id %}">
+                            <img src="{{ product.watch_image.url }}" alt="{{ product.product_name }}">
+                        </a>
                         <h3>{{ product.product_name }}</h3>
                         <p><strong>Product Price:</strong> ${{ product.product_price }}</p>
                         <p><strong>Product Sale Price:</strong> ${{ product.product_sale_price }}</p>
                         <p><strong>Discount:</strong> {{ product.discount }}%</p>
-                      
-                        <button class="btn btn-primary">View Details</button>
-                        
-                        <!-- Use a form to submit the product ID for adding to the cart -->
-                        <form method="post" action="{% url 'add_to_cart' product.id %}">
-                            {% csrf_token %}
-                            <input type="submit" class="btn btn-success" value="Add to Cart">
-                        </form>
                     </div>
                 </div>
             {% endif %}
         {% endfor %}
     </div>
 </div>
-
-</div>
 </body>
-</html> 
+</html>
+
   
