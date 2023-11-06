@@ -183,12 +183,18 @@ class WatchProduct(models.Model):
 
 
 
-class AddToCart(models.Model):
-    user = models.ForeignKey(CustomUser, on_delete=models.CASCADE)
+
+class CartItem(models.Model):
+    cart = models.ForeignKey('Cart', on_delete=models.CASCADE)
     product = models.ForeignKey(WatchProduct, on_delete=models.CASCADE)
     quantity = models.PositiveIntegerField(default=1)
-    date_added = models.DateTimeField(auto_now_add=True)
-    is_active = models.BooleanField(default=True)
 
     def __str__(self):
-        return f"{self.quantity} x {self.product.product_name} in {self.user.username}'s cart"
+        return f"{self.quantity} x {self.product.name}"
+
+class Cart(models.Model):
+    user = models.OneToOneField(CustomUser, on_delete=models.CASCADE)
+    products = models.ManyToManyField(WatchProduct, through='CartItem')
+
+    def __str__(self):
+        return f"Cart for {self.user.username}"

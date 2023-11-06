@@ -31,10 +31,7 @@ path('Customer_Profile/', views.Customer_Profile, name='Customer_Profile'),  # A
     path('view_products/',views.view_products,name='view_products'),
     path('service/', views.service, name='service'),
     path('repair/', views.repair, name='repair'),
-    path('activate/<int:user_id>/', views.activate_user, name='activate_user'),
-    path('deactivate/<int:user_id>/', views.deactivate_user, name='deactivate_user'),
-    path('user-list/', views.user_list, name='user_list'),
-
+    
 
     path('reset_password/', auth_views.PasswordResetView.as_view(), name="reset_password"),
     path('reset_password_sent/', auth_views.PasswordResetDoneView.as_view(), name="password_reset_done"),
@@ -47,14 +44,15 @@ path('Customer_Profile/', views.Customer_Profile, name='Customer_Profile'),  # A
 
 
     path('delete_product/<int:product_id>/', views.delete_product, name='delete_product'),
-     path('view_cart/', views.view_cart, name='view_cart'),
+    path('view_cart/', views.view_cart, name='view_cart'),
+#          path('product/<int:product_id>/', views.view_details, name='view_details'),
+    path('view_details/<int:product_id>/', views.view_details, name='view_details'),
 
-    path('place_order/', views.place_order, name='place_order'),
-     path('update_cart/<item_id>/', views.update_cart, name='update_cart'),
-         path('product/<int:product_id>/', views.view_details, name='view_details'),
+ path('increase-cart-item/<int:product_id>/', views.increase_cart_item, name='increase-cart-item'),
+    path('decrease-cart-item/<int:product_id>/', views.decrease_cart_item, name='decrease-cart-item'),
+ path('fetch-cart-count/', views.fetch_cart_count, name='fetch-cart-count'),
 
-
-path('remove_from_cart/<int:item_id>/', views.remove_from_cart, name='remove_from_cart'),
+    path('remove-from-cart/<int:product_id>/', views.remove_from_cart, name='remove-from-cart'),
     path('add_to_cart/<int:product_id>/', views.add_to_cart, name='add_to_cart'),
 ]
 

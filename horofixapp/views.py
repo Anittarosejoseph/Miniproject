@@ -8,6 +8,8 @@ from django.views.decorators.cache import never_cache
 from django.contrib import messages
 from .models import CustomUser
 from .models import WatchProduct
+from .models import Cart  # Import the Cart model
+from django.http import HttpResponse
 
 
  
@@ -277,180 +279,116 @@ def edit_product(request, product_id):
 
         # Redirect to the view product page or wherever you want
         return redirect('view_products')
-
-    return render(request, 'edit_product.html', {'product': product})
-
-
-from django.shortcuts import render, redirect, get_object_or_404
-from .models import CustomUser
-
-
-def user_list(request):
-    users = CustomUser.objects.all()
-    return render(request, 'user_list.html', {'users': users})
-
-def activate_user(request, user_id):
-    try:
-        user = CustomUser.objects.get(pk=user_id)
-        user.is_active = True  # Activate the user
-        user.save()
-        send_activation_email(user)  # Send activation email
-        return redirect('adminpanel')  # Redirect to a suitable page
-    except CustomUser.DoesNotExist:
-        return redirect('adminpanel')
-
-def deactivate_user(request, user_id):
-    try:
-        user = CustomUser.objects.get(pk=user_id)
-        user.is_active = False  # Deactivate the user
-        user.save()
-        send_deactivation_email(user)  
-        return redirect('adminpanel') 
-    except CustomUser.DoesNotExist:
-        return redirect('adminpanel')
-
-
-
-
-
-
-
-from django.shortcuts import render, get_object_or_404, redirect
-from django.contrib import messages
-from .models import WatchProduct  # Import your WatchProduct model
-from .models import AddToCart
+from .models import WatchProduct, Cart, CartItem
+from django.http import JsonResponse
 from django.contrib.auth.decorators import login_required
+from django.shortcuts import get_object_or_404, redirect
 
-@login_required 
+@login_required(login_url='login')
 def add_to_cart(request, product_id):
-    product = get_object_or_404(WatchProduct, id=product_id)
+    product = get_object_or_404(WatchProduct, pk=product_id)
+    cart, created = Cart.objects.get_or_create(user=request.user)
+    cart_item, item_created = CartItem.objects.get_or_create(cart=cart, product=product)
     
-    # Check if the product is in stock
-    if product.stock <= 0:
-        messages.warning(request, f"{product.product_name} is out of stock.")
-    else:
-        # Get or create a cart item for the user and the selected product
-        cart_item, created = AddToCart.objects.get_or_create(user=request.user, product=product)
-        
-        if not created:
-            # If the cart item already exists, update its quantity and set it as active
-            cart_item.is_active = True
-            cart_item.quantity += 1
-            cart_item.save()
-        else:
-            # If it's a new item, set it as active
-            cart_item.is_active = True
-            cart_item.save()
+    if not item_created:
+        cart_item.quantity += 1
+        cart_item.save()
     
-    return redirect('view_cart')  
-
-from django.shortcuts import render, redirect, get_object_or_404
-from django.contrib import messages
-from .models import AddToCart, WatchProduct
-
-from django.contrib.auth.decorators import login_required
-
-@login_required
-def view_cart(request):
-    cart_items = AddToCart.objects.filter(user=request.user, is_active=True)
-    # Your view logic goes here
-
-    
-    # Calculate order summary
-    subtotal = sum(item.product.product_sale_price * item.quantity for item in cart_items)
-    shipping = 10  # Adjust this value as needed
-    total = subtotal + shipping
-    
-    context = {
-        'cart_items': cart_items,
-        'subtotal': subtotal,
-        'shipping': shipping,
-        'total': total,
-    }
-    return render(request, 'view_cart.html', context)
-
-
-
-# View to place an order
-def place_order(request):
-    # Here, you can implement the logic to create an order based on the items in the cart.
-    # For example, create an Order model and related logic to finalize the order.
-    
-    # After creating the order, you can clear the cart.
-    AddToCart.objects.filter(user=request.user, is_active=True).update(is_active=False)
-    
-    messages.success(request, "Your order has been placed successfully.")
     return redirect('view_cart')
 
-from django.http import HttpResponse
-
-def update_cart(request, item_id):
-    # Your view logic here
-    return HttpResponse("Update Cart View")
 
 
-from django.shortcuts import render, get_object_or_404
-from .models import WatchProduct  # Import the WatchProduct model
+
+@login_required(login_url='login')
+def remove_from_cart(request, product_id):
+    # Get the WatchProduct object based on the product_id
+    product = get_object_or_404(WatchProduct, pk=product_id)
+    
+    # Get the user's cart
+    cart = Cart.objects.get(user=request.user)
+    
+    try:
+        # Get the cart item for the product
+        cart_item = cart.cartitem_set.get(product=product)
+        
+        if cart_item.quantity >= 1 and product.status == 'In Stock':
+            cart_item.delete()
+    except CartItem.DoesNotExist:
+        pass
+    
+    return redirect('view_cart')
+@login_required(login_url='login')
+def view_cart(request):
+    user = request.user
+    
+    # Filter CartItem objects based on the fields available in your model
+    cart_items = CartItem.objects.filter(cart__user=user)  # Adjust this filtering based on your model's structure
+    
+    return render(request, 'view_cart.html', {'cart_items': cart_items})
+
+
+
+
+    from django.shortcuts import get_object_or_404, redirect
+from django.contrib.auth.decorators import login_required
+
+from django.shortcuts import get_object_or_404, redirect
+
+@login_required(login_url='login')
+def increase_cart_item(request, product_id):
+    product = get_object_or_404(WatchProduct, pk=product_id)
+    user = request.user
+    cart, created = Cart.objects.get_or_create(user=user)
+    
+    # Get or create the cart item
+    cart_item, created = CartItem.objects.get_or_create(cart=cart, product=product)
+    
+    if not created:
+        
+        cart_item.quantity += 1
+        cart_item.save()
+    
+    return redirect('view_cart')
+
+from django.shortcuts import get_object_or_404, redirect
+
+@login_required(login_url='login')
+def decrease_cart_item(request, product_id):
+    product = get_object_or_404(WatchProduct, pk=product_id)
+    user = request.user
+    
+    # Correct the variable name from CartItemt to CartItem
+    cart_item = CartItem.objects.get(cart__user=user, product=product)
+    
+    if cart_item.quantity > 1:
+        cart_item.quantity -= 1
+        cart_item.save()
+    else:
+        cart_item.delete()
+    
+    return redirect('view_cart')
+
+
+
+from django.http import JsonResponse
+from django.contrib.auth.decorators import login_required
+
+@login_required(login_url='login')
+def fetch_cart_count(request):
+    cart_count = 0
+    if request.user.is_authenticated:
+        user = request.user
+        cart_count = CartItem.objects.filter(user=user, is_active=True).count()
+    return JsonResponse({'cart_count': cart_count})
+
+@login_required(login_url='login')
+def get_cart_count(request):
+    cart_count = 0
+    if request.user.is_authenticated:
+        user = request.user
+        cart_count = CartItem.objects.filter(user=user, is_active=True).count()
+    return JsonResponse({'cart_count': cart_count})
 
 def view_details(request, product_id):
-    # Retrieve the product details from the database
     product = get_object_or_404(WatchProduct, pk=product_id)
-
-    # Render the product details template with the product data
     return render(request, 'viewdetails.html', {'product': product})
-
-
-from django.shortcuts import render, get_object_or_404, redirect
-from django.contrib import messages
-from django.db import models
-from .models import AddToCart
-
-# Define the calculate_shipping_cost function
-def calculate_shipping_cost(request):
-    # Replace this logic with your own criteria for determining shipping costs
-    shipping_cost = 10  # Example: a flat rate of $10 for shipping
-    
-    return shipping_cost
-
-from django.shortcuts import render, get_object_or_404, redirect
-from django.contrib import messages
-from .models import AddToCart
-from django.db import models
-from decimal import Decimal  # Import Decimal
-import json  # Import json module
-
-# ... (other imports and views)
-
-def remove_from_cart(request, item_id):
-    cart_item = get_object_or_404(AddToCart, id=item_id)
-    
-    # Check if the item belongs to the current user
-    if cart_item.user == request.user:
-        product = cart_item.product
-
-        # Get all items with the same product in the user's cart
-        cart_items = AddToCart.objects.filter(product=product, user=request.user, is_active=True)
-
-        # Calculate the total quantity to be removed
-        total_removed_quantity = cart_items.aggregate(total_quantity=models.Sum('quantity'))['total_quantity'] or 0
-
-        # Remove all quantities of the product
-        cart_items.delete()
-        
-        messages.success(request, f"All {product.product_name} items have been removed from your cart.")
-
-        # Recalculate the updated subtotal and total
-        cart_items = AddToCart.objects.filter(user=request.user, is_active=True)
-        subtotal = sum(item.product.product_sale_price * item.quantity for item in cart_items)
-        shipping = calculate_shipping_cost(request)  # Use the calculate_shipping_cost function
-        total = subtotal + shipping
-
-        # Convert subtotal and total to float
-        subtotal = float(subtotal)
-        total = float(total)
-
-        # Update the subtotal and total in session or context as strings
-        request.session['cart_subtotal'] = json.dumps(subtotal)
-        request.session['cart_total'] = json.dumps(total)
-    
-    return redirect('view_cart')

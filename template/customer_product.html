@@ -47,25 +47,34 @@
         text-align: center;
         color: #333;
     }
+    
     .product-card {
-            background-color: #fff;
-            border: 1px solid #ddd;
-            padding: 20px;
-            text-align: center;
-            margin-bottom: 20px;
-            width: 31%; /* Set the width to approximately 31% for three products in one row */
-            display: inline-block; /* Display products side by side */
-            margin-right: 2%; /* Add some space between products */
-            box-sizing: border-box; /* Include padding and border in the width */
-        }
+    border: 1px solid #ccc;
+    border-radius: 8px;
+    padding: 16px;
+    margin: 16px;
+    box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
+    display: inline-block;
+    vertical-align: top;
+    width: 240px;
+    background: white;
+}
 
-        /* Style product images */
-        .product-card img {
-            max-width: 100%;
-            height: auto;
-            margin-bottom: 10px;
-        }
+.product-image img {
+    max-width: 100%;
+    height: auto; margin-bottom: 12px;
+}
 
+.product-name {
+    font-size: 18px;
+    font-weight: bold;
+    margin-bottom: 8px;
+}
+
+.product-description {
+    font-size: 14px;
+    margin-bottom: 8px;
+}
         /* Style product titles */
         .product-card h3 {
             font-size: 1.5rem;
@@ -243,39 +252,64 @@
             color: #fff;
             border: none;
         }
+
+    /* Add strikethrough style to the product price */
+    .product-card p .product-price {
+        text-decoration: line-through;
+        color: #999; /* You can change the color to your preference */
+        margin-right: 5px; /* Add some space between original and discounted price */
+    }
+
+    /* Style the discounted price */
+    .product-card p .product-sale-price {
+        color: #28a745; /* Change to the desired color for discounted price */
+    }
+    
+    /* Rest of your CSS styles... */
+</style>
+
+</style>
+
+        
     </style>
 </head>
 <body>
-  {% load static %}
+  
+ 
+  <div class="container">
+      <h1><center>Our Products</center></h1>
+      <div class="row">
+          {% for product in products %}
+              {% if product.status == 'In Stock' %}
+                  <div class="col-md-6">
+                      <div class="product-card">
+                         
 
-<!DOCTYPE html>
-<html lang="en">
-<head>
-    <!-- Your head section here -->
-</head>
-<body>
-<div class="container">
-    <h1><center>Our Products</center></h1>
-    <div class="row">
-        {% for product in products %}
-            {% if product.status == 'In Stock' %}
-                <div class="col-md-6">
-                    <div class="product-card">
-                        <!-- Make the product image a clickable link to viewdetails.html -->
-                        <a href="{% url 'view_details' product.id %}">
+
+
+                          <a href="{% url 'view_details' product.id %}">
                             <img src="{{ product.watch_image.url }}" alt="{{ product.product_name }}">
                         </a>
                         <h3>{{ product.product_name }}</h3>
-                        <p><strong>Product Price:</strong> ${{ product.product_price }}</p>
-                        <p><strong>Product Sale Price:</strong> ${{ product.product_sale_price }}</p>
+                        <p>
+                            <strong>Product Price:</strong>
+                            <span class="product-price">${{ product.product_price }}</span>
+                            {% if product.product_sale_price %}
+                                <span class="product-sale-price">${{ product.product_sale_price }}</span>
+                            {% endif %}
+                        </p>
                         <p><strong>Discount:</strong> {{ product.discount }}%</p>
                     </div>
-                </div>
-            {% endif %}
-        {% endfor %}
-    </div>
-</div>
-</body>
-</html>
-
+                          
+                  </div>
+              {% endif %}
+          {% endfor %}
+      </div>
+  </div>
+  </body>
+  </html>
   
+
+
+
+

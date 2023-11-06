@@ -11,46 +11,47 @@
 
     <!-- fonts style -->
     <link href="https://fonts.googleapis.com/css2?family=Roboto:wght@400;500;700;900&display=swap" rel="stylesheet">
-  
+
     <!-- font awesome style -->
     <link href="{% static '/css/font-awesome.min.css' %}" rel="stylesheet" />
-  
+
     <!-- Custom styles for this template -->
     <link href="{% static '/css/style.css' %}" rel="stylesheet" />
     <!-- responsive style -->
     <link href="{% static '/css/responsive.css' %}" rel="stylesheet" />
     <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.0.2/dist/css/bootstrap.min.css" rel="stylesheet" integrity="sha384-EVSTQN3/azprG1Anm3QDgpJLIm9Nao0Yz1ztcQTwFspd3yD65VohhpuuCOmLASjC" crossorigin="anonymous">
-    </head>
-      <script>
-          // JavaScript function to navigate to the index page
-          function goToIndex() {
-              window.location.href = '/'; // Replace '/' with the actual URL of your index page
-          }
-          
-          
-      </script>
-      <style>
-      body {
-        font-family: Arial, sans-serif;
-        margin: 0;
-        padding: 0;
-        background-color: #f0f0f0;
+</head>
+<script>
+    
+    // JavaScript function to navigate to the index page
+    function goToIndex() {
+        window.location.href = '/'; // Replace '/' with the actual URL of your index page
     }
+</script>
 
-    /* Style the container */
-    .container {
-        max-width: 1200px;
-        margin: 0 auto;
-        padding: 20px;
-        background-color: #fff;
-    }
+    <style>
+        body {
+            font-family: Arial, sans-serif;
+            margin: 0;
+            padding: 0;
+            background-color: #f0f0f0;
+        }
 
-    /* Style the heading */
-    h1 {
-        text-align: center;
-        color: #333;
-    }
-    .product-card {
+        /* Style the container */
+        .container {
+            max-width: 1200px;
+            margin: 0 auto;
+            padding: 20px;
+            background-color: #fff;
+        }
+
+        /* Style the heading */
+        h1 {
+            text-align: center;
+            color: #333;
+        }
+
+        .product-card {
             background-color: #fff;
             border: 1px solid #ddd;
             padding: 20px;
@@ -81,6 +82,11 @@
             font-size: 1rem;
             margin: 5px 0;
         }
+        .cart-item-price .original-price {
+    text-decoration: line-through;
+    color: #777; /* Change the color to your preference */
+}
+
 
         /* Style buttons */
         .btn {
@@ -101,223 +107,282 @@
             color: #fff;
             border: none;
         }
+
+
+
+
+
+        .container {
+    max-width: 800px;
+    margin: 0 auto;
+    padding: 20px;
+    background-color: #f4f4f4;
+    border-radius: 8px;
+    box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
+}
+
+.cart-header {
+    text-align: center;
+    margin-bottom: 20px;
+}
+
+.cart-item {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    padding: 10px;
+    border-bottom: 1px solid #ddd;
+}
+
+.cart-item-details {
+    display: flex;
+    align-items: center;
+}
+
+.cart-item-name {
+    font-weight: bold;
+    margin-right: 10px;
+    flex: 1;
+    white-space: nowrap;
+    overflow: hidden;
+    text-overflow: ellipsis;
+}
+
+.remove-from-cart-btn,
+.quantity-btn {
+    background-color: #ff6347;
+    color: white;
+    border: none;
+    border-radius: 4px;
+    padding: 5px 10px;
+    cursor: pointer;
+    transition: background-color 0.3s;
+}
+
+.remove-from-cart-btn:hover,
+.quantity-btn:hover {
+    background-color: #e74c3c;
+}
+.remove-from-cart-btn:hover,
+.quantity-btn:hover {
+    background-color: #e74c3c;
+}
+
+.cart-item-quantity {
+    display: flex;
+    align-items: center;
+    margin-right: 10px;
+}
+
+.cart-item-price {
+    font-weight: bold;
+}
+
+.continue-shopping-link {
+    display: inline-block;
+    margin-top: 20px;
+    text-decoration: none;
+    color: #3498db;
+    font-weight: bold;
+}
+
+.continue-shopping-link:hover {
+    text-decoration: underline;
+}
+
+.checkout-button {
+    display: inline-block;
+    background-color: #28a745; 
+    color: white;
+    padding: 10px 20px;
+    border-radius: 4px;
+    margin-top: 20px;
+    margin-left: 400px;
+    text-decoration: none;
+    font-weight: bold;
+    transition: background-color 0.3s;
+}
+
+.checkout-button:hover {
+    background-color: #218838;
+}
     </style>
-
-  </head>
-  <body>
-  <div class="hero_area">
-      <header class="header_section">
+</head>
+<body>
+<div class="hero_area">
+    <header class="header_section">
         <div class="container-fluid">
-          <nav class="navbar navbar-expand-lg custom_nav-container ">
-            <a class="navbar-brand" href="index.html">
-              <span>
-                HandTime
-              </span>
-            </a>
-  
-            <button class="navbar-toggler" type="button" data-toggle="collapse" data-target="#navbarSupportedContent" aria-controls="navbarSupportedContent" aria-expanded="false" aria-label="Toggle navigation">
-              <span class=""> </span>
-            </button>
-  
-            <div class="collapse navbar-collapse" id="navbarSupportedContent">
-              <ul class="navbar-nav  ">
-                <li class="nav-item ">
-                  <a class="nav-link" href="{% url 'index' %}">Home </a>
-                </li>
-                <li class="nav-item">
-                  <a class="nav-link" href="{% url 'about' %}"> About</a>
-                </li>
-                <li class="nav-item">
-                  <a class="nav-link" href="{% url 'customer_products' %}">Products</a>
-                </li>
-                <li class="nav-item">
-                  <a class="nav-link" href="testimonial.html">Testimonial</a>
-                </li>
-                <li class="nav-item">
-                  <a class="nav-link" href="contact.html">Contact Us</a>
-                </li>
-  
-              
-                <!-- <li class="nav-item">
-                  <a class="nav-link" href="{% url 'login' %}">Login</a>
-                </li>
-              </ul>
-              <div class="user_optio_box"> -->
-  
-  
-                <!-- Inside your user_optio_box div -->
-                <div class="user_optio_box" >
-                  {% if request.session.is_authenticated %}
-                    <!-- Display "Logout" button when the user is authenticated -->
-                    <a href="{% url 'logout' %}">
-                      <i class="fa fa-sign-out" aria-hidden="true"></i> Logout<span class="sr-only">(current)</span>
-                    </a>
-                  {% else %}
-                    <!-- Display "Login" link when the user is not authenticated -->
-                    <a href="{% url 'login' %}">
-                      <i class="fa fa-sign-in" aria-hidden="true"></i> Login
-                    </a>
-                  {% endif %}
-    
-  
-  <li class="nav-item" >
-                  <a class="nav-link" href="{% url 'Customer_Profile' %}"><i class="fa fa-user" aria-hidden="true"></i></a>
-                
-            </div>            
-                <!-- <a href="">
-                  <i class="fa fa-user" aria-hidden="true"></i>
+            <nav class="navbar navbar-expand-lg custom_nav-container ">
+                <a class="navbar-brand" href="index.html">
+                    <span>
+                        HandTime
+                    </span>
                 </a>
-                <a href="">
-                  <i class="fa fa-shopping-cart" aria-hidden="true"></i>
-                </a>
-              </div> -->
-            </div>
-          </nav>
-        </div>
-      </header>
-     
 
-      <div class="container">
-        <h1>Your Shopping Cart</h1>
-        <div class="row">
-            <div class="col-md-8">
-                {% for item in cart_items %}
-                    <div class="card mb-3">
-                        <div class="row g-0">
-                            <div class="col-md-4">
-                                <img src="{{ item.product.watch_image.url }}" alt="{{ item.product.product_name }}">
-                            </div>
-                            <div class="col-md-8">
-                                <div class="card-body">
-                                    <h5 class="card-title">{{ item.product.product_name }}</h5>
-                                    <div class="form-group">
-                                      <select name="quantity" id="quantity_{{ item.id }}" data-price="{{ item.product.product_price }}" data-sale-price="{{ item.product.product_sale_price }}">
-                                        {% for quantity in "123456789"|make_list %}
-                                            <option value="{{ quantity }}" {% if item.quantity == quantity %}selected{% endif %}>
-                                                {{ quantity }}
-                                            </option>
-                                        {% endfor %}
-                                    </select>
-                                    </div>
-                                    <p class="card-text">Price: $<span id="price_{{ item.id }}">{{ item.product.product_price }}</span></p>
-                                    <p class="card-text">Sale Price: ${{ item.product.product_sale_price }}</p>
-                                    <p class="card-text">Discount: {{ item.product.discount }}%</p>
-                                    
-                                    <form method="post" action="{% url 'remove_from_cart' item.id %}">
-                                        {% csrf_token %}
-                                        <button type="submit" class="btn btn-danger" data-item-id="{{ item.id }}">Remove from Cart</button>
-                                    </form>
-                                    
-                                </div>
+                <button class="navbar-toggler" type="button" data-toggle="collapse" data-target="#navbarSupportedContent" aria-controls="navbarSupportedContent" aria-expanded="false" aria-label="Toggle navigation">
+                    <span class=""> </span>
+                </button>
+
+                <div class="collapse navbar-collapse" id="navbarSupportedContent">
+                    <ul class="navbar-nav  ">
+                        <li class="nav-item ">
+                            <a class="nav-link" href="{% url 'index' %}">Home </a>
+                        </li>
+                        <li class="nav-item">
+                            <a class="nav-link" href="{% url 'about' %}"> About</a>
+                        </li>
+                        <li class="nav-item">
+                            <a class="nav-link" href="{% url 'customer_products' %}">Products</a>
+                        </li>
+                        <li class="nav-item">
+                            <a class="nav-link" href="testimonial.html">Testimonial</a>
+                        </li>
+                        <li class="nav-item">
+                            <a class="nav-link" href="contact.html">Contact Us</a>
+                        </li>
+
+                        <div class="user_optio_box">
+                            <!-- Inside your user_optio_box div -->
+                            <div class="user_optio_box" >
+                                {% if request.session.is_authenticated %}
+                                    <!-- Display "Logout" button when the user is authenticated -->
+                                    <a href="{% url 'logout' %}">
+                                        <i class="fa fa-sign-out" aria-hidden="true"></i> Logout<span class="sr-only">(current)</span>
+                                    </a>
+                                {% else %}
+                                    <!-- Display "Login" link when the user is not authenticated -->
+                                    <a href="{% url 'login' %}">
+                                        <i class="fa fa-sign-in" aria-hidden="true"></i> Login
+                                    </a>
+                                {% endif %}
+
+                                <li class="nav-item" >
+                                    <a class="nav-link" href="{% url 'Customer_Profile' %}"><i class="fa fa-user" aria-hidden="true"></i></a>
+                                </li>
                             </div>
                         </div>
-                    </div>
-                {% endfor %}
-            </div>
-            <div class="col-md-4">
-                <div class="order-summary">
-                    <h3>Order Summary</h3>
-                    <p>Subtotal: $<span id="subtotal">{{ subtotal }}</span></p>
-                    <p>Shipping: ${{ shipping }}</p>
-                    <p>Total: $<span id="total">{{ total }}</span></p>
-                    <form method="post" action="{% url 'place_order' %}">
-                        {% csrf_token %}
-                        <button type="submit" class="btn btn-success">Place Order</button>
-                    </form>
+                    </ul>
                 </div>
-            </div>
+            </nav>
         </div>
-    </div>
-    
-    <script>
-    document.addEventListener('DOMContentLoaded', function () {
-        const itemIds = [{% for item in cart_items %}"{{ item.id }}"{% if not forloop.last %}, {% endif %}{% endfor %}];
-        const shippingCharge = parseFloat('{{ shipping }}');
-        let currentSubtotal = parseFloat('{{ subtotal }}');
-        let currentTotal = currentSubtotal + shippingCharge; // Initialize total based on subtotal and shipping
-    
-        // Add debugging statements
-        console.log("Initial subtotal: ", currentSubtotal);
-        console.log("Initial shippingCharge: ", shippingCharge);
-        console.log("Initial currentTotal: ", currentTotal);
-    
-        itemIds.forEach(itemId => {
-            const quantityDropdown = document.getElementById(`quantity_${itemId}`);
-    
-            quantityDropdown.addEventListener('change', function () {
-                const selectedQuantity = parseInt(quantityDropdown.value);
-                const itemPrice = parseFloat(quantityDropdown.getAttribute('data-price'));
-                const itemSalePrice = parseFloat(quantityDropdown.getAttribute('data-sale-price'));
-    
-                // Use sale price if available, otherwise use regular price
-                const totalPrice = selectedQuantity * (itemSalePrice ? itemSalePrice : itemPrice);
-    
-                // Update the individual product price
-                document.getElementById(`price_${itemId}`).innerText = totalPrice.toFixed(2);
-    
-                // Recalculate the subtotal when quantity changes
-                currentSubtotal = 0;
-                itemIds.forEach(id => {
-                    const itemQuantity = parseInt(document.getElementById(`quantity_${id}`).value);
-                    const itemPrice = parseFloat(document.getElementById(`quantity_${id}`).getAttribute('data-price'));
-                    currentSubtotal += itemQuantity * (itemPrice ? itemPrice : 0);
-                });
-    
-                // Update the subtotal
-                document.getElementById('subtotal').innerText = currentSubtotal.toFixed(2);
-    
-                // Update the total
-                currentTotal = currentSubtotal + shippingCharge;
-                document.getElementById('total').innerText = currentTotal.toFixed(2);
-    
-                // Add debugging statements
-                console.log("Updated subtotal: ", currentSubtotal);
-                console.log("Updated currentTotal: ", currentTotal);
-            });
-        });
+    </header>
+
+        <link rel="stylesheet" href="{% static 'css/cart.css' %}">
+        <div class="container">
+            <div class="cart-header">
+                <h1>Your Cart</h1>
+            </div>
+            <ul>
+                {% for item in cart_items %}
+                <li class="cart-item">
+                    <div class="cart-item-details">
+                        <div class="cart-item-image">
+                            <img src="{{ item.product.watch_image.url }}" alt="{{ item.product.product_name }}">
+                        </div>
+                        <div class="cart-item-name">{{ item.product.product_name }}</div>
+                        <form action="{% url 'remove-from-cart' item.product.id %}" method="post">
+                            {% csrf_token %}
+                            <button class="remove-from-cart-btn" type="submit">Remove</button>
+                        </form>
+                    </div>
+                    <div class="cart-item-quantity">
+                        <form action="{% url 'increase-cart-item' item.product.id %}" method="post">
+                            {% csrf_token %}
+                            <button class="quantity-btn increase-quantity" type="submit">+</button>
+                        </form>
+                        <span class="item-quantity">{{ item.quantity }}</span>
+                        <form action="{% url 'decrease-cart-item' item.product.id %}" method="post">
+                            {% csrf_token %}
+                            <button class="quantity-btn decrease-quantity" type="submit">-</button>
+                        </form>
+                    </div>
+                    <div class="cart-item-price" data-price="{{ item.product.product_sale_price }}">
+                        <span class="original-price">${{ item.product.product_price }}</span>
+                        <span class="sale-price">${{ item.product.product_sale_price }}</span>
+                    </div>
+                </li>
+                {% endfor %}
+            </ul>
+            <div class="order-summary">
+                <h2>Order Summary</h2>
+                <div class="total-details">
+                    <div class="total-amount">
+                        <span class="total-label">Total Amount:</span>
+                        <span class="total-price" id="total-price">$0.00</span>
+                    </div>
+                </div>
+                <a class="checkout-button" href="#">Proceed to Pay</a>
+            </div>
+            <a class="continue-shopping-link" href="{% url 'customer_products' %}">Continue Shopping</a>
+        </div>
         
-        // Function to deduct sale price when a product is removed
-        function deductSalePrice(itemId) {
-            const itemSalePrice = parseFloat(document.getElementById(`quantity_${itemId}`).getAttribute('data-sale-price'));
-            if (itemSalePrice) {
-                currentTotal -= itemSalePrice;
-            }
+
+
+        <script >
+
+
+
+            const increaseButtons = document.querySelectorAll(".increase-quantity");
+const decreaseButtons = document.querySelectorAll(".decrease-quantity");
+const quantityElements = document.querySelectorAll(".item-quantity");
+const priceElements = document.querySelectorAll(".cart-item-price");
+
+increaseButtons.forEach((button, index) => {
+    button.addEventListener("click", (event) => {
+        event.preventDefault();
+        const currentItem = event.target.closest(".cart-item");
+        const quantityElement = currentItem.querySelector(".item-quantity");
+        const priceElement = currentItem.querySelector(".cart-item-price");
+        const pricePerItem = parseFloat(priceElement.getAttribute("data-price"));
+        const currentQuantity = parseInt(quantityElement.textContent);
+
+        quantityElement.textContent = currentQuantity + 1;
+        updateCartItemPrice(priceElement, pricePerItem, currentQuantity + 1);
+    });
+});
+
+decreaseButtons.forEach((button, index) => {
+    button.addEventListener("click", (event) => {
+        event.preventDefault();
+        const currentItem = event.target.closest(".cart-item");
+        const quantityElement = currentItem.querySelector(".item-quantity");
+        const priceElement = currentItem.querySelector(".cart-item-price");
+        const pricePerItem = parseFloat(priceElement.getAttribute("data-price"));
+        const currentQuantity = parseInt(quantityElement.textContent);
+
+        if (currentQuantity > 1) {
+            quantityElement.textContent = currentQuantity - 1;
+            updateCartItemPrice(priceElement, pricePerItem, currentQuantity - 1);
         }
-    
-        // Detect click on "Remove from Cart" buttons and deduct sale price
-        const removeButtons = document.querySelectorAll('.btn-danger');
-        removeButtons.forEach(button => {
-            button.addEventListener('click', function () {
-                const itemId = this.getAttribute('data-item-id');
-                deductSalePrice(itemId);
-    
-                // Update the total
-                document.getElementById('total').innerText = currentTotal.toFixed(2);
-            });
-        });
     });
+});
 
-    document.addEventListener('DOMContentLoaded', function () {
-        const placeOrderButton = document.getElementById('place-order-button');
-        const orderSummary = document.getElementById('order-summary');
+function updateCartItemPrice(priceElement, pricePerItem, quantity) {
+    const totalPrice = (pricePerItem * quantity).toFixed(2);
+    priceElement.textContent = "$" + totalPrice;
+}
 
-        placeOrderButton.addEventListener('click', function () {
-            // Toggle the visibility of the order summary
-            if (orderSummary.style.display === 'none') {
-                orderSummary.style.display = 'block';
-            } else {
-                orderSummary.style.display = 'none';
-            }
+
+    // Calculate and update the total amount
+    function updateTotalAmount() {
+        const priceElements = document.querySelectorAll(".cart-item-price");
+        let totalAmount = 0;
+
+        priceElements.forEach(priceElement => {
+            const pricePerItem = parseFloat(priceElement.getAttribute("data-price"));
+            const quantityElement = priceElement.previousElementSibling.querySelector(".item-quantity");
+            const quantity = parseInt(quantityElement.textContent);
+
+            totalAmount += pricePerItem * quantity;
         });
-    });
-    </script>
-    
-  
 
-      {% endblock %}
-      
-        
-        
-        
-        
-        
+        const totalAmountElement = document.getElementById("total-price");
+        totalAmountElement.textContent = "$" + totalAmount.toFixed(2);
+    }
+
+    // Call the function to calculate and display the total amount initially
+    updateTotalAmount();
+
+        </script>
+    {% endblock %}
+    
