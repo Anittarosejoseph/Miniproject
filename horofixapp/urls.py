@@ -4,10 +4,6 @@ from django.urls import path #, include
 from django.contrib.auth import views as auth_views
 from django.conf import settings
 from django.conf.urls.static import static
-
-
-
-
 from . import views
 urlpatterns = [
     path('',views.index,name="index"),
@@ -51,9 +47,13 @@ path('Customer_Profile/', views.Customer_Profile, name='Customer_Profile'),  # A
  path('increase-cart-item/<int:product_id>/', views.increase_cart_item, name='increase-cart-item'),
     path('decrease-cart-item/<int:product_id>/', views.decrease_cart_item, name='decrease-cart-item'),
  path('fetch-cart-count/', views.fetch_cart_count, name='fetch-cart-count'),
-
+ path('add_address/', views.add_address, name='add_address'),
     path('remove-from-cart/<int:product_id>/', views.remove_from_cart, name='remove-from-cart'),
     path('add_to_cart/<int:product_id>/', views.add_to_cart, name='add_to_cart'),
+path('add_another_address/', views.add_another_address, name='add_another_address'),
+  path('create-order/', views.create_order, name='create-order'),
+    path('handle-payment/',views. handle_payment, name='handle-payment'),
+    path('checkout/', views.checkout, name='checkout'),
 ]
 
 

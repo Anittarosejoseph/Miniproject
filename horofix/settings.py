@@ -157,7 +157,8 @@ MEDIA_ROOT = os.path.join(BASE_DIR, 'media')
 
 # settings.py
 
-
+RAZOR_KEY_ID = 'rzp_test_CWNbERskB9qZzi'
+RAZOR_KEY_SECRET = '2G7smLq92kbrLngjyFTrFkVd'
 
 
 

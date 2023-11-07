@@ -297,21 +297,17 @@
                         </form>
                     </div>
                     <div class="cart-item-price" data-price="{{ item.product.product_sale_price }}">
-                        <span class="original-price">${{ item.product.product_price }}</span>
                         <span class="sale-price">${{ item.product.product_sale_price }}</span>
                     </div>
                 </li>
                 {% endfor %}
             </ul>
-            <div class="order-summary">
-                <h2>Order Summary</h2>
-                <div class="total-details">
-                    <div class="total-amount">
-                        <span class="total-label">Total Amount:</span>
-                        <span class="total-price" id="total-price">$0.00</span>
-                    </div>
-                </div>
-                <a class="checkout-button" href="#">Proceed to Pay</a>
+            <p class="total-price-data"><span id="total-price"></span></p>
+
+            
+                <a class="checkout-button" href="{% url 'add_address' %}">Proceed to Pay</a>
+    <a class="checkout-button" href="{% url 'checkout' %}">Checkout</a>
+
             </div>
             <a class="continue-shopping-link" href="{% url 'customer_products' %}">Continue Shopping</a>
         </div>

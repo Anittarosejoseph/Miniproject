@@ -1,5 +1,5 @@
 from django.shortcuts import render,redirect
-from .models import CustomUser,UserProfile
+from .models import CustomUser
 from .models import CustomerProfile  # Import the correct model
 from django.contrib.auth.decorators import login_required
 # from django.contrib.sessions.models import Session
@@ -321,9 +321,9 @@ def remove_from_cart(request, product_id):
 def view_cart(request):
     user = request.user
     
-    # Filter CartItem objects based on the fields available in your model
-    cart_items = CartItem.objects.filter(cart__user=user)  # Adjust this filtering based on your model's structure
-    
+   
+    cart_items = CartItem.objects.filter(cart=request.user.cart)
+    # Rest of your code
     return render(request, 'view_cart.html', {'cart_items': cart_items})
 
 
@@ -381,14 +381,180 @@ def fetch_cart_count(request):
         cart_count = CartItem.objects.filter(user=user, is_active=True).count()
     return JsonResponse({'cart_count': cart_count})
 
-@login_required(login_url='login')
+from django.shortcuts import get_object_or_404
+
+@login_required
 def get_cart_count(request):
     cart_count = 0
     if request.user.is_authenticated:
         user = request.user
-        cart_count = CartItem.objects.filter(user=user, is_active=True).count()
+        cart = user.cart  # Get the user's cart
+        cart_count = CartItem.objects.filter(cart=cart, is_active=True).count()
     return JsonResponse({'cart_count': cart_count})
 
 def view_details(request, product_id):
     product = get_object_or_404(WatchProduct, pk=product_id)
     return render(request, 'viewdetails.html', {'product': product})
+
+from django.shortcuts import render
+from .models import CustomerProfile
+@login_required
+def add_address(request):
+    # Retrieve the customer profile associated with the currently logged-in user
+    customer_profile = CustomerProfile.objects.get(customer=request.user)
+
+    context = {
+        'name': customer_profile.name,
+        'street_address': customer_profile.street_address,
+        'state': customer_profile.state,
+        'country': customer_profile.country,
+        'phone': customer_profile.phone,
+    }
+
+    return render(request, 'add_address.html', context)
+from .models import Address  # Import the Address model from your models.py
+from django.contrib.auth.decorators import login_required
+
+@login_required
+def add_another_address(request):
+    if request.method == 'POST':
+        # Get the form data from the request
+        street_address = request.POST['street_address']
+        country = request.POST['country']
+        state = request.POST['state']
+        pincode = request.POST['pincode']
+        phone = request.POST['phone']
+        is_default = request.POST.get('is_default') == 'on'  # Check if the checkbox is checked
+
+        # Create a new Address instance
+        address = Address(
+            user=request.user,  # Ensure the user is a CustomUser instance
+            street_address=street_address,
+            country=country,
+            state=state,
+            pincode=pincode,
+            phone=phone,
+            is_default=is_default
+        )
+
+        # Save the new address to the database
+        address.save()
+
+        # Redirect to a success page or any other appropriate view
+        return redirect('add_address')
+
+    return render(request, 'add_another_address.html')
+
+from django.http import JsonResponse
+from django.conf import settings
+import razorpay
+import json
+from django.views.decorators.csrf import csrf_exempt
+from .models import Cart, CartItem, Order, OrderItem
+
+@csrf_exempt
+def create_order(request):
+    if request.method == 'POST':
+        user = request.user
+        cart = user.cart
+
+        cart_items = CartItem.objects.filter(cart=cart)
+        total_amount = sum(item.product.product_sale_price * item.quantity for item in cart_items)
+
+        try:
+            order = Order.objects.create(user=user, total_amount=total_amount)
+            for cart_item in cart_items:
+                OrderItem.objects.create(
+                    order=order,
+                    product=cart_item.product,
+                    quantity=cart_item.quantity,
+                    item_total=cart_item.product.product_sale_price * cart_item.quantity
+                )
+
+            client = razorpay.Client(auth=(settings.RAZOR_KEY_ID, settings.RAZOR_KEY_SECRET))
+            payment_data = {
+                'amount': int(total_amount * 100),
+                'currency': 'INR',
+                'receipt': f'order_{order.id}',
+                'payment_capture': '1'
+            }
+            orderData = client.order.create(data=payment_data)
+            order.payment_id = orderData['id']
+            order.save()
+
+            return JsonResponse({'order_id': orderData['id']})
+        
+        except Exception as e:
+            print(str(e))
+            return JsonResponse({'error': 'An error occurred. Please try again.'}, status=500)
+
+from django.http import JsonResponse
+from django.views.decorators.csrf import csrf_exempt
+import json
+from django.conf import settings
+from .models import Order, CustomerProfile
+
+@csrf_exempt
+def checkout(request):
+    cart_count = get_cart_count(request)
+    email = ""
+
+    if request.user.is_authenticated:
+        user = request.user
+        cart_items = CartItem.objects.filter(cart=user.cart)
+        total_amount = sum(item.product.product_sale_price * item.quantity for item in cart_items)
+
+        # Access the user's name from the related CustomerProfile
+        customer_profile = CustomerProfile.objects.get(customer=user)
+        email = user.email
+        full_name = customer_profile.name
+
+    else:
+        # Handle the case where the user is not authenticated
+        user = None
+        cart_items = []
+        total_amount = 0
+        full_name = ""
+
+    context = {
+        'cart_count': cart_count,
+        'cart_items': cart_items,
+        'total_amount': total_amount,
+        'email': email,
+        'full_name': full_name,
+    }
+    return render(request, 'checkout.html', context)
+
+from django.http import JsonResponse
+from django.views.decorators.csrf import csrf_exempt
+import json
+import razorpay
+from django.conf import settings
+from .models import Order
+
+@csrf_exempt
+def handle_payment(request):
+    if request.method == 'POST':
+        data = json.loads(request.body)
+        razorpay_order_id = data.get('order_id')
+        payment_id = data.get('payment_id')
+
+        try:
+            order = Order.objects.get(payment_id=razorpay_order_id)
+
+            client = razorpay.Client(auth=(settings.RAZOR_KEY_ID, settings.RAZOR_KEY_SECRET))
+            payment = client.payment.fetch(payment_id)
+
+            if payment['status'] == 'captured':
+                order.payment_status = True
+                order.save()
+                # Add your logic for clearing the cart or marking the order as paid
+                return JsonResponse({'message': 'Payment successful'})
+            else:
+                return JsonResponse({'message': 'Payment failed'})
+
+        except Order.DoesNotExist:
+            return JsonResponse({'message': 'Invalid Order ID'})
+        except Exception as e:
+            print(str(e))
+            return JsonResponse({'message': 'Server error, please try again later.'})
