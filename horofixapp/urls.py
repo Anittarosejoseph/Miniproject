@@ -54,6 +54,9 @@ path('add_another_address/', views.add_another_address, name='add_another_addres
   path('create-order/', views.create_order, name='create-order'),
     path('handle-payment/',views. handle_payment, name='handle-payment'),
     path('checkout/', views.checkout, name='checkout'),
+        path('user_list/', views.user_list, name='user_list'),
+    path('block_unblock_user/<int:user_id>/', views.block_unblock_user, name='block_unblock_user'),
+
 ]
 
 

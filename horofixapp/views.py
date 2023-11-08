@@ -10,6 +10,8 @@ from .models import CustomUser
 from .models import WatchProduct
 from .models import Cart  # Import the Cart model
 from django.http import HttpResponse
+from .models import UserProfile
+from django.core.mail import send_mail
 
 
  
@@ -558,3 +560,25 @@ def handle_payment(request):
         except Exception as e:
             print(str(e))
             return JsonResponse({'message': 'Server error, please try again later.'})
+
+
+
+
+def user_list(request):
+    users = CustomUser.objects.filter(is_superadmin=False)
+    
+    return render(request, 'user_list.html', {'users': users})
+@login_required
+def block_unblock_user(request, user_id):
+    user = CustomUser.objects.get(pk=user_id)
+    if user.is_active:
+        user.is_active = False  # Block the user
+        subject = 'Account Blocked'
+        message = 'Your account has been blocked by the admin.'
+        from_email = 'anittarosejoseph2024a@mca.ajce.in'  # Use your admin's email address
+        recipient_list = [user.email]
+        send_mail(subject, message, from_email, recipient_list, fail_silently=False)
+    else:
+        user.is_active = True  # Unblock the user
+    user.save()
+    return redirect('user_list')  # Assuming 'user_list' is the name of your user list view
