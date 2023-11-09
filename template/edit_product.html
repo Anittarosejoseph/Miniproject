@@ -3,259 +3,138 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Add Watch Product</title>
+    <title>Admin Dashboard</title>
+
+    <!-- Include Bootstrap CSS and jQuery -->
+    <link rel="stylesheet" href="https://maxcdn.bootstrapcdn.com/bootstrap/4.5.2/css/bootstrap.min.css">
+    <script src="https://code.jquery.com/jquery-3.6.0.min.js"></script>
+    <script src="https://maxcdn.bootstrapcdn.com/bootstrap/4.5.2/js/bootstrap.min.js"></script>
+
     <style>
-        
-        /* Add your CSS styles here */
-        body {
-            font-family: Arial, sans-serif;
-            margin: 50;
-            padding: 40;
-        }
-        
-        .container {
-            max-width: 600px;
-            margin: 0 auto; /* Set margin to "auto" horizontally to center the container */
-            padding: 10px;
-            border: 1px solid blue;
-            border-radius: 5px;
-            box-shadow: 0 0 1px rgba(0, 0, 0, 0.1);
-        }
-
-        label {
-            display: block;
-            margin-bottom: 1px;
-        }
-        input[type="text"],
-        input[type="number"],
-        input[type="file"], /* Add the file input type */
-        textarea {
-            width: 60%;
-            padding: 10px;
-            margin-bottom: 5px;
-            border: 1px solid #ccc;
-            border-radius: 1px;
-            font-size: 14px;
-        }
-        input[type="submit"],
-        input[type="button"] {
-            background-color: blue;
-            color: #fff;
-            border: none;
-            padding: 10px 20px;
-            border-radius: 3px;
-            cursor: pointer;
-        }
-        
-        .header {
-            background-color: blue;
-            padding: 20px 0;
-            color: white;
-            text-align: center;
-            margin-bottom: 1px; /* Add margin to separate the header from the content */
-        }
-
-        /* Footer styles */
-        footer {
-            background-color: blue;
-            color: #fff;
-            padding: 5px 0;
-            text-align: center;
-        }
-       
-        .container {
-            max-width: 450px;
-            margin: 0 auto;
-            padding: 10px;
-        }
-        table {
-            width: 100%;
-            border-collapse: collapse;
-            margin-top: 20px;
-        }
-        th, td {
-            padding: 10px;
-            text-align: left;
-            border-bottom: 1px solid #ddd;
-        }
-        th {
-            background-color: #f2f2f2;
-        }
-        img {
-            max-width: 100px; /* Set a maximum width for the images */
-        }
-        .action-buttons {
-            display: flex;
-            justify-content: space-between;
-        }
-        body, html {
-            margin: 0;
-            padding: 0;
-            font-family: Arial, sans-serif;
-        }
-
         /* Sidebar Styles */
         .sidebar {
             height: 100%;
-            width: 250px;
+            width: 200px;
             position: fixed;
             top: 0;
             left: 0;
-            background-color:blue;
+            background-color: #007bff;
             padding-top: 20px;
         }
 
         .sidebar a {
-            padding: 10px;
+            padding: 15px;
             text-decoration: none;
             font-size: 15px;
-            color: rgb(247, 240, 240);
+            color: white;
             display: block;
         }
 
         .sidebar a:hover {
-            background-color: blue;
+            background-color: #0056b3;
         }
 
         /* Content Styles */
         .content {
-            margin-left:230px;
-            padding: 10px;
+            margin-left: 200px;
+            padding: 15px;
         }
 
-        /* Header Styles */
-        .header {
-            background-color: blue;
-            padding: 15px 0;
-            color: white;
-            text-align: right;
-        }
-
-        /* Sample Card Styles */
-        .card {
-            background-color: white;
-            padding: 20px;
-            margin: 20px;
-            box-shadow: 0 4px 8px rgba(0, 0, 0, 0.2);
-        }
-
-        /* Dropdown Styles */
-        .dropdown {
-            position: relative;
-            display: inline-block;
-        }
-
-        .dropdown-content {
-            display: none;
-            position: absolute;
-            background-color: blue;
-            min-width: 160px;
-            z-index: 1;
-        }
-
-        .dropdown-content a {
-            padding: 12px 16px;
+        /* Logout Button Styles */
+        .logout-button {
             text-decoration: none;
-            display: block;
             color: white;
-        }
-
-        .dropdown-content a:hover {
-            background-color: blue;
-        }
-
-        .dropdown:hover .dropdown-content {
-            display: block;
-        }
-
-        .content {
-             margin-left: 250px; /* Adjust the margin-left to match the width of the sidebar */
-             padding: 10px;
+            margin-top: 1px;
+            background-color: red; /* Red color */
+            padding: 10px 15px; /* Add padding to the button */
+            border-radius: 5px; /* Rounded corners */
+            float: right; /* Float to the right to align with the right side of the page */
         }
     </style>
 </head>
 <body>
     <div class="sidebar">
-        <a href="#">Dashboard</a>
-        <a href="#">Users</a>
-        
-        <!-- Product Actions Dropdown -->
+        <a href="{% url 'adminpanel' %}">Dashboard</a>
+        <a href="{% url 'user_list' %}">Users</a>
         <div class="dropdown">
             <a href="#" class="dropbtn">Product</a>
             <div class="dropdown-content">
                 <a href="{% url 'add_product' %}">Add Product</a>
                 <a href="{% url 'view_products' %}">View Products</a>
-                <a href="#">Edit Product</a>
             </div>
         </div>
-
         <a href="#">Technicians</a>
-        <a href="#">Delivery Boys</a>
+        <a href="#">Delivery Boy</a>
         <a href="#">Repair Request</a>
-        <a href="#">Orders</a>
-        <a href="#">My Orders</a>
+        <a href="{% url 'all_user_orders'%}">Orders</a>
         <a href="#">Settings</a>
     </div>
+
     <div class="content">
+        <!-- Header -->
         <div class="header">
-            <!-- Home button -->
-            <a href="{% url 'adminpanel' %}">
-                <button class="btn btn-primary">Home</button>
-            </a>
-            
-            <!-- Add Product button -->
-            <a href="{% url 'view_products' %}">
-                <button class="btn btn-success">View Product</button>
-            </a>
-            
-            <!-- Logout button -->
-            <a href="{% url 'index' %}">
-                <button class="btn btn-danger">Logout</button>
-            </a>
-            
-            
+           
+            <a href="{% url 'index' %}" class="logout-button">Logout</a>
         </div>
     </div>
-    
+<style>
+        .container {
+            max-width: 600px;
+            margin: 20px auto;
+            padding: 20px;
+            border: 1px solid #e0e0e0;
+            border-radius: 5px;
+            box-shadow: 0 0 10px rgba(0, 0, 0, 0.1);
+        }
     </style>
-
 </head>
 <body>
-  
     <div class="container">
         <h1>Edit Product</h1>
         <form method="post">
             {% csrf_token %}
-            <label for="product_name">Product Name:</label>
-            <input type="text" id="product_name" name="product_name" value="{{ product.product_name }}" required>
-
+            <div class="form-group">
+                <label for="product_name">Product Name:</label>
+                <input type="text" class="form-control" id="product_name" name="product_name" value="{{ product.product_name }}" required>
+            </div>
+            <div class="form-group">
+                <label for="category">Category:</label>
+                <select class="form-control" id="category" name="category">
+                    <option value="Men" {% if product.category == 'Men' %}selected{% endif %}>Men</option>
+                    <option value="Women" {% if product.category == 'Women' %}selected{% endif %}>Women</option>
+                    <!-- Add more <option> elements for other categories if needed -->
+                </select>
+            </div>
+            <div class="form-group">
+                <label for="product_price">Product Price:</label>
+                <input type="number" class="form-control" id="product_price" name="product_price" value="{{ product.product_price }}" step="0.01" min="0" required onchange="calculateSalePrice()">
+            </div>
+            <div class="form-group">
+                <label for="product_sale_price">Product Sale Price:</label>
+                <input type="number" class="form-control" id="product_sale_price" name="product_sale_price" value="{{ product.product_sale_price }}" step="0.01" min="0" required>
+            </div>
+            <div class="form-group">
+                <label for="discount">Discount Percentage:</label>
+                <input type="number" class="form-control" id="discount" name="discount" value="{{ product.discount }}" step="0.01" min="0" max="100" required onchange="calculateSalePrice()">
+            </div>
+            <div class="form-group">
+                <label for="watch_description">Watch Description:</label>
+                <textarea class="form-control" id="watch_description" name="watch_description" rows="4" required>{{ product.watch_description }}</textarea>
+            </div>
+            <div class="form-group">
+                <label for="product_image">Product Image (PNG or JPG only):</label>
+                <input type="file" class="form-control-file" id="product_image" name="product_image" accept="image/png, image/jpeg">
+                {% if product.product_image %}
+                    <img src="{{ product.product_image.url }}" alt="Product Image" class="img-thumbnail" style="max-width: 200px;">
+                {% endif %}
+            </div>
             
-            <label for="category">Category:</label>
-            <select id="category" name="category">
-                <option value="Men" {% if product.category == 'Men' %}selected{% endif %}>Men</option>
-                <option value="Women" {% if product.category == 'Women' %}selected{% endif %}>Women</option>
-                <!-- Add more <option> elements for other categories if needed -->
-            </select>
             
-            <label for="product_price">Product Price:</label>
-            <input type="number" id="product_price" name="product_price" value="{{ product.product_price }}" step="0.01" min="0" required onchange="calculateSalePrice()">
-
-            <label for="product_sale_price">Product Sale Price:</label>
-            <input type="number" id="product_sale_price" name="product_sale_price" value="{{ product.product_sale_price }}" step="0.01" min="0" required>
-
-            <label for="discount">Discount Percentage:</label>
-            <input type="number" id="discount" name="discount" value="{{ product.discount }}" step="0.01" min="0" max="100" required onchange="calculateSalePrice()">
-
-            <label for="watch_description">Watch Description:</label>
-            <textarea id="watch_description" name="watch_description" rows="4" required>{{ product.watch_description }}</textarea>
-
-            <label for="product_image">Product Image:</label>
-            <input type="file" id="product_image" name="product_image" value="{{ product.product_image }}" accept="image/*">
-            <input type="submit" value="Save Changes">
+            <button type="submit" class="btn btn-primary">Save Changes</button>
         </form>
     </div>
 
-    <footer>
+    <footer class="text-center mt-4">
         &copy; horofix@gmail.com
     </footer>
 
@@ -272,5 +151,3 @@
     </script>
 </body>
 </html>
-
-    

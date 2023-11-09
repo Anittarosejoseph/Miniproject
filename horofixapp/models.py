@@ -235,3 +235,11 @@ class OrderItem(models.Model):
 
     def __str__(self):
         return f"{self.quantity} x {self.product.product_name} in Order {self.order.id}"
+
+
+class WishlistItem(models.Model):
+    user = models.ForeignKey(CustomUser, on_delete=models.CASCADE)
+    product = models.ForeignKey('WatchProduct', on_delete=models.CASCADE)
+
+    def _str_(self):
+        return self.product.product_name

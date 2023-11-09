@@ -64,38 +64,35 @@
         <table class="table table-striped">
             <thead>
                 <tr>
-                    <th>ID</th>
-                    <th>Name</th>
-                    <th>Username</th>
-                    <th>Email</th>
-                    <th>Phone</th>
-                    <th>Status</th>
-                    <th>Actions</th>
+                    <th>User ID</th>
+                    <th>User Name</th>
+                    <th>Order ID</th>
+                    <th>Total Amount</th>
+                    <th>Payment Status</th>
+                    <th>Action</th>
                 </tr>
             </thead>
+         
             <tbody>
-                {% for user in users %}
-                <tr>
-                    <td>{{ user.id }}</td>
-                    <td>{{ user.name }}</td>
-                    <td>{{ user.username }}</td>
-                    <td>{{ user.email }}</td>
-                    <td>{{ user.phone }}</td>
-                    <td>
-                        {% if user.is_active %}
-                            Active
-                        {% else %}
-                            Blocked
-                        {% endif %}
-                    </td>
-                    <td>
-                        {% if user.is_active %}
-                            <a href="{% url 'block_unblock_user' user.id %}" class="btn btn-danger">Block</a>
-                        {% else %}
-                            <a href="{% url 'block_unblock_user' user.id %}" class="btn btn-success">Unblock</a>
-                        {% endif %}
-                    </td>
-                </tr>
+                {% for user, orders in user_orders.items %}
+                    {% for order in orders %}
+                        <tr>
+                            <td>{{ user.id }}</td>
+                            <td>{{ user.name }}</td>
+                            <td>{{ order.id }}</td>
+                            <td>&#8377;{{ order.total_amount }}</td>
+                            <td>{% if order.payment_status %}Paid{% else %}Not Paid{% endif %}</td>
+                            <td>
+                                <form method="post" action="{% url 'approve_disapprove_order' %}">
+                                    {% csrf_token %}
+                                    <input type="hidden" name="order_id" value="{{ order.id }}">
+                                    <input type="hidden" name="action" value="approve">
+                                    <button type="submit" class="btn btn-success">Approve</button>
+                                </form>
+                            </td>
+                            <td></td>
+                        </tr>
+                    {% endfor %}
                 {% endfor %}
             </tbody>
         </table>

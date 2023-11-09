@@ -1,3 +1,5 @@
+{% extends "base.html" %}
+{% block content %}
 {% load static %}
 <!DOCTYPE html>
 <html lang="en">
@@ -81,9 +83,11 @@
                             {% endif %}
 
                             <li class="nav-item">
-                                <a class="nav-link" href="{% url 'Customer_Profile' %}">
-                                    <i class="fa fa-user" aria-hidden="true"></i>
+                                <a class="nav-link" href="{% url 'ordersummary' %}">
+                                    <i class="fa fa-shopping-cart" aria-hidden="true"></i> Order Summary
                                 </a>
+                            </li>
+                            
                             </li>
                         </div>
                     </ul>
@@ -91,57 +95,8 @@
             </nav>
         </div>
     </header>
-
-    <div class="container">
-        <section class="inner_page_head">
-            <div class="row">
-                <div class="col-md-12">
-                    <div class="full">
-                        <h4 class="left-corner-heading"></h4>
-                    </div>
-                </div>
-            </div>
-        </section>
-
-        <main>
-            <section class="product-details">
-                <div class="product-info-container">
-                    <div class="product-info">
-                        <h1><strong>{{ product.product_name }}</strong></h1>
-                        <div class="product-image">
-                            <img class="product-image" src="{{ product.watch_image.url }}" alt="{{ product.product_name }}">
-                        </div>
-                        
-                        <p class="product-price">
-                            {% if product.product_sale_price %}
-                                <span class="sale-price">Rs.{{ product.product_sale_price }}</span>
-                                <del class="original-price">Rs.{{ product.product_price }}</del>
-                            {% else %}
-                                <span class="price">Rs.{{ product.product_price }}</span>
-                            {% endif %}
-                        </p>
-                        <p class="product-discount">Discount: {{ product.discount }}% Off</p>
-                        <p class="product-description" style="text-align: left;">Product Description: {{ product.watch_description }}</p> <!-- Added style for text alignment -->
-                        <div class="gift-option">
-                          <label for="gift-checkbox">Gift Option:</label>
-                          <input type="checkbox" id="gift-checkbox" name="gift-option">
-                      </div>
-                        <a href="{% url 'add_to_cart' product.id %}" class="btn btn-primary">Add to Cart</a>
-                        <a href="{% url 'wishlist' %}" class="btn btn-primary">Wishlist</a>
-                        
-                    </div>
-                </div>
-    
-                <section class="product-specs">
-                    <h2><strong>Product Specifications</strong></h2>
-                    <ul>
-                        <li><strong>Category:</strong> {{ product.get_category_display }}</li>
-                        <li><strong>Stock Status:</strong> {{ product.status }}</li>
-                        <!-- Add more specifications as needed -->
-                    </ul>
-                </section>
-            </section>
-        </main>
-    </div>
-</body>
-</html>
+<div class="container">
+    <h1>Authentication Required</h1>
+    <p>You need to be logged in to access this page. Please <a href="{% url 'login' %}">log in</a> or <a href="{% url 'register_user' %}">register</a> to continue.</p>
+</div>
+{% endblock %}

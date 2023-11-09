@@ -11,8 +11,11 @@ from .models import WatchProduct
 from .models import Cart  # Import the Cart model
 from django.http import HttpResponse
 from .models import UserProfile
+from .models import WishlistItem
+from django.http import HttpResponseRedirect
 from django.core.mail import send_mail
 
+from django.shortcuts import get_object_or_404
 
  
 @never_cache
@@ -136,8 +139,7 @@ def Customer_Profile(request):
     }
     return render(request, 'Customer_Profile.html', context)
 
-# def forgotpassword(request):
-#     return render(request, 'forgotpassword.html')
+
 
 @login_required(login_url='login')
 def custom_logout(request):
@@ -162,50 +164,60 @@ def customer_product_view(request):
     return render(request, 'customer_product.html', {'products': products})
 
 # Django view to delete the product
-from django.shortcuts import render, redirect
 
 
 
 
 
-from django.shortcuts import get_object_or_404
+from django.shortcuts import get_object_or_404,reverse
 
 def delete_product(request, product_id):
     product = get_object_or_404(WatchProduct, pk=product_id)
-    product.status = 'disabled'  # Mark the product as deactivated
+    product.status = 'Out of Stock'  # Mark the product as deactivated
     product.save()
     return redirect('view_products')
 
 
 # views.py
+from django.shortcuts import render, redirect, get_object_or_404
+from .models import WatchProduct
 
-from django.shortcuts import render, get_object_or_404, redirect
-
+@never_cache
 def edit_product(request, product_id):
-    # Get the existing product object
     product = get_object_or_404(WatchProduct, id=product_id)
-
+    
     if request.method == 'POST':
-        # Retrieve the data from the form
         product_name = request.POST['product_name']
         product_price = request.POST['product_price']
         product_sale_price = request.POST['product_sale_price']
         discount = request.POST['discount']
         watch_description = request.POST['watch_description']
+        watch_image = request.FILES.get('product_image')
 
-        # Update the fields of the existing product object
-        product.product_name = product_name
-        product.product_price = product_price
-        product.product_sale_price = product_sale_price
-        product.discount = discount
-        product.watch_description = watch_description
+        # Ensure the numerical fields are valid numbers before saving
+        try:
+            product_price = float(product_price)
+            product_sale_price = float(product_sale_price)
+            discount = float(discount)
 
-        # Save the changes
-        product.save()
+            # Update the product instance with the new data
+            product.product_name = product_name
+            product.product_price = product_price
+            product.product_sale_price = product_sale_price
+            product.discount = discount
+            product.watch_description = watch_description
 
-        return redirect('view_products')
+            if watch_image:
+                product.watch_image = watch_image
+
+            product.save()
+            messages.success(request, f"Product '{product.product_name}' edited successfully.")
+            return redirect('view_products')
+        except (ValueError, TypeError):
+            messages.error(request, "Invalid numerical input.")
 
     return render(request, 'edit_product.html', {'product': product})
+
 
 
 
@@ -253,34 +265,7 @@ def add_product(request):
 from django.shortcuts import render, get_object_or_404, redirect
 
 
-def edit_product(request, product_id):
-    # Retrieve the product you want to edit (you need to fetch it from your database)
-    product = WatchProduct.objects.get(pk=product_id)
 
-    if request.method == 'POST':
-        product_name = request.POST['product_name']
-        category = request.POST['category']  # Retrieve the category field
-        product_price = request.POST['product_price']
-        product_sale_price = request.POST['product_sale_price']
-        discount = request.POST['discount']
-        watch_description = request.POST['watch_description']
-        watch_image = request.FILES.get('product_image')  # Use get() to avoid errors
-
-        # Update the product fields
-        product.product_name = product_name
-        product.category = category  # Update the category
-        product.product_price = product_price
-        product.product_sale_price = product_sale_price
-        product.discount = discount
-        product.watch_description = watch_description
-
-        if watch_image:
-            product.watch_image = watch_image
-
-        product.save()  # Save the updated product
-
-        # Redirect to the view product page or wherever you want
-        return redirect('view_products')
 from .models import WatchProduct, Cart, CartItem
 from django.http import JsonResponse
 from django.contrib.auth.decorators import login_required
@@ -320,13 +305,14 @@ def remove_from_cart(request, product_id):
     
     return redirect('view_cart')
 @login_required(login_url='login')
+
+
 def view_cart(request):
-    user = request.user
-    
-   
     cart_items = CartItem.objects.filter(cart=request.user.cart)
-    # Rest of your code
+    # Rest of your view logic
+
     return render(request, 'view_cart.html', {'cart_items': cart_items})
+
 
 
 
@@ -383,7 +369,6 @@ def fetch_cart_count(request):
         cart_count = CartItem.objects.filter(user=user, is_active=True).count()
     return JsonResponse({'cart_count': cart_count})
 
-from django.shortcuts import get_object_or_404
 
 @login_required
 def get_cart_count(request):
@@ -582,3 +567,135 @@ def block_unblock_user(request, user_id):
         user.is_active = True  # Unblock the user
     user.save()
     return redirect('user_list')  # Assuming 'user_list' is the name of your user list view
+
+from django.shortcuts import render, get_object_or_404, redirect
+from .models import WatchProduct, WishlistItem
+from django.contrib.auth.decorators import login_required
+from django.http import HttpResponseRedirect
+from django.urls import reverse
+
+def wishlist(request):
+    if request.user.is_authenticated:
+        wishlist_items = WishlistItem.objects.filter(user=request.user)
+        return render(request, 'wishlist.html', {'wishlist_items': wishlist_items})
+    else:
+        return redirect('login')
+def remove_from_wishlist(request, wishlist_item_id):
+    try:
+        wishlist_item = get_object_or_404(WishlistItem, id=wishlist_item_id)
+        # Perform the logic to remove the wishlist item here
+        # ...
+        wishlist_item.delete()  # Remove the item from the wishlist
+        return redirect('wishlist')  # Redirect the user back to their wishlist page
+    except WishlistItem.DoesNotExist:
+        # Handle the case where the item with the specified ID doesn't exist
+        return HttpResponseNotFound("Wishlist item not found")
+def add_to_wishlist(request, id):
+    if request.user.is_authenticated:
+        product = WatchProduct.objects.get(id=id)
+        wishlist_item, created = WishlistItem.objects.get_or_create(user=request.user, product=product)
+        if created:
+            # The item was added to the wishlist
+            messages.success(request, f'{product.product_name} has been added to your wishlist.')
+        else:
+            # The item is already in the wishlist
+            messages.warning(request, f'{product.product_name} is already in your wishlist.')
+    return redirect('wishlist')
+from django.shortcuts import render
+from .models import OrderItem  # Import your OrderItem model or the appropriate model
+
+from django.shortcuts import render
+from .models import OrderItem
+
+from django.shortcuts import render
+from .models import OrderItem, CustomerProfile
+
+def ordersummary(request):
+    if request.user.is_authenticated:
+        # Fetch order items and total amount specific to the logged-in user
+        order_items = OrderItem.objects.filter(order__user=request.user)
+        total_amount = sum(item.item_total for item in order_items)
+
+        # Fetch the shipping address associated with the user (Assuming you have a CustomerProfile model)
+        customer_profile = CustomerProfile.objects.get(customer=request.user)
+
+        context = {
+            'order_items': order_items,
+            'total_amount': total_amount,
+            'shipping_address': customer_profile.street_address,
+            'country': customer_profile.country,
+            'state': customer_profile.state,
+            'phone': customer_profile.phone,
+            # Add other context variables as needed for the shipping address, etc.
+        }
+
+        return render(request, 'ordersummary.html', context)
+    else:
+        # Handle the case where the user is not authenticated (not logged in)
+        # You can redirect the user to a login page or display a message.
+        return render(request, 'not_authenticated.html')  # Create a 'not_authenticated.html' template for this case
+
+
+from django.shortcuts import render, redirect
+from django.contrib.auth.decorators import login_required
+from .models import Order, CustomUser
+
+@login_required
+def all_user_orders(request):
+    users = CustomUser.objects.filter(is_superadmin=False)
+    user_orders = {}
+    
+    for user in users:
+        orders = Order.objects.filter(user=user, payment_status=True)
+        user_orders[user] = orders
+
+    return render(request, 'all_user_orders.html', {'user_orders': user_orders})
+
+# Add a function to handle approval and disapproval (in the same view)
+from django.core.mail import send_mail
+from django.shortcuts import redirect
+from django.contrib import messages
+
+from django.contrib import messages
+
+def approve_disapprove_order(request):
+    if request.method == 'POST':
+        order_id = request.POST.get('order_id')
+        action = request.POST.get('action')
+
+        try:
+            order = Order.objects.get(pk=order_id)
+
+            if action == 'approve' and not order.payment_status:
+                # Update payment status to True (approved) only if it's not already approved
+                order.payment_status = True
+                order.save()
+
+                # Send an approval message to the user
+                subject = 'Order Approved'
+                message = 'Your Order Has been placed by Horofix. For any query, email us at support@horofix.com'
+                from_email = 'admin@horofix.com'
+                user_email = order.user.email
+                send_mail(subject, message, from_email, [user_email], fail_silently=False)
+
+                # Add a success message for the admin
+                messages.success(request, f'Order {order_id} has been approved.')
+            elif action == 'disapprove':
+                # Handle disapproval logic here
+                order.payment_status = False  # Assuming you want to mark it as not paid
+                order.save()
+
+                # Send a disapproval message to the user
+                subject = 'Order Disapproved'
+                message = 'Your Order has been rejected by Horofix.'
+                from_email = 'admin@horofix.com'
+                user_email = order.user.email
+                send_mail(subject, message, from_email, [user_email], fail_silently=False)
+
+                # Add a success message for the admin
+                messages.success(request, f'Order {order_id} has been disapproved.')
+
+        except Order.DoesNotExist:
+            messages.error(request, f'Order {order_id} does not exist.')
+
+    return redirect('all_user_orders')

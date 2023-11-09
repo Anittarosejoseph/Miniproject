@@ -69,6 +69,9 @@ document.addEventListener('DOMContentLoaded', function () {
                             const orderSection = document.getElementById('order-placed-section');
                             const orderMessage = document.getElementById('order-success-message');
 
+                            // After a successful payment, redirect to the ordersummary page
+                            window.location.href = "{% url 'ordersummary' %}";
+
                             orderMessage.textContent = "Successfully placed order!";
                             orderSection.style.display = "block";
                         } else {

@@ -6,6 +6,7 @@ admin.site.register(WatchProduct)
 # admin.site.register(CartProduct)
 admin.site.register(Order)
 admin.site.register(OrderItem)
+admin.site.register(WishlistItem)
 
 from django.contrib.auth import get_user_model
 

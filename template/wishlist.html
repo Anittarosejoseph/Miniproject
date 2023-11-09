@@ -1,0 +1,49 @@
+{% load static %}
+
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <!-- Your head content (CSS links, meta tags, etc.) -->
+</head>
+<body>
+    <header>
+        <!-- Your header content -->
+    </header>
+    <main>
+        <div class="content">
+            <div id="product-container" class="product-container">
+                {% if wishlist_items %}
+                    {% for wishlist_item in wishlist_items %}
+                        <div class="product-card">
+                            <a href="{% url 'viewdetails' wishlist_item.product.id %}">
+                                <div class="product-image">
+                                    <img class="product-image" src="{{ product.watch_image.url }}" alt="{{ product.product_name }}">
+                                </div>
+                                <div class="product-details">
+                                    <h4>{{ wishlist_item.product.product_name }}</h4>
+                                    <div class="product-price">
+                                        <span> Rs.{{ wishlist_item.product.product_sale_price }}</span>
+                                        <span> {{ wishlist_item.product.discount }}%</span>
+                                    </div>
+                                    <div class="button-container">
+                                        <form method="post" action="{% url 'remove_from_wishlist' wishlist_item.product.id %}">
+                                            {% csrf_token %}
+                                            <button type="submit" class="remove-button">Remove</button>
+                                        </form>
+                                        <form method="post" action="{% url 'add_to_cart' wishlist_item.product.id %}">
+                                            {% csrf_token %}
+                                            <button type="submit" class="add-to-cart-button">Add to Cart</button>
+                                        </form>
+                                    </div>
+                                </div>
+                            </a>
+                        </div>
+                    {% endfor %}
+                {% else %}
+                    <p class="no-products">Your wishlist is empty.</p>
+                {% endif %}
+            </div>
+        </div>
+    </main>
+</body>
+</html>
