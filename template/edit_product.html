@@ -125,7 +125,7 @@
                 <label for="product_image">Product Image (PNG or JPG only):</label>
                 <input type="file" class="form-control-file" id="product_image" name="product_image" accept="image/png, image/jpeg">
                 {% if product.product_image %}
-                    <img src="{{ product.product_image.url }}" alt="Product Image" class="img-thumbnail" style="max-width: 200px;">
+                    <img src="{{ product.watch_image.url }}" alt="Product Image" class="img-thumbnail" style="max-width: 200px;">
                 {% endif %}
             </div>
             
