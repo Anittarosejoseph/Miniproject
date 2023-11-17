@@ -64,7 +64,7 @@ class CustomUser(AbstractUser):
     #last_name = models.CharField(max_length=50)
     #USERNAME_FIELD = 'email'
     email = models.EmailField(max_length=100, unique=True)
-    phone = models.CharField(max_length=10,blank=True,unique=True)
+    phone = models.CharField(max_length=10,blank=True)
     password = models.CharField(max_length=128)
    # confirmPassword = models.CharField(max_length=128)
     #role = models.PositiveSmallIntegerField(choices=ROLE_CHOICE, blank=True, null=True,default='1')
@@ -139,9 +139,9 @@ class UserProfile(models.Model):
 class CustomerProfile(models.Model):
     customer = models.ForeignKey(CustomUser, on_delete=models.CASCADE, default=None)
     name = models.CharField(max_length=100)
-    street_address=models.CharField(max_length=100,null=True,blank=True)
+    street_address=models.CharField(max_length=100,null=True,blank=True, default=None)
     country = models.CharField(max_length=15, default="India", blank=True, null=True)
-    state = models.CharField(max_length=50, blank=True, null=True)
+    state = models.CharField(max_length=50, blank=True, null=True, default=None)
     pincode = models.CharField(max_length=50, blank=True, null=True)
    
     phone = models.CharField(max_length=10,blank=True, null=True)
@@ -192,7 +192,7 @@ class CartItem(models.Model):
 
 
     def __str__(self):
-        return f"{self.quantity} x {self.product.name}"
+        return f"{self.quantity} x {self.product.product_name}"
 
 class Cart(models.Model):
     user = models.OneToOneField(CustomUser, on_delete=models.CASCADE)
@@ -225,6 +225,8 @@ class Order(models.Model):
 
     def __str__(self):
         return f"Order {self.id} by {self.user.username}"
+   
+from django.db import models
 from django.db import models
 
 class OrderItem(models.Model):
@@ -232,14 +234,27 @@ class OrderItem(models.Model):
     product = models.ForeignKey(WatchProduct, on_delete=models.CASCADE)
     quantity = models.PositiveIntegerField(default=1)
     item_total = models.DecimalField(max_digits=10, decimal_places=2)
+    order_date = models.DateField(auto_now_add=True)
+    order_time = models.TimeField(auto_now_add=True)
 
     def __str__(self):
         return f"{self.quantity} x {self.product.product_name} in Order {self.order.id}"
+
 
 
 class WishlistItem(models.Model):
     user = models.ForeignKey(CustomUser, on_delete=models.CASCADE)
     product = models.ForeignKey('WatchProduct', on_delete=models.CASCADE)
 
-    def _str_(self):
+    def __str__(self):
         return self.product.product_name
+from django.db import models
+
+class ShippingAddress(models.Model):
+    street_address = models.CharField(max_length=255)
+    city = models.CharField(max_length=100)
+    state = models.CharField(max_length=100)
+    pincode = models.CharField(max_length=10)
+
+    def __str__(self):
+        return f"{self.street_address}, {self.city}, {self.state} - {self.pincode}"

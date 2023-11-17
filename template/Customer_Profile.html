@@ -153,9 +153,6 @@
                       <label for="state" class="form-label">State *</label>
           <input type="text" class="form-control" id="state" name="state" placeholder="Enter State" required>
       </div>
-                    <!-- State Dropdown -->
-                    <!-- State Dropdown -->
-
 <br><br>
 <!-- Pincode -->
 <div class="col-md-6">
@@ -172,13 +169,6 @@
                     <input type="text" class="form-control" id="phone" name="phone" placeholder="Enter your mobile no." value="{% if request.user.is_authenticated %}{{ user_profile.customer.phone }}{% endif %}" required onchange="validateMobileNumber(this.value)">
                     <div id="mobile_number_error" class="text-danger"></div>
                 </div>
-                
-                
-                
-                
-                
-                
-
 <script>
     // JavaScript function to validate the Mobile number field
     function validateMobileNumber(mobileNumber) {
@@ -212,17 +202,7 @@
         }
         return true;
     }
-
-
-
-
-
-
 </script>
-
-
-                
-
                 <!-- Email -->
                 <div class="row g-3">
                     <div class="col-md-6">
@@ -238,10 +218,7 @@
                 <div class="gap-3 d-md-flex justify-content-md-center text-center">
                     <button type="submit" class="btn btn-danger btn" id="save_button">Save</button>
                     <button type="button" class="btn btn-primary btn" id="update_button">Update</button>
-                    <!-- <a href="{% url 'index' %}" class="btn btn-secondary btn">Back</a> -->
-                    <!-- <div id="update-success-message" class="alert alert-success mt-3" style="display: none;">
-                      Profile updated successfully!
-                  </div> -->
+                    
                   </div>
                     
                 </body>                </div>

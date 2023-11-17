@@ -14,6 +14,7 @@ from .models import UserProfile
 from .models import WishlistItem
 from django.http import HttpResponseRedirect
 from django.core.mail import send_mail
+from django.urls import reverse
 
 from django.shortcuts import get_object_or_404
 
@@ -101,25 +102,18 @@ def login_user(request):
 
 
 def Customer_Profile(request):
-    # Ensure that the user is authenticated
     if not request.user.is_authenticated:
-        # Handle the case where the user is not authenticated, e.g., redirect to the login page.
-        return redirect('login')  # Replace 'login' with the name of your login view.
-
-    # Get or create the user's profile
+        return redirect('login')  
     user_profile, created = CustomerProfile.objects.get_or_create(customer=request.user)
 
     if request.method == 'POST':
-        # Handle the POST request for updating user profile fields
         name = request.POST.get('name')
         street_address=request.POST.get('street_address')
         country=request.POST.get('country')
         state=request.POST.get('state')
         pincode=request.POST.get('pincode')
-        #last_name = request.POST.get('last_name')
         phone = request.POST.get('phone')
 
-        # Update the user profile fields
         user_profile.name = name
         user_profile.street_address=street_address
         user_profile.country=country
@@ -130,9 +124,7 @@ def Customer_Profile(request):
         user_profile.save()
 
         messages.success(request, 'Profile updated successfully')  # Display a success message
-        return redirect('Customer_Profile')  # Redirect to the same page or another page after update
-
-    # Handle the GET request for displaying the user profile form
+        return redirect('Customer_Profile')  
     context = {
         'user_profile': user_profile,
         'form_submitted': False,
@@ -304,15 +296,32 @@ def remove_from_cart(request, product_id):
         pass
     
     return redirect('view_cart')
+
+from django.shortcuts import render, redirect
+from .models import Cart
 @login_required(login_url='login')
-
-
 def view_cart(request):
-    cart_items = CartItem.objects.filter(cart=request.user.cart)
-    # Rest of your view logic
+    # Check if the user is authenticated
+    if request.user.is_authenticated:
+        try:
+            # Try to get the user's cart
+            cart = request.user.cart
+        except Cart.DoesNotExist:
+            # If the cart does not exist, create a new one
+            cart = Cart.objects.create(user=request.user)
 
-    return render(request, 'view_cart.html', {'cart_items': cart_items})
+        # Now you can access the user's cart and retrieve cart items
+        cart_items = CartItem.objects.filter(cart=cart)
 
+        context = {
+            'cart_items': cart_items,
+            'cart': cart,
+        }
+
+        return render(request, 'view_cart.html', context)
+    else:
+        # If the user is not authenticated, you may want to redirect them to the login page
+        return redirect('login')  # Replace 'login' with the actual name of your login URL pattern
 
 
 
@@ -431,7 +440,6 @@ def add_another_address(request):
         return redirect('add_address')
 
     return render(request, 'add_another_address.html')
-
 from django.http import JsonResponse
 from django.conf import settings
 import razorpay
@@ -449,7 +457,10 @@ def create_order(request):
         total_amount = sum(item.product.product_sale_price * item.quantity for item in cart_items)
 
         try:
+            # Create a new order object
             order = Order.objects.create(user=user, total_amount=total_amount)
+
+            # Create order items for each cart item
             for cart_item in cart_items:
                 OrderItem.objects.create(
                     order=order,
@@ -458,50 +469,67 @@ def create_order(request):
                     item_total=cart_item.product.product_sale_price * cart_item.quantity
                 )
 
+            # Initialize Razorpay client
             client = razorpay.Client(auth=(settings.RAZOR_KEY_ID, settings.RAZOR_KEY_SECRET))
+
             payment_data = {
-                'amount': int(total_amount * 100),
+                'amount': int(total_amount * 100),  # Amount should be in paisa (multiply by 100)
                 'currency': 'INR',
                 'receipt': f'order_{order.id}',
-                'payment_capture': '1'
+                'payment_capture': '1'  # Auto-capture payment
             }
-            orderData = client.order.create(data=payment_data)
-            order.payment_id = orderData['id']
+
+            # Create a Razorpay order
+            order_data = client.order.create(data=payment_data)
+
+            # Update the order with the Razorpay order ID
+            order.payment_id = order_data['id']
             order.save()
 
-            return JsonResponse({'order_id': orderData['id']})
-        
+            # Return the order ID as a JSON response
+            return JsonResponse({'order_id': order_data['id']})
+
         except Exception as e:
-            print(str(e))
-            return JsonResponse({'error': 'An error occurred. Please try again.'}, status=500)
+            # Log the error for debugging purposes
+            print(f"Error creating order: {str(e)}")
+            
+            # Return an informative error response
+            return JsonResponse({'error': f'An error occurred while creating the order: {str(e)}'}, status=500)
+
+from django.shortcuts import render
+from .models import CartItem, CustomerProfile  # Import CartItem
 
 from django.http import JsonResponse
 from django.views.decorators.csrf import csrf_exempt
 import json
 from django.conf import settings
-from .models import Order, CustomerProfile
 
 @csrf_exempt
 def checkout(request):
     cart_count = get_cart_count(request)
     email = ""
+    full_name = ""
 
     if request.user.is_authenticated:
         user = request.user
         cart_items = CartItem.objects.filter(cart=user.cart)
         total_amount = sum(item.product.product_sale_price * item.quantity for item in cart_items)
 
-        # Access the user's name from the related CustomerProfile
-        customer_profile = CustomerProfile.objects.get(customer=user)
-        email = user.email
-        full_name = customer_profile.name
+        try:
+            # Try to access the user's name from the related CustomerProfile
+            customer_profile = CustomerProfile.objects.get(customer=user)
+            email = user.email
+            full_name = customer_profile.name
+        except CustomerProfile.DoesNotExist:
+            # Handle the case where the CustomerProfile does not exist
+            # You can create a new profile, redirect the user, or set default values
+            pass
 
     else:
         # Handle the case where the user is not authenticated
         user = None
         cart_items = []
         total_amount = 0
-        full_name = ""
 
     context = {
         'cart_count': cart_count,
@@ -512,12 +540,7 @@ def checkout(request):
     }
     return render(request, 'checkout.html', context)
 
-from django.http import JsonResponse
-from django.views.decorators.csrf import csrf_exempt
-import json
-import razorpay
-from django.conf import settings
-from .models import Order
+from django.shortcuts import get_object_or_404
 
 @csrf_exempt
 def handle_payment(request):
@@ -527,7 +550,7 @@ def handle_payment(request):
         payment_id = data.get('payment_id')
 
         try:
-            order = Order.objects.get(payment_id=razorpay_order_id)
+            order = get_object_or_404(Order, payment_id=razorpay_order_id)
 
             client = razorpay.Client(auth=(settings.RAZOR_KEY_ID, settings.RAZOR_KEY_SECRET))
             payment = client.payment.fetch(payment_id)
@@ -535,19 +558,26 @@ def handle_payment(request):
             if payment['status'] == 'captured':
                 order.payment_status = True
                 order.save()
-                # Add your logic for clearing the cart or marking the order as paid
+
+                # Keep a record of purchased items in the order
+                for cart_item in request.user.cart.cartitem_set.all():
+                    OrderItem.objects.create(
+                        order=order,
+                        product=cart_item.product,
+                        quantity=cart_item.quantity,
+                        item_total=cart_item.product.product_price * cart_item.quantity
+                    )
+
+                # Clear the user's cart after a successful payment
+                request.user.cart.cartitem_set.all().delete()
+
                 return JsonResponse({'message': 'Payment successful'})
             else:
-                return JsonResponse({'message': 'Payment failed'})
+                return JsonResponse({'error': 'Payment failed'}, status=400)
 
-        except Order.DoesNotExist:
-            return JsonResponse({'message': 'Invalid Order ID'})
         except Exception as e:
             print(str(e))
-            return JsonResponse({'message': 'Server error, please try again later.'})
-
-
-
+            return JsonResponse({'error': 'Server error, please try again later.'}, status=500)
 
 def user_list(request):
     users = CustomUser.objects.filter(is_superadmin=False)
@@ -601,23 +631,28 @@ def add_to_wishlist(request, id):
             # The item is already in the wishlist
             messages.warning(request, f'{product.product_name} is already in your wishlist.')
     return redirect('wishlist')
-from django.shortcuts import render
-from .models import OrderItem  # Import your OrderItem model or the appropriate model
-
-from django.shortcuts import render
-from .models import OrderItem
-
-from django.shortcuts import render
+from django.shortcuts import render, redirect
+from django.contrib import messages
 from .models import OrderItem, CustomerProfile
 
 def ordersummary(request):
     if request.user.is_authenticated:
-        # Fetch order items and total amount specific to the logged-in user
-        order_items = OrderItem.objects.filter(order__user=request.user)
-        total_amount = sum(item.item_total for item in order_items)
+        try:
+            # Try to fetch the customer profile for the logged-in user
+            customer_profile = CustomerProfile.objects.get(customer=request.user)
+        except CustomerProfile.DoesNotExist:
+            # Handle the case where the CustomerProfile does not exist
+            # You can redirect the user to a profile creation page or display a message.
+            messages.warning(request, 'Please complete your profile to proceed.')
+            return redirect('Customer_Profile')  # Replace 'profile_creation' with your actual view name for profile creation
 
-        # Fetch the shipping address associated with the user (Assuming you have a CustomerProfile model)
-        customer_profile = CustomerProfile.objects.get(customer=request.user)
+        # Fetch distinct orders with a paid status
+        paid_orders = Order.objects.filter(user=request.user, payment_status=True)
+        
+        # Fetch the associated OrderItem instances
+        order_items = OrderItem.objects.filter(order__in=paid_orders)
+        
+        total_amount = sum(item.item_total for item in order_items)
 
         context = {
             'order_items': order_items,
@@ -631,9 +666,8 @@ def ordersummary(request):
 
         return render(request, 'ordersummary.html', context)
     else:
-        # Handle the case where the user is not authenticated (not logged in)
-        # You can redirect the user to a login page or display a message.
-        return render(request, 'not_authenticated.html')  # Create a 'not_authenticated.html' template for this case
+        # Redirect the user to the login page
+        return redirect('login')  # Replace 'login' with your actual login view name
 
 
 from django.shortcuts import render, redirect
@@ -699,3 +733,70 @@ def approve_disapprove_order(request):
             messages.error(request, f'Order {order_id} does not exist.')
 
     return redirect('all_user_orders')
+
+
+from django.http import JsonResponse
+from django.views.decorators.csrf import csrf_exempt
+import json
+from .models import OrderItem
+
+@csrf_exempt
+def cancel_order(request):
+    if request.method == 'POST':
+        data = json.loads(request.body)
+        item_id = data.get('item_id')
+
+        try:
+            order_item = OrderItem.objects.get(id=item_id)
+
+            # Implement your cancellation logic here
+            # For example, you might want to update the order item status
+            order_item.status = 'cancelled'
+            order_item.save()
+
+            return JsonResponse({'message': 'Order cancelled successfully'})
+        except OrderItem.DoesNotExist:
+            return JsonResponse({'message': 'Invalid Order Item ID'}, status=400)
+        except Exception as e:
+            print(str(e))
+            return JsonResponse({'message': 'Server error, please try again later.'}, status=500)
+from django.shortcuts import render, redirect
+from .models import ShippingAddress
+
+def add_shipping_address(request):
+    if request.method == 'POST':
+        # Get data from the request
+        street_address = request.POST.get('street_address')
+        city = request.POST.get('city')
+        state = request.POST.get('state')
+        pincode = request.POST.get('pincode')
+
+        # Validate the data (add your validation logic here)
+
+        # Create a new ShippingAddress instance
+        new_address = ShippingAddress.objects.create(
+            street_address=street_address,
+            city=city,
+            state=state,
+            pincode=pincode
+        )
+
+        return redirect('ordersummary', address_id=new_address.id)
+
+    return render(request, 'add_shipping_address.html')
+# views.py
+
+from django.http import JsonResponse
+from django.views.decorators.http import require_POST
+from django.shortcuts import get_object_or_404
+
+@require_POST
+def remove_item(request):
+    item_id = request.POST.get('item_id')
+
+    # Perform logic to remove the order with the given item_id
+    order = get_object_or_404(Order, id=item_id)
+    order.delete()
+
+    # Assuming the removal was successful, return a JSON response
+    return JsonResponse({'success': True})

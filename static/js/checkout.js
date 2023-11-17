@@ -17,80 +17,80 @@ document.addEventListener('DOMContentLoaded', function () {
         const rawPrice = totalItemAmount.textContent;
         const totalPrice = parseFloat(rawPrice.replace('₹', '').trim());
 
-        fetch("/create-order/", {
+        fetch("http://127.0.0.1:8000/create-order/", {
             method: 'POST',
             headers: {
                 'Content-Type': 'application/json',
                 'X-CSRFToken': getCookie('csrftoken')
             }
         })
-        .then(response => {
-            if (!response.ok) {
-                throw new Error('Network response was not ok');
-            }
-            return response.json();
-        })
-        .then(data => {
-            var options = {
-                "key": "rzp_test_CWNbERskB9qZzi",
-                "amount": totalPrice * 100,
-                "currency": "INR",
-                "name": "Ecommerce",
-                "description": "Order Payment",
-                "order_id": data['order_id'],
-                "prefill": {
-                    "name": fullName,
-                    "email": email
-                },
-                "handler": function (response) {
-                    const razorpay_order_id = response.razorpay_order_id;
-                    const payment_id = response.razorpay_payment_id;
-                    console.log(razorpay_order_id, payment_id)
-
-                    fetch("/handle-payment/", {
-                        method: 'POST',
-                        headers: {
-                            'Content-Type': 'application/json',
-                            'X-CSRFToken': getCookie('csrftoken')
-                        },
-                        body: JSON.stringify({
-                            'order_id': razorpay_order_id,
-                            'payment_id': payment_id
-                        })
-                    })
-                    .then(response => {
-                        if (!response.ok) {
-                            throw new Error('Network response was not ok during payment handling');
-                        }
-                        return response.json();
-                    })
-                    .then(data => {
-                        if (data.message === 'Payment successful') {
-                            const orderSection = document.getElementById('order-placed-section');
-                            const orderMessage = document.getElementById('order-success-message');
-
-                            // After a successful payment, redirect to the ordersummary page
-                            window.location.href = "{% url 'ordersummary' %}";
-
-                            orderMessage.textContent = "Successfully placed order!";
-                            orderSection.style.display = "block";
-                        } else {
-                            alert('Payment failed');
-                        }
-                    })
-                    .catch(error => {
-                        console.error('An error occurred while processing the payment.', error);
-                        alert('There was an issue processing your payment. Please try again.');
-                    });
+            .then(response => {
+                if (!response.ok) {
+                    throw new Error('Network response was not ok');
                 }
-            };
+                return response.json();
+            })
+            .then(data => {
+                var options = {
+                    "key": "rzp_test_CWNbERskB9qZzi",
+                    "amount": totalPrice * 100,
+                    "currency": "INR",
+                    "name": "Ecommerce",
+                    "description": "Order Payment",
+                    "order_id": data['order_id'],
+                    "prefill": {
+                        "name": fullName,
+                        "email": email
+                    },
+                    "handler": function (response) {
+                        const razorpay_order_id = response.razorpay_order_id;
+                        const payment_id = response.razorpay_payment_id;
+                        console.log(razorpay_order_id, payment_id)
 
-            var rzp1 = new Razorpay(options);
-            rzp1.open();
-        })
-        .catch(error => {
-            console.error('Error creating order:', error);
-            alert('There was an issue initiating your order. Please try again.');
-        });
+                        fetch("http://127.0.0.1:8000/handle-payment/", {
+                            method: 'POST',
+                            headers: {
+                                'Content-Type': 'application/json',
+                                'X-CSRFToken': getCookie('csrftoken')
+                            },
+                            body: JSON.stringify({
+                                'order_id': razorpay_order_id,
+                                'payment_id': payment_id
+                            })
+                        })
+                            .then(response => {
+                                if (!response.ok) {
+                                    throw new Error('Network response was not ok during payment handling');
+                                }
+                                return response.json();
+                            })
+                            .then(data => {
+                                if (data.message === 'Payment successful') {
+                                    const orderSection = document.getElementById('order-placed-section');
+                                    const orderMessage = document.getElementById('order-success-message');
+
+                                    orderMessage.textContent = "Successfully placed order!";
+                                    orderSection.style.display = "block";
+
+                                    // Redirect to ordersummary page
+                                    window.location.href = "{% url 'ordersummary' %}";
+                                } else {
+                                    alert('Payment failed');
+                                }
+                            })
+                            .catch(error => {
+                                console.error('An error occurred while processing the payment.', error);
+                                alert('There was an issue processing your payment. Please try again.');
+                            });
+                    }
+                };
+
+                var rzp1 = new Razorpay(options);
+                rzp1.open();
+            })
+            .catch(error => {
+                console.error('Error creating order:', error);
+                alert('There was an issue initiating your order. Please try again.');
+            });
     });
 });
