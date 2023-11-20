@@ -68,16 +68,18 @@ document.addEventListener('DOMContentLoaded', function () {
                                 if (data.message === 'Payment successful') {
                                     const orderSection = document.getElementById('order-placed-section');
                                     const orderMessage = document.getElementById('order-success-message');
-
+                            
                                     orderMessage.textContent = "Successfully placed order!";
                                     orderSection.style.display = "block";
+                            
+                                    
+var ordersummary_url = "{% url 'ordersummary' %}";
 
-                                    // Redirect to ordersummary page
-                                    window.location.href = "{% url 'ordersummary' %}";
                                 } else {
                                     alert('Payment failed');
                                 }
                             })
+                            
                             .catch(error => {
                                 console.error('An error occurred while processing the payment.', error);
                                 alert('There was an issue processing your payment. Please try again.');

@@ -11,7 +11,15 @@
   
     <!-- font awesome style -->
     <link href="{% static '/css/font-awesome.min.css' %}" rel="stylesheet" />
-  
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.0.2/dist/css/bootstrap.min.css" rel="stylesheet"
+    integrity="sha384-EVSTQN3/azprG1Anm3QDgpJLIm9Nao0Yz1ztcQTwFspd3yD65VohhpuuCOmLASjC"
+    crossorigin="anonymous">
+
+<!-- Your custom styles -->
+<link href="{% static '/css/style.css' %}" rel="stylesheet" />
+<link href="{% static '/css/responsive.css' %}" rel="stylesheet" />
+<!-- Font Awesome -->
+<link href="{% static '/css/font-awesome.min.css' %}" rel="stylesheet" />
     <!-- Custom styles for this template -->
     <link href="{% static '/css/style.css' %}" rel="stylesheet" />
     <!-- responsive style -->
@@ -146,15 +154,14 @@
               
                 
   
-                <!-- Inside your user_optio_box div -->
-                <div class="user_optio_box" >
-                  {% if request.session.is_authenticated %}
-                    <!-- Display "Logout" button when the user is authenticated -->
-                    <a href="{% url 'logout' %}">
-                      <i class="fa fa-sign-out" aria-hidden="true"></i> Logout<span class="sr-only">(current)</span>
-                    </a>
+                <div class="user_optio_box">
+                
+                  {% if user.is_authenticated %}
+                    <li>Welcome,{{user.username}}</li>
+                      <a href="{% url 'logout' %}">
+                        <i class="fa fa-sign-out" aria-hidden="true"></i> Logout
+                      </a>
                   {% else %}
-                    <!-- Display "Login" link when the user is not authenticated -->
                     <a href="{% url 'login' %}">
                       <i class="fa fa-sign-in" aria-hidden="true"></i> Login
                     </a>
@@ -183,61 +190,92 @@
         </div>
       </header>
     <style>
-        /* Reset some default styles */
+       
+     
+    
         body {
-            font-family: Arial, sans-serif;
+            font-family: 'Roboto', sans-serif;
             margin: 0;
             padding: 0;
             background-color: #f0f0f0;
         }
 
-        /* Style the container */
         .container {
-            max-width: 1500px;
+            max-width: 1200px;
             margin: 0 auto;
             padding: 20px;
             background-color: #fff;
         }
 
-        /* Style the heading */
         h1 {
             text-align: center;
             color: #333;
         }
 
-        /* Style product cards */
-        .product-card {
-            background-color: #fff;
-            border: 1px solid #ddd;
-            padding: 10px;
-            text-align: center;
+        .search-sort-container {
+            display: flex;
+            flex-wrap: wrap;
+            justify-content: space-between;
             margin-bottom: 20px;
-            width: 55%; /* Set the width to 45% for two products in one row */
-            display:block; /* Display products side by side */
-            margin-right: 4%; /* Add some space between products */
         }
 
-        /* Style product images */
+        .search-form, .filter-form, .sort-form {
+            flex-basis: 30%;
+            margin-bottom: 10px;
+        }
+
+        .input-group {
+            width: 100%;
+            margin-bottom: 10px;
+        }
+
+        .input-group label {
+            width: 100%;
+            text-align: left;
+        }
+
+        .input-group input {
+            width: 100%;
+        }
+
+        .radio-container {
+            display: flex;
+            align-items: center;
+        }
+
+        .radio-container label {
+            margin-right: 10px;
+        }
+
+        .product-card {
+            border: 1px solid #ccc;
+            border-radius: 8px;
+            padding: 16px;
+            margin: 16px;
+            box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
+            display: inline-block;
+            vertical-align: top;
+            width: 100%;
+            background: white;
+        }
+
         .product-card img {
             max-width: 100%;
             height: auto;
-            margin-bottom: 1px;
+            margin-bottom: 12px;
         }
 
-        /* Style product titles */
         .product-card h3 {
             font-size: 1.5rem;
             margin: 10px 0;
             color: #333;
         }
 
-        /* Style product details */
         .product-card p {
             font-size: 1rem;
-            margin: 10px 10px;
+            margin: 5px 0;
         }
 
-        /* Style buttons */
         .btn {
             padding: 10px 20px;
             font-size: 1rem;
@@ -256,64 +294,88 @@
             color: #fff;
             border: none;
         }
-
-    /* Add strikethrough style to the product price */
-    .product-card p .product-price {
-        text-decoration: line-through;
-        color: #999; /* You can change the color to your preference */
-        margin-right: 5px; /* Add some space between original and discounted price */
-    }
-
-    /* Style the discounted price */
-    .product-card p .product-sale-price {
-        color: #28a745; /* Change to the desired color for discounted price */
-    }
-    
-    /* Rest of your CSS styles... */
-</style>
-
-</style>
-
-        
     </style>
+
 </head>
 <body>
+
   
- 
+  
+
+
+  
   <div class="container">
       <h1><center>Our Products</center></h1>
-      <div class="row">
-          {% for product in products %}
-              {% if product.status == 'In Stock' %}
-                  <div class="col-md-6">
-                      <div class="product-card">
-                         
-
-
-
-                          <a href="{% url 'view_details' product.id %}">
-                            <img src="{{ product.watch_image.url }}" alt="{{ product.product_name }}">
-                        </a>
-                        <h3>{{ product.product_name }}</h3>
-                        <p>
-                            <strong>Product Price:</strong>
-                            <span class="product-price">${{ product.product_price }}</span>
-                            {% if product.product_sale_price %}
-                                <span class="product-sale-price">${{ product.product_sale_price }}</span>
-                            {% endif %}
-                        </p>
-                        <p><strong>Discount:</strong> {{ product.discount }}%</p>
-                    </div>
-                          
+  
+      <!-- Search and Sort container -->
+      <div class="search-sort-container">
+          <!-- Search form -->
+          <form method="GET" action="{% url 'search_products' %}" class="search-form">
+              <div class="input-group mb-3">
+                  <label for="search_name" class="input-group-text">Search by Product Name:</label>
+                  <input type="text" name="search_name" id="search_name" class="form-control">
+              </div>
+  
+              <div class="input-group mb-3">
+                  <label for="search_category" class="input-group-text">Search by Category:</label>
+                  <input type="text" name="search_category" id="search_category" class="form-control">
+              </div>
+  
+              <button type="submit" class="btn btn-primary">Search</button>
+          </form>
+  
+          <!-- Category filter form with radio buttons -->
+          <form method="GET" action="{% url 'filter_products_by_category' %}" class="filter-form">
+              <div class="input-group mb-3 radio-container">
+                  <label class="input-group-text">Filter by Category:</label>
+                  <div>
+                      <label><input type="radio" name="category" value="All"> All</label>
+                      <label><input type="radio" name="category" value="Men"> Men</label>
+                      <label><input type="radio" name="category" value="Women"> Women</label>
                   </div>
-              {% endif %}
+                  <button type="submit" class="btn btn-primary">Filter</button>
+              </div>
+          </form>
+  
+          <!-- Sort form with radio buttons -->
+          <form method="GET" action="{% url 'sort_products' %}" class="sort-form">
+              <div class="input-group mb-3 radio-container">
+                  <label for="sort_option" class="input-group-text">Sort by Price:</label>
+                  <div>
+                      <label><input type="radio" name="sort_option" value="asc"> Low to High</label>
+                      <label><input type="radio" name="sort_option" value="desc"> High to Low</label>
+                  </div>
+                  <button type="submit" class="btn btn-primary">Sort</button>
+              </div>
+          </form>
+      </div>
+      <div class="row">
+      
+          {% for product in products %}
+          {% if product.status == 'In Stock' %}
+          <div class="col-md-6">
+              <div class="product-card">
+                  <a href="{% url 'view_details' product.id %}">
+                      <img src="{{ product.watch_image.url }}" alt="{{ product.product_name }}">
+                  </a>
+                  <h3>{{ product.product_name }}</h3>
+                  <p>
+                      <strong>Product Price:</strong>
+                      <span class="product-price">${{ product.product_price }}</span>
+                      {% if product.product_sale_price %}
+                      <span class="product-sale-price">${{ product.product_sale_price }}</span>
+                      {% endif %}
+                  </p>
+                  <p><strong>Discount:</strong> {{ product.discount }}%</p>
+              </div>
+          </div>
+          {% endif %}
           {% endfor %}
       </div>
   </div>
+  
+  <!-- Bootstrap JS and other scripts... -->
+  
   </body>
   </html>
   
-
-
-
-

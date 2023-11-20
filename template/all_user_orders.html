@@ -76,7 +76,7 @@
                 {% for user, orders in user_orders.items %}
                     {% for order in orders %}
                         <tr>
-                            <td>{{ user.name }}</td>
+                            <td>{{ user.username }}</td>
                             <td>{{ order.id }}</td>
                             <td>&#8377;{{ order.total_amount }}</td>
                             <td>{% if order.payment_status %}Paid{% else %}Not Paid{% endif %}</td>

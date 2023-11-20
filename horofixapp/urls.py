@@ -44,6 +44,10 @@ urlpatterns = [
     path('approve_disapprove_order/', views.approve_disapprove_order, name='approve_disapprove_order'),
     path('add-shipping-address/', views.add_shipping_address, name='add_shipping_address'),
     path('remove_item/', views.remove_item, name='remove_item'),
+    path('search_products/',views.search_products, name='search_products'),
+    path('sort-products/', views.sort_products, name='sort_products'),
+    path('filter-products-by-category/', views.filter_products_by_category, name='filter_products_by_category'),
+
     path('ordersummary/', views.ordersummary, name='ordersummary'),
     path('wishlist/', views.wishlist, name='wishlist'),
     path('remove_from_wishlist/<int:wishlist_item_id>/', views.remove_from_wishlist, name='remove_from_wishlist'),

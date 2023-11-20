@@ -77,17 +77,14 @@
               </li>
             </ul>
             <div class="user_optio_box"> -->
-
-
-              <!-- Inside your user_optio_box div -->
-              <div class="user_optio_box" >
-                {% if request.session.is_authenticated %}
-                  <!-- Display "Logout" button when the user is authenticated -->
-                  <a href="{% url 'logout' %}">
-                    <i class="fa fa-sign-out" aria-hidden="true"></i> Logout<span class="sr-only">(current)</span>
-                  </a>
+              <div class="user_optio_box">
+                
+                {% if user.is_authenticated %}
+                  <li>Welcome,{{user.username}}</li>
+                    <a href="{% url 'logout' %}">
+                      <i class="fa fa-sign-out" aria-hidden="true"></i> Logout
+                    </a>
                 {% else %}
-                  <!-- Display "Login" link when the user is not authenticated -->
                   <a href="{% url 'login' %}">
                     <i class="fa fa-sign-in" aria-hidden="true"></i> Login
                   </a>
@@ -255,7 +252,7 @@
         const phone = document.getElementById("phone").value;
 
         // Construct the URL with parameters
-        const url = `/placeorder.html?name=${name}&streetAddress=${streetAddress}&country=${country}&state=${state}&pincode=${pincode}&phone=${phone}`;
+        const url = `/ordersummary.html?name=${name}&streetAddress=${streetAddress}&country=${country}&state=${state}&pincode=${pincode}&phone=${phone}`;
         window.location.href = url;
     }
 

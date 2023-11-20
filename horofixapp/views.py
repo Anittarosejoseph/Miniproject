@@ -68,6 +68,8 @@ def register_user(request):
 
 @never_cache
 def login_user(request):
+    if request.user.is_authenticated:
+        return redirect('index')
     if request.method == 'POST':
         username = request.POST["username"]
         password = request.POST["password"]
@@ -82,15 +84,11 @@ def login_user(request):
                     request.session['is_authenticated'] = True
                 
                     return redirect('/')
-                # elif request.user.user_typ == CustomUser.VENDOR:
-                #     print("user is therapist")
-                #     return redirect(reverse('therapist'))
+               
                 elif request.user.user_types == CustomUser.ADMIN:
                     print("user is admin")                   
                     return redirect('adminpanel')
-                # else:
-                #     print("user is normal")
-                #     return redirect('')
+                
 
             else:
                 messages.success(request,("Invalid credentials."))
@@ -135,10 +133,10 @@ def Customer_Profile(request):
 
 @login_required(login_url='login')
 def custom_logout(request):
-     if request.session.get('is_authenticated'):
-        del request.session['is_authenticated'] 
-        logout(request)
-        return redirect('index')
+    #  if request.session.get('is_authenticated'):
+    #     del request.session['is_authenticated'] 
+    logout(request)
+    return redirect('index')
 @login_required
 def adminpanel(request):
     return render(request, 'adminpanel.html')
@@ -571,7 +569,7 @@ def handle_payment(request):
                 # Clear the user's cart after a successful payment
                 request.user.cart.cartitem_set.all().delete()
 
-                return JsonResponse({'message': 'Payment successful'})
+                return JsonResponse({'message': 'Payment successful', 'redirect_url': '/ordersummary/'})
             else:
                 return JsonResponse({'error': 'Payment failed'}, status=400)
 
@@ -632,7 +630,6 @@ def add_to_wishlist(request, id):
             messages.warning(request, f'{product.product_name} is already in your wishlist.')
     return redirect('wishlist')
 from django.shortcuts import render, redirect
-from django.contrib import messages
 from .models import OrderItem, CustomerProfile
 
 def ordersummary(request):
@@ -646,12 +643,9 @@ def ordersummary(request):
             messages.warning(request, 'Please complete your profile to proceed.')
             return redirect('Customer_Profile')  # Replace 'profile_creation' with your actual view name for profile creation
 
-        # Fetch distinct orders with a paid status
-        paid_orders = Order.objects.filter(user=request.user, payment_status=True)
-        
-        # Fetch the associated OrderItem instances
-        order_items = OrderItem.objects.filter(order__in=paid_orders)
-        
+        # Fetch only the orders with a paid status
+        order_items = OrderItem.objects.filter(order__user=request.user, order__payment_status=True)
+
         total_amount = sum(item.item_total for item in order_items)
 
         context = {
@@ -668,7 +662,6 @@ def ordersummary(request):
     else:
         # Redirect the user to the login page
         return redirect('login')  # Replace 'login' with your actual login view name
-
 
 from django.shortcuts import render, redirect
 from django.contrib.auth.decorators import login_required
@@ -800,3 +793,54 @@ def remove_item(request):
 
     # Assuming the removal was successful, return a JSON response
     return JsonResponse({'success': True})
+
+from django.shortcuts import render
+from .models import WatchProduct
+
+def search_products(request):
+    query_name = request.GET.get('search_name')
+    query_category = request.GET.get('search_category')
+
+    products = WatchProduct.objects.filter(status='In Stock')
+
+    if query_name:
+        products = products.filter(product_name__icontains=query_name)
+
+    if query_category:
+        products = products.filter(category=query_category)
+
+    return render(request, 'customer_product.html', {'products': products})
+
+# views.py
+
+from django.shortcuts import render
+from .models import WatchProduct
+def sort_products(request):
+    # Get the sort option from the request
+    sort_option = request.GET.get('sort_option', 'asc')
+
+    # Retrieve the products from the database
+    if sort_option == 'asc':
+        products = WatchProduct.objects.filter(status='In Stock').order_by('product_price')
+    elif sort_option == 'desc':
+        products = WatchProduct.objects.filter(status='In Stock').order_by('-product_price')
+    else:
+        # Handle other cases or default sorting
+        products = WatchProduct.objects.filter(status='In Stock').order_by('product_price')
+
+    # Render the template with the sorted products
+    context = {'products': products}
+    return render(request, 'customer_product.html', context)
+
+
+def filter_products_by_category(request):
+    category = request.GET.get('category')
+
+    if category == 'All':
+        products = WatchProduct.objects.filter(status='In Stock')
+    else:
+        products = WatchProduct.objects.filter(category=category, status='In Stock')
+
+
+
+    return render(request, 'customer_product.html', {'products': products})
