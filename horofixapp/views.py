@@ -779,20 +779,6 @@ def add_shipping_address(request):
     return render(request, 'add_shipping_address.html')
 # views.py
 
-from django.http import JsonResponse
-from django.views.decorators.http import require_POST
-from django.shortcuts import get_object_or_404
-
-@require_POST
-def remove_item(request):
-    item_id = request.POST.get('item_id')
-
-    # Perform logic to remove the order with the given item_id
-    order = get_object_or_404(Order, id=item_id)
-    order.delete()
-
-    # Assuming the removal was successful, return a JSON response
-    return JsonResponse({'success': True})
 
 from django.shortcuts import render
 from .models import WatchProduct
@@ -844,3 +830,41 @@ def filter_products_by_category(request):
 
 
     return render(request, 'customer_product.html', {'products': products})
+from django.shortcuts import render, redirect, get_object_or_404
+from django.contrib import messages
+from .models import OrderItem, WatchProduct
+
+def rate_product(request):
+    if request.method == 'POST':
+        item_id = request.POST.get('item_id')
+        rating = request.POST.get('rating')
+
+        # Get the OrderItem and associated product
+        order_item = get_object_or_404(OrderItem, id=item_id)
+        product = order_item.product
+
+        # Update the product's ratings
+        product.ratings += int(rating)
+        product.save()
+
+        # You can also store the rating and review in the OrderItem model if needed
+        order_item.rating = int(rating)
+        order_item.save()
+
+        messages.success(request, 'Product rated successfully.')
+    else:
+        messages.error(request, 'Invalid request.')
+
+    # Redirect back to the order summary page
+    return redirect('ordersummary')
+from django.shortcuts import get_object_or_404, redirect
+
+def remove_order_item(request, item_id):
+    order_item = get_object_or_404(OrderItem, id=item_id)
+
+    # Set the 'is_removed' flag to True
+    order_item.is_removed = True
+    order_item.save()
+
+    # Redirect back to the order summary page or any desired page
+    return redirect('ordersummary')

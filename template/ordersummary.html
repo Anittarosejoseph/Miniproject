@@ -195,15 +195,33 @@
                                     <p><strong>Order Date:</strong> {{ item.order_date }}</p>
                                     <p><strong>Order Time:</strong> {{ item.order_time }}</p>
                                 </div>
-                                <div class="col-md-12 text-end btn-cancel-order">
-                                    <!-- Add cancel button here -->
-                                    <button class="btn btn-danger" onclick="removeItem('{{ item.id }}')">Remove</button>
-                                  </div>
-                            </div>
-                        </li>
-                    {% endfor %}
-                </ul>
-            </div>
+<div class="col-md-12 text-end btn-cancel-order">
+  <button class="btn btn-danger" onclick="removeItem('{{ item.id }}')">Remove</button>
+</div>
+
+                                                  <form method="post" action="{% url 'rate_product' %}">
+                                                      {% csrf_token %}
+                                                      <input type="hidden" name="item_id" value="{{ item.id }}">
+                                                      <!-- Add this block of code inside the <form> tag -->
+<div class="rating-section">
+  <label for="rating">Rate this product:</label>
+  <div class="rating-buttons">
+      {% for rating_value in '12345' %}
+          <input type="radio" id="rating{{ rating_value }}" name="rating" value="{{ rating_value }}" {% if rating_value == '5' %}checked{% endif %}>
+          <label for="rating{{ rating_value }}">{{ rating_value }}</label>
+      {% endfor %}
+  </div>
+</div>
+<button type="submit" class="btn btn-primary">Submit Rating</button>
+
+                                                  </form>
+                                              </div>
+                                          </li>
+                                      {% endfor %}
+                                  </ul>
+                              </div>
+                              
+                           
 
             <div class="order-total">
                 <h2>Total Amount</h2>
@@ -221,23 +239,19 @@
   function removeItem(itemId) {
       // Show a confirmation dialog
       var confirmed = window.confirm('Do you want to remove this item?');
-      
+
       // If the user confirms, proceed with the removal
       if (confirmed) {
           // Send an AJAX request to the server to remove the item
           $.ajax({
-              url: '{% url "remove_item" %}',  // Update the URL to the endpoint handling item removal
-              method: 'POST',
-              data: {
-                  'item_id': itemId,
-                  'csrfmiddlewaretoken': '{{ csrf_token }}'  // Include CSRF token for security
-              },
-              success: function(response) {
+              url: '/remove_order_item/' + itemId + '/',  // Update the URL to your endpoint
+              method: 'GET',  // You can use POST if needed
+              success: function (response) {
                   // Handle success, update the UI, etc.
                   // You may want to remove the item from the DOM
                   $('#item-' + itemId).remove();
               },
-              error: function(error) {
+              error: function (error) {
                   // Handle error, show a message, etc.
                   console.error('Error removing item:', error);
               }
@@ -245,4 +259,24 @@
       }
   }
 </script>
+
+<script>
+  // Add event listener to radio buttons
+  document.addEventListener('DOMContentLoaded', function() {
+      var ratingButtons = document.querySelectorAll('.rating-buttons input[type="radio"]');
+      
+      ratingButtons.forEach(function(button) {
+          button.addEventListener('change', function() {
+              localStorage.setItem('selectedRating', this.value);
+          });
+      });
+
+      // Check for a previously selected rating
+      var selectedRating = localStorage.getItem('selectedRating');
+      if (selectedRating) {
+          document.querySelector('.rating-buttons input[value="' + selectedRating + '"]').checked = true;
+      }
+  });
+</script>
+
 {% endblock %}

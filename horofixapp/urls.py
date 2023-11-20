@@ -43,10 +43,11 @@ urlpatterns = [
     path('all_user_orders/', views.all_user_orders, name='all_user_orders'),
     path('approve_disapprove_order/', views.approve_disapprove_order, name='approve_disapprove_order'),
     path('add-shipping-address/', views.add_shipping_address, name='add_shipping_address'),
-    path('remove_item/', views.remove_item, name='remove_item'),
     path('search_products/',views.search_products, name='search_products'),
     path('sort-products/', views.sort_products, name='sort_products'),
     path('filter-products-by-category/', views.filter_products_by_category, name='filter_products_by_category'),
+    path('rate_product/', views.rate_product, name='rate_product'),
+    path('remove_order_item/<int:item_id>/', views.remove_order_item, name='remove_order_item'),
 
     path('ordersummary/', views.ordersummary, name='ordersummary'),
     path('wishlist/', views.wishlist, name='wishlist'),

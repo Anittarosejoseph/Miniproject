@@ -160,7 +160,7 @@ class WatchProduct(models.Model):
     discount = models.DecimalField(max_digits=5, decimal_places=2, null=True)
     category = models.CharField(max_length=10, choices=[('Men', 'Men'), ('Women', 'Women')], default=None)
     stock = models.PositiveIntegerField(default=1, null=True)  # Add the 'stock' field
-
+    ratings = models.IntegerField(default=0) 
     # Modify the STATUS_CHOICES
     STATUS_CHOICES = [
         ('In Stock', 'In Stock'),
@@ -236,6 +236,7 @@ class OrderItem(models.Model):
     item_total = models.DecimalField(max_digits=10, decimal_places=2)
     order_date = models.DateField(auto_now_add=True)
     order_time = models.TimeField(auto_now_add=True)
+    is_removed = models.BooleanField(default=False)
 
     def __str__(self):
         return f"{self.quantity} x {self.product.product_name} in Order {self.order.id}"
