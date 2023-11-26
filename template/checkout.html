@@ -124,15 +124,12 @@
 <div id="checkout-data" data-email="{{ email }}" data-fullname="{{ full_name }}">
 </div>
 
-
-
-<script src="https://checkout.razorpay.com/v1/checkout.js"></script>
 <script src="{% static 'js/checkout.js' %}"></script>
 <script src="https://checkout.razorpay.com/v1/checkout.js"></script>
 
 <script>
     var handlePaymentUrl = "{% url 'handle-payment' %}";
-
+    var orderCompleteUrl="{% url 'ordersummary' %}";
 </script>
 
 

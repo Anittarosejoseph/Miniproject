@@ -1,0 +1,18 @@
+<!-- order_list.html -->
+{% extends 'base.html' %}
+
+{% block content %}
+  <h2>Order List</h2>
+  <ul>
+    {% for order in orders %}
+      <li>
+        Order #{{ order.id }} - Total Amount: ${{ order.total_amount }} - 
+        {% if order.delivered %}
+          Delivered
+        {% else %}
+          <a href="{% url 'order_delivery_update' pk=order.id %}">Update Delivery</a>
+        {% endif %}
+      </li>
+    {% endfor %}
+  </ul>
+{% endblock %}

@@ -88,8 +88,8 @@ def login_user(request):
                 elif request.user.user_types == CustomUser.ADMIN:
                     print("user is admin")                   
                     return redirect('adminpanel')
-                
-
+                elif user.user_types == CustomUser.DELIVERYTEAM:
+                    return redirect('deliveryteam_dashboard') 
             else:
                 messages.success(request,("Invalid credentials."))
         else:
@@ -211,7 +211,6 @@ def edit_product(request, product_id):
 
 
 
-
 @never_cache
 def add_product(request):
     if request.method == 'POST':
@@ -321,7 +320,9 @@ def view_cart(request):
         # If the user is not authenticated, you may want to redirect them to the login page
         return redirect('login')  # Replace 'login' with the actual name of your login URL pattern
 
-
+def deliveryteam_dashboard(request):
+    # Add any logic specific to the delivery team dashboard
+    return render(request, 'deliveryteam_dashboard.html')
 
 
     from django.shortcuts import get_object_or_404, redirect
@@ -868,3 +869,65 @@ def remove_order_item(request, item_id):
 
     # Redirect back to the order summary page or any desired page
     return redirect('ordersummary')
+# views.py
+
+from django.shortcuts import render, redirect
+from django.contrib import messages
+from django.core.mail import send_mail
+from django.conf import settings
+from django.template.loader import render_to_string
+from .models import DeliveryTeam, CustomUser
+
+def register_delivery_team(request):
+    if request.method == 'POST':
+        # Get data from the request
+        name = request.POST.get('name')
+        username = request.POST.get('username')
+        email = request.POST.get('email')
+        phone = request.POST.get('phone')
+        location = request.POST.get('location')
+        password = request.POST.get('password')
+        confirm_password = request.POST.get('confirm_password')
+
+        # Basic password validation
+        if password != confirm_password:
+            messages.error(request, 'Passwords do not match.')
+            return redirect('register_delivery_team')
+
+        # Create a new CustomUser instance
+        user = CustomUser(
+            name=name,
+            username=username,
+            email=email,
+            phone=phone,
+            password=password
+        )
+        user.save()
+
+        # Create a new DeliveryTeam instance linked to the user
+        delivery_team = DeliveryTeam(
+            user=user,
+            location=location
+        )
+        delivery_team.save()
+
+        # Send a welcome email to the new delivery boy
+        subject = 'Welcome to our Delivery Team'
+        message = render_to_string('welcome_email_template.txt', {'user': user, 'password': password})
+        from_email = 'admin@horofix.com'
+        recipient_list = [email]  # Use the actual email field from your model
+
+        send_mail(subject, message, from_email, recipient_list)
+
+        messages.success(request, 'Delivery team added successfully. Welcome email sent.')
+        return redirect('delivery_team_list')  # Replace with the actual URL pattern for the delivery team list
+
+    return render(request, 'register_delivery_team.html')
+
+
+def delivery_team_list(request):
+    delivery_teams = DeliveryTeam.objects.all()
+    return render(request, 'delivery_team_list.html', {'delivery_teams': delivery_teams})
+def delete_delivery_boy(request, user_id):
+   
+    return redirect('delivery_team_list')

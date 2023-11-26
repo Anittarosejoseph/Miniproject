@@ -1,0 +1,8 @@
+Hello {{ user.name }},
+
+Welcome to our Delivery Team! Your username is: {{ user.username }} and your password is: {{ password }}.
+
+Thank you for joining us!
+
+Best regards,
+Horofix

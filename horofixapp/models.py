@@ -11,7 +11,7 @@ from django.contrib.auth.models import AbstractUser, BaseUserManager
 # Create your models here.
 
 class UserManager(BaseUserManager):
-     def create_user(self,name, username, phone, email, password=None):
+    def create_user(self,name, username, phone, email, password=None):
          if not email:
              raise ValueError('User must have an email address')
 
@@ -24,8 +24,8 @@ class UserManager(BaseUserManager):
          user.set_password(password)
          user.save(using=self._db)
          return user
-
-     def create_superuser(self,name,phone, email, password=None):
+    
+    def create_superuser(self,name,phone, email, password=None):
         
          user = self.create_user(
               email=self.normalize_email(email),
@@ -79,7 +79,7 @@ class CustomUser(AbstractUser):
     #REQUIRED_FIELDS = ['first_name','last_name', 'phone']
 
     objects = UserManager()
-
+   
     def str(self):
         return self.email
 
@@ -88,7 +88,7 @@ class CustomUser(AbstractUser):
 
     def has_module_perms(self, app_label):
         return True
-
+    
 
 
 class UserProfile(models.Model):
@@ -152,7 +152,7 @@ class CustomerProfile(models.Model):
 from django.db import models
 
 class WatchProduct(models.Model):
-    product_name = models.CharField(max_length=255, unique=True)  # Add unique=True to prevent duplicates
+    product_name = models.CharField(max_length=255, unique=True) 
     watch_description = models.TextField()
     watch_image = models.ImageField(upload_to='watch_images/', null=True, blank=True)
     product_price = models.DecimalField(max_digits=10, decimal_places=2, null=True)
@@ -213,6 +213,7 @@ class Address(models.Model):
     def __str__(self):
         return f"Address for {self.user.username}"
 
+from django.utils import timezone
 
 
 class Order(models.Model):
@@ -222,7 +223,7 @@ class Order(models.Model):
     payment_id = models.CharField(max_length=100, null=True, blank=True)
     payment_status = models.BooleanField(default=False)
     created_at = models.DateTimeField(auto_now_add=True)
-
+    
     def __str__(self):
         return f"Order {self.id} by {self.user.username}"
    
@@ -259,3 +260,13 @@ class ShippingAddress(models.Model):
 
     def __str__(self):
         return f"{self.street_address}, {self.city}, {self.state} - {self.pincode}"
+# models.py
+from django.db import models
+from .models import CustomUser
+
+class DeliveryTeam(models.Model):
+    user = models.OneToOneField(CustomUser, on_delete=models.CASCADE)
+    location = models.CharField(max_length=255, blank=True, null=True)  
+
+    def __str__(self):
+        return self.user.username
