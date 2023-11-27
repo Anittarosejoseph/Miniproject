@@ -49,10 +49,8 @@ urlpatterns = [
     path('rate_product/', views.rate_product, name='rate_product'),
     path('remove_order_item/<int:item_id>/', views.remove_order_item, name='remove_order_item'),
     path('ordersummary/', views.ordersummary, name='ordersummary'),
-    path('register_delivery_team/', views.register_delivery_team, name='register_delivery_team'),
-    path('deliveryteam_dashboard/', views.deliveryteam_dashboard, name='deliveryteam_dashboard'),
-    path('delivery_team_list/', views.delivery_team_list, name='delivery_team_list'),
-    path('delete_delivery_boy/<int:user_id>/', views.delete_delivery_boy, name='delete_delivery_boy'),
+    path('register_delivery_team/',views. register_delivery_team, name='register_delivery_team'),
+    path('deliverindex/',views. deliveryindex, name='deliveryindex'),
 
     path('wishlist/', views.wishlist, name='wishlist'),
     path('remove_from_wishlist/<int:wishlist_item_id>/', views.remove_from_wishlist, name='remove_from_wishlist'),

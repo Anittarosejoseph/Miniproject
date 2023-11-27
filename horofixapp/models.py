@@ -38,9 +38,9 @@ class UserManager(BaseUserManager):
          user.is_active = True
          user.is_staff = True
          user.is_superadmin = True
-         user.role=1
          user.save(using=self._db)
          return user
+
 
 class CustomUser(AbstractUser):
     ADMIN = 1
@@ -67,7 +67,7 @@ class CustomUser(AbstractUser):
     phone = models.CharField(max_length=10,blank=True)
     password = models.CharField(max_length=128)
    # confirmPassword = models.CharField(max_length=128)
-    #role = models.PositiveSmallIntegerField(choices=ROLE_CHOICE, blank=True, null=True,default='1')
+    # role = models.PositiveSmallIntegerField(choices=ROLE_CHOICE, blank=True, null=True,default='1')
 
 
     is_admin = models.BooleanField(default=False)
@@ -88,7 +88,7 @@ class CustomUser(AbstractUser):
 
     def has_module_perms(self, app_label):
         return True
-    
+   
 
 
 class UserProfile(models.Model):
@@ -260,13 +260,12 @@ class ShippingAddress(models.Model):
 
     def __str__(self):
         return f"{self.street_address}, {self.city}, {self.state} - {self.pincode}"
-# models.py
 from django.db import models
-from .models import CustomUser
 
 class DeliveryTeam(models.Model):
     user = models.OneToOneField(CustomUser, on_delete=models.CASCADE)
-    location = models.CharField(max_length=255, blank=True, null=True)  
+    location = models.TextField(default='', null=True)  # Field for the employee's address
+    active = models.BooleanField(default=True)
 
     def __str__(self):
-        return self.user.username
+        return f"{self.user.username}"

@@ -1,0 +1,23 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Delivery Team Dashboard</title>
+</head>
+<body>
+    <h2>Welcome to the Delivery Team Dashboard</h2>
+
+    {% if user.is_authenticated %}
+        <p>Hello, {{ user.name }}!</p>
+        <p>Your email: {{ user.email }}</p>
+        <p>Your phone: {{ user.phone }}</p>
+
+        <h3>Delivery Team Details:</h3>
+        <p>Location: {{ user.deliveryteam.location }}</p>
+        <p>Status: {% if user.deliveryteam.active %}Active{% else %}Inactive{% endif %}</p>
+    {% else %}
+        <p>You are not logged in. <a href="{% url 'login' %}">Login</a></p>
+    {% endif %}
+</body>
+</html>

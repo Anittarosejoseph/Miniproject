@@ -210,7 +210,10 @@ SESSION_COOKIE_AGE = 600 # 2 weeks
 AUTHENTICATION_BACKENDS = [
     'django.contrib.auth.backends.ModelBackend',
     'allauth.account.auth_backends.AuthenticationBackend',
+ 
 ]
+
+
 
 # SOCIALACCOUNT_LOGIN_ON_GET=True
 # django_project/settings.py
