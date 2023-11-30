@@ -92,57 +92,50 @@
             </div>
             <a href="{% url 'logout' %}" class="logout-button">Logout</a>
         </div>
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Delivery Team List</title>
+</head>
+<body>
 
-        <!-- Flex Container for Small Boxes -->
-        <div class="small-box-container">
-            <!-- User Statistics Small Box -->
-            <div class="small-box">
-                <h2>User Statistics</h2>
-                <canvas id="userStatsChart"></canvas>
-            </div>
-            <!-- Add Product Here Small Box -->
-            <div class="small-box">
-                <h2>Add Product Here</h2>
-                <a href="{% url 'add_product' %}">Add Product</a>
-            </div>
-            <!-- Recent Orders Small Box -->
-            <div class="small-box">
-                <h2>Recent Orders</h2>
-                <p>484 new Arrivals</p>
-            </div>
-        </div>
-    </div>
+    <body>
 
-    <!-- Add the JavaScript code for the user statistics chart here -->
-    <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
-    <script>
-        // Sample user statistics data (replace with your actual data)
-        var userData = {
-            labels: ["Jan", "Feb", "Mar", "Apr", "May", "Jun"],
-            datasets: [{
-                label: "User Count",
-                data: [100, 150, 200, 250, 300, 350],
-                backgroundColor: "rgba(75, 192, 192, 0.2)",
-                borderColor: "rgba(75, 192, 192, 1)",
-                borderWidth: 1
-            }]
-        };
-
-        // Get the canvas element by id
-        var ctx = document.getElementById('userStatsChart').getContext('2d');
-
-        // Create a new chart using Chart.js
-        var userStatsChart = new Chart(ctx, {
-            type: 'bar',
-            data: userData,
-            options: {
-                scales: {
-                    y: {
-                        beginAtZero: true
-                    }
-                }
-            }
-        });
-    </script>
-</body>
-</html>
+        <h1>Delivery Team List</h1>
+    
+        <table border="1">
+            <thead>
+                <tr>
+                    <th>User</th>
+                    <th>Name</th>
+                    <th>Username</th>
+                    <th>Email</th>
+                    <th>Phone</th>
+                    <th>Team Name</th>
+                    <th>Vehicle Number</th>
+                    <th>Pincode</th>
+                    <th>Active</th>
+                </tr>
+            </thead>
+            <tbody>
+                {% for delivery_team in delivery_teams %}
+                    <tr>
+                        <td>{{ delivery_team.user.name }}</td>
+                        <td>{{ delivery_team.user.customerprofile.name }}</td>
+                        <td>{{ delivery_team.user.username }}</td>
+                        <td>{{ delivery_team.user.email }}</td>
+                        <td>{{ delivery_team.user.phone }}</td>
+                        <td>{{ delivery_team.team_name }}</td>
+                        <td>{{ delivery_team.vehicle_number }}</td>
+                        <td>{{ delivery_team.pincode }}</td>
+                        <td>{{ delivery_team.active }}</td>
+                    </tr>
+                {% endfor %}
+            </tbody>
+        </table>
+    
+    </body>
+    </html>
+    

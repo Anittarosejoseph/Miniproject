@@ -1,6 +1,5 @@
 #from django.db import models
 from django.contrib.auth.models import User
-
 from django.db import models
 from datetime import date
 from django.db.models.signals import post_save
@@ -18,6 +17,7 @@ class UserManager(BaseUserManager):
          user = self.model(
              email=self.normalize_email(email),
              name= name,
+             username=username,
              #last_name=last_name,
              phone=phone, 
          )
@@ -43,52 +43,49 @@ class UserManager(BaseUserManager):
 
 
 class CustomUser(AbstractUser):
-    ADMIN = 1
-    CUSTOMER = 2
-    DELIVERYTEAM = 3
-    TECHNICIAN = 4
 
     USER_TYPES = (
-        (ADMIN, 'Admin'),
-        (CUSTOMER, 'Customer'),
-        (DELIVERYTEAM, 'Deliveryteam'),
-        (TECHNICIAN,'Technician'),
+        ('ADMIN','Admin'),
+        ('VENDOR', 'Vendor'),
+        ('DELIVERYTEAM', 'Deliveryteam'),
+        ('CUSTOMER', 'Customer'),
     )
 
-    #username=None
-    user_types = models.PositiveSmallIntegerField(choices=USER_TYPES,default='2')
+    user_type = models.CharField(max_length=20,choices=USER_TYPES,blank=True, null=True, default='CUSTOMER')
+
     name = models.CharField(max_length=50)
     username=models.CharField(max_length=50,unique=True)
 
 
-    #last_name = models.CharField(max_length=50)
-    #USERNAME_FIELD = 'email'
+  
     email = models.EmailField(max_length=100, unique=True)
     phone = models.CharField(max_length=10,blank=True)
     password = models.CharField(max_length=128)
-   # confirmPassword = models.CharField(max_length=128)
-    # role = models.PositiveSmallIntegerField(choices=ROLE_CHOICE, blank=True, null=True,default='1')
+    pincode = models.CharField(max_length=50, blank=True, null=True)
 
 
     is_admin = models.BooleanField(default=False)
     is_staff = models.BooleanField(default=False)
     is_active = models.BooleanField(default=True)
     is_superadmin = models.BooleanField(default=False)
+    is_customer = models.BooleanField(default=True)
+    is_deliveryteam = models.BooleanField(default=False)
 
-    
-    #REQUIRED_FIELDS = ['first_name','last_name', 'phone']
-
+    REQUIRED_FIELDS = []
+   
     objects = UserManager()
    
     def str(self):
-        return self.email
+        return self.username
 
     def has_perm(self, perm, obj=None):
         return self.is_admin
 
     def has_module_perms(self, app_label):
         return True
-   
+    def set_delivery_team_role(self):
+        self.user_types = self.DELIVERYTEAM  # Assign the integer value associated with DELIVERYTEAM
+        self.save()
 
 
 class UserProfile(models.Model):
@@ -260,12 +257,15 @@ class ShippingAddress(models.Model):
 
     def __str__(self):
         return f"{self.street_address}, {self.city}, {self.state} - {self.pincode}"
+
 from django.db import models
 
 class DeliveryTeam(models.Model):
+    team_name = models.CharField(max_length=100, default='', null=True)  # Field for the delivery team's name
+    vehicle_number = models.CharField(max_length=20, default='', null=True)  # Field for the vehicle number
     user = models.OneToOneField(CustomUser, on_delete=models.CASCADE)
-    location = models.TextField(default='', null=True)  # Field for the employee's address
+    pincode = models.CharField(max_length=50)
     active = models.BooleanField(default=True)
 
     def __str__(self):
-        return f"{self.user.username}"
+        return f"{self.user.username} - {self.team_name}"

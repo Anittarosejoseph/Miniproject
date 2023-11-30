@@ -49,8 +49,11 @@ urlpatterns = [
     path('rate_product/', views.rate_product, name='rate_product'),
     path('remove_order_item/<int:item_id>/', views.remove_order_item, name='remove_order_item'),
     path('ordersummary/', views.ordersummary, name='ordersummary'),
-    path('register_delivery_team/',views. register_delivery_team, name='register_delivery_team'),
-    path('deliverindex/',views. deliveryindex, name='deliveryindex'),
+    path('deliveryteamreg/', views.delivery_team_registration, name='deliveryteamreg'),
+    path('deliveryindex/',views. deliveryindex, name='deliveryindex'),
+    path('delivery_team_list/', views.delivery_team_list, name='delivery_team_list'),
+    path('change_password/', views.change_password, name='change_password'),
+path('order-management/', views.order_management, name='order_management'),
 
     path('wishlist/', views.wishlist, name='wishlist'),
     path('remove_from_wishlist/<int:wishlist_item_id>/', views.remove_from_wishlist, name='remove_from_wishlist'),

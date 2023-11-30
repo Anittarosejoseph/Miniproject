@@ -73,15 +73,18 @@
                         </li>
 
                         <div class="user_optio_box">
-                            {% if request.session.is_authenticated %}
+                
+                            {% if user.is_authenticated %}
+                              <li>Welcome,{{user.username}}</li>
                                 <a href="{% url 'logout' %}">
-                                    <i class="fa fa-sign-out" aria-hidden="true"></i> Logout<span class="sr-only">(current)</span>
+                                  <i class="fa fa-sign-out" aria-hidden="true"></i> Logout
                                 </a>
                             {% else %}
-                                <a href="{% url 'login' %}">
-                                    <i class="fa fa-sign-in" aria-hidden="true"></i> Login
-                                </a>
+                              <a href="{% url 'login' %}">
+                                <i class="fa fa-sign-in" aria-hidden="true"></i> Login
+                              </a>
                             {% endif %}
+                              
 
                             <li class="nav-item">
                                 <a class="nav-link" href="{% url 'Customer_Profile' %}">

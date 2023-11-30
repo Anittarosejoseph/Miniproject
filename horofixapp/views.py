@@ -72,40 +72,46 @@ from django.shortcuts import render, redirect
 from django.views.decorators.cache import never_cache
 from .models import CustomUser
 
-@never_cache
 def login_user(request):
-    
+    if request.user.is_authenticated:
+        return redirect('/')
+        # Example redirection based on session (commented out)
+        # if 'username' in request.session:
+        #     return redirect('/userhome')
+        # elif 'username' in request.session:
+        #     return redirect('/pumphome')
+        # elif 'username' in request.session:
+        #     return redirect('/adminhome')
 
     if request.method == 'POST':
-        username = request.POST["username"]
-
-        password = request.POST["password"]
-       
+        username = request.POST.get("username")
+        password = request.POST.get("password")
 
         if username and password:
-            user = authenticate(request, username =username , password=password)
-           
+            user = authenticate(request, username=username, password=password)
+
             if user is not None:
-                auth_login(request,user)
-            
-                if request.user.user_types==CustomUser.CUSTOMER:
-              
+                auth_login(request, user)
+
+                if user.is_customer:
+                    request.session["username"] = user.username
                     return redirect('/')
-                elif request.user.user_types == CustomUser.DELIVERYTEAM:
+                elif user.is_deliveryteam :
+                    request.session["username"] = user.username
                     return redirect('deliveryindex')
-                
-                elif request.user.user_types == CustomUser.ADMIN:
-                    print("user is admin")                   
+                elif user.is_superadmin:
+                    request.session["username"] = user.username
                     return redirect('adminpanel')
-
-
             else:
+                # Invalid credentials - user not authenticated
                 messages.error(request, "Invalid credentials.")
+                return redirect('/login')
         else:
-            messages.error(request, "Please fill out all fields.")
-
-    return render(request, 'login.html')
-
+            # Handle the case where username or password is missing
+            messages.error(request, "Please provide both username and password.")
+            return redirect('/login')
+    
+    return render(request,'login.html')
 
 
 
@@ -877,57 +883,130 @@ def remove_order_item(request, item_id):
 
     # Redirect back to the order summary page or any desired page
     return redirect('ordersummary')
-from django.shortcuts import render, redirect
+
+# views.py
 from django.core.mail import send_mail
+from django.shortcuts import render, redirect
 from django.conf import settings
-from django.contrib import messages
 from .models import CustomUser, DeliveryTeam
 
-def register_delivery_team(request):
+def delivery_team_registration(request):
     if request.method == 'POST':
         name = request.POST.get('name')
+        username = request.POST.get('username')
         email = request.POST.get('email')
         phone = request.POST.get('phone')
-        location = request.POST.get('location')
-        username = request.POST.get('username')
         password = request.POST.get('password')
-        user_type = CustomUser.DELIVERYTEAM
-
-        if CustomUser.objects.filter(email=email).exists():
-            messages.error(request, "Email already exists")
+        team_name = request.POST.get('team_name')
+        vehicle_number = request.POST.get('vehicle_number')
+        pincode = request.POST.get('pincode') 
+    
+        user_type = 'DELIVERYTEAM'  # Use the string value associated with DELIVERYTEAM
         
-        elif not phone or len(phone) != 10 or not phone.startswith(('6', '7', '8', '9')):
-            messages.error(request, "Invalid phone number. Please enter a 10-digit number starting with 6, 7, 8, or 9.")
-        elif not email.endswith(('@ajce.com', '@gmail.com', '@hotmail.com')):
-            messages.error(request, "Invalid email domain. Allowed domains are @ajce, @gmail, @hotmail.")
-        elif email and password:
-            user = CustomUser.objects.create_user(name=name, username=username, email=email, phone=phone, password=password)
-            user.user_types = user_type
+        if CustomUser.objects.filter(username=username, user_type=user_type).exists():
+            return render(request, 'delivery_team_list.html')
+        else:
+            user = CustomUser.objects.create_user(name=name, email=email, phone=phone, password=password, username=username)
+            user.user_type = user_type
+            user.is_deliveryteam = True
+            user. is_customer = False 
             user.save()
 
-            delivery_team = DeliveryTeam(user=user, location=location)
+            delivery_team = DeliveryTeam(user=user, team_name=team_name, vehicle_number=vehicle_number,pincode=pincode)
             delivery_team.save()
 
             # Send a welcome email to the newly registered delivery team
             subject = 'Delivery Team Login Details'
-            message = f'Registered as a delivery team. Your username: {username}, Password: {password}'
-            from_email = settings.EMAIL_HOST_USER
-            recipient_list = [user.email]
+            message = f'Registered as a delivery team. Your username: {user.username}, Password: {password}'
+            from_email = settings.EMAIL_HOST_USER  # Your email address
+            recipient_list = [user.email]  # Delivery team's email address
 
             send_mail(subject, message, from_email, recipient_list)
 
-            messages.success(request, "Registered as a delivery team successfully")
-            return redirect('login')  # Redirect to the login page
-        else:
-            messages.error(request, "Missing required fields")
+            return redirect('delivery_team_list')
+    else:
+        return render(request, 'deliveryteamreg.html')
 
-    return render(request, 'register_delivery_team.html')
-
-
+# views.py
+from django.http import JsonResponse
+from django.contrib.auth import update_session_auth_hash
 
 from django.shortcuts import render
-from django.contrib.auth.decorators import login_required
 
-@login_required(login_url='login')  # Redirect to login page if not authenticated
 def deliveryindex(request):
-    return render(request, 'deliveryindex.html', {'user': request.user})
+    # Your view logic goes here
+    return render(request, 'deliveryindex.html')  
+from django.shortcuts import render
+
+def delivery_team_list(request):
+    # Your logic to retrieve data from the database goes here
+    # For example, you can retrieve the DeliveryTeam objects and pass them to the template
+    delivery_teams = DeliveryTeam.objects.all()
+    return render(request, 'delivery_team_list.html', {'delivery_teams': delivery_teams})
+from django.http import JsonResponse
+from django.contrib.auth import update_session_auth_hash
+
+def change_password(request):
+    if request.method == 'POST':
+        old_password = request.POST.get('old_password')
+        new_password = request.POST.get('new_password')
+        confirm_password = request.POST.get('confirm_password')
+
+        user = request.user
+
+        # Check if the entered old password matches the user's current password
+        if not user.check_password(old_password):
+            return JsonResponse({'error': 'Incorrect old password'}, status=400)
+
+        if new_password == confirm_password:
+            try:
+                # Change the user's password and save it to the database
+                user.set_password(new_password)
+                user.save()
+
+                # Update the session to keep the user logged in
+                update_session_auth_hash(request, user)
+
+                return JsonResponse({'message': 'Password changed successfully'})
+            except Exception as e:
+                # Print the error to the console for debugging
+                print(f"Password change error: {e}")
+
+                # Return a JsonResponse with an error message
+                return JsonResponse({'error': 'An error occurred while changing the password'}, status=500)
+        else:
+            return JsonResponse({'error': 'Passwords do not match'}, status=400)
+
+    return render(request, 'change_password.html')
+from django.shortcuts import render
+
+from django.shortcuts import render, get_object_or_404
+from django.contrib.auth.decorators import login_required
+from .models import Order, DeliveryTeam
+
+@login_required
+def order_management(request):
+    # Retrieve orders associated with the logged-in user
+    orders = Order.objects.filter(user=request.user)
+
+    # Get the user's pincode
+    user_pincode = request.user.pincode
+
+    # Get delivery teams with the matching pincode
+    matching_delivery_teams = DeliveryTeam.objects.filter(pincode=user_pincode, active=True)
+
+    # Add the delivery team information to each order
+    for order in orders:
+        # Check if the order already has a delivery team assigned
+        if order.delivery_team:
+            order.delivery_team_name = order.delivery_team.team_name
+        else:
+            # Find the matching delivery team based on pincode
+            matching_team = matching_delivery_teams.first()
+            order.delivery_team_name = matching_team.team_name if matching_team else None
+
+    context = {
+        'orders': orders,
+    }
+
+    return render(request, 'order_management.html', context)
