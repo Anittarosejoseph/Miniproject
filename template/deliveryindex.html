@@ -147,7 +147,7 @@
 
             <!-- New Side Menus -->
             <li class="nav-item">
-                <a class="nav-link" href="{% url 'order_management' %}">Order Management</a>
+                <a class="nav-link" href="{% url '' %}">Order Management</a>
             </li>
             <li class="nav-item">
                 <a class="nav-link" href="#">Profile</a>
@@ -169,6 +169,7 @@
                 <p>Hello, {{ user.name }}!</p>
                 <p>Your email: {{ user.email }}</p>
                 <p>Your phone: {{ user.phone }}</p>
+                <p>City: {{ user.deliveryteam.city }}</p>
 
                 <h3>Delivery Team Details:</h3>
                 <p>Status: {% if user.deliveryteam.active %}Active{% else %}Inactive{% endif %}</p>

@@ -3,7 +3,7 @@ from django.urls import path
 from django.contrib.auth import views as auth_views
 from django.conf import settings
 from django.conf.urls.static import static
-from . import views
+from . import views 
 
 urlpatterns = [
     path('', views.index, name="index"),
@@ -53,7 +53,9 @@ urlpatterns = [
     path('deliveryindex/',views. deliveryindex, name='deliveryindex'),
     path('delivery_team_list/', views.delivery_team_list, name='delivery_team_list'),
     path('change_password/', views.change_password, name='change_password'),
-path('order-management/', views.order_management, name='order_management'),
+ path('orders/<int:order_id>/assign/', views.assign_order, name='assign_order'),
+    path('delivery_team/orders/', views.delivery_team_orders, name='delivery_team_orders'),
+    path('orders/<int:order_id>/deliver/', views.deliver_order, name='deliver_order'),
 
     path('wishlist/', views.wishlist, name='wishlist'),
     path('remove_from_wishlist/<int:wishlist_item_id>/', views.remove_from_wishlist, name='remove_from_wishlist'),

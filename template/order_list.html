@@ -1,18 +1,44 @@
-<!-- order_list.html -->
-{% extends 'base.html' %}
-
-{% block content %}
-  <h2>Order List</h2>
-  <ul>
-    {% for order in orders %}
-      <li>
-        Order #{{ order.id }} - Total Amount: ${{ order.total_amount }} - 
-        {% if order.delivered %}
-          Delivered
-        {% else %}
-          <a href="{% url 'order_delivery_update' pk=order.id %}">Update Delivery</a>
-        {% endif %}
-      </li>
-    {% endfor %}
-  </ul>
-{% endblock %}
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Order List</title>
+</head>
+<body>
+    <h1>Order List</h1>
+    
+    <table border="1">
+        <thead>
+            <tr>
+                <th>Order ID</th>
+                <th>Total Amount</th>
+                <th>Delivery Team</th>
+                <th>Status</th>
+                <th>Action</th>
+            </tr>
+        </thead>
+        <tbody>
+            {% for order in orders %}
+                <tr>
+                    <td>{{ order.id }}</td>
+                    <td>{{ order.total_amount }}</td>
+                    <td>
+                        {% if order.delivery_team %}
+                            {{ order.delivery_team.team_name }}
+                        {% else %}
+                            Not Assigned
+                        {% endif %}
+                    </td>
+                    <td>{{ order.status }}</td>
+                    <td>
+                        {% if order.status == 'Placed' %}
+                            <a href="{% url 'assign_order' order.id %}">Assign to Delivery Team</a>
+                        {% endif %}
+                    </td>
+                </tr>
+            {% endfor %}
+        </tbody>
+    </table>
+</body>
+</html>

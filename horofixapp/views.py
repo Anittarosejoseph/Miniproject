@@ -115,36 +115,42 @@ def login_user(request):
 
 
 
+from django.shortcuts import render, redirect
+from .models import CustomerProfile
+from django.contrib import messages
+
 def Customer_Profile(request):
     if not request.user.is_authenticated:
-        return redirect('login')  
-    user_profile, created = CustomerProfile.objects.get_or_create(customer=request.user)
+        return redirect('login')
+
+    user_profile, created = CustomerProfile.objects.get_or_create(user=request.user)
 
     if request.method == 'POST':
         name = request.POST.get('name')
-        street_address=request.POST.get('street_address')
-        country=request.POST.get('country')
-        state=request.POST.get('state')
-        pincode=request.POST.get('pincode')
+        street_address = request.POST.get('street_address')
+        city = request.POST.get('city') 
+        country = request.POST.get('country')
+        state = request.POST.get('state')
+        pincode = request.POST.get('pincode')
         phone = request.POST.get('phone')
 
         user_profile.name = name
-        user_profile.street_address=street_address
-        user_profile.country=country
-        user_profile.state=state
-        user_profile.pincode=pincode
-        
-        user_profile.phone= phone
+        user_profile.street_address = street_address
+        user_profile.city = city  
+        user_profile.country = country
+        user_profile.state = state
+        user_profile.pincode = pincode
+        user_profile.phone = phone
         user_profile.save()
 
         messages.success(request, 'Profile updated successfully')  # Display a success message
-        return redirect('Customer_Profile')  
+        return redirect('Customer_Profile')
+
     context = {
         'user_profile': user_profile,
         'form_submitted': False,
     }
     return render(request, 'Customer_Profile.html', context)
-
 
 
 @login_required(login_url='login')
@@ -410,7 +416,7 @@ from .models import CustomerProfile
 @login_required
 def add_address(request):
     # Retrieve the customer profile associated with the currently logged-in user
-    customer_profile = CustomerProfile.objects.get(customer=request.user)
+    customer_profile = CustomerProfile.objects.get(user=request.user)
 
     context = {
         'name': customer_profile.name,
@@ -530,7 +536,7 @@ def checkout(request):
 
         try:
             # Try to access the user's name from the related CustomerProfile
-            customer_profile = CustomerProfile.objects.get(customer=user)
+            customer_profile = CustomerProfile.objects.get(user=user)
             email = user.email
             full_name = customer_profile.name
         except CustomerProfile.DoesNotExist:
@@ -651,7 +657,7 @@ def ordersummary(request):
     if request.user.is_authenticated:
         try:
             # Try to fetch the customer profile for the logged-in user
-            customer_profile = CustomerProfile.objects.get(customer=request.user)
+            customer_profile = CustomerProfile.objects.get(user=request.user)
         except CustomerProfile.DoesNotExist:
             # Handle the case where the CustomerProfile does not exist
             # You can redirect the user to a profile creation page or display a message.
@@ -885,10 +891,12 @@ def remove_order_item(request, item_id):
     return redirect('ordersummary')
 
 # views.py
+# views.py
+
 from django.core.mail import send_mail
 from django.shortcuts import render, redirect
 from django.conf import settings
-from .models import CustomUser, DeliveryTeam
+from .models import CustomUser
 
 def delivery_team_registration(request):
     if request.method == 'POST':
@@ -899,33 +907,35 @@ def delivery_team_registration(request):
         password = request.POST.get('password')
         team_name = request.POST.get('team_name')
         vehicle_number = request.POST.get('vehicle_number')
-        pincode = request.POST.get('pincode') 
-    
-        user_type = 'DELIVERYTEAM'  # Use the string value associated with DELIVERYTEAM
-        
+        pincode = request.POST.get('pincode')
+        city = request.POST.get('city')  # Add this line for the city field
+
+        user_type = 'DELIVERYTEAM'
+
         if CustomUser.objects.filter(username=username, user_type=user_type).exists():
             return render(request, 'delivery_team_list.html')
         else:
             user = CustomUser.objects.create_user(name=name, email=email, phone=phone, password=password, username=username)
             user.user_type = user_type
             user.is_deliveryteam = True
-            user. is_customer = False 
+            user.is_customer = False
             user.save()
 
-            delivery_team = DeliveryTeam(user=user, team_name=team_name, vehicle_number=vehicle_number,pincode=pincode)
+            delivery_team = DeliveryTeam(user=user, team_name=team_name, vehicle_number=vehicle_number, pincode=pincode, city=city)
             delivery_team.save()
 
             # Send a welcome email to the newly registered delivery team
             subject = 'Delivery Team Login Details'
             message = f'Registered as a delivery team. Your username: {user.username}, Password: {password}'
-            from_email = settings.EMAIL_HOST_USER  # Your email address
-            recipient_list = [user.email]  # Delivery team's email address
+            from_email = settings.EMAIL_HOST_USER
+            recipient_list = [user.email]
 
             send_mail(subject, message, from_email, recipient_list)
 
             return redirect('delivery_team_list')
     else:
         return render(request, 'deliveryteamreg.html')
+
 
 # views.py
 from django.http import JsonResponse
@@ -978,35 +988,49 @@ def change_password(request):
             return JsonResponse({'error': 'Passwords do not match'}, status=400)
 
     return render(request, 'change_password.html')
-from django.shortcuts import render
-
-from django.shortcuts import render, get_object_or_404
-from django.contrib.auth.decorators import login_required
+# views.py
+from django.shortcuts import render, get_object_or_404, redirect
 from .models import Order, DeliveryTeam
 
-@login_required
-def order_management(request):
-    # Retrieve orders associated with the logged-in user
-    orders = Order.objects.filter(user=request.user)
+def delivery_team_orders(request):
+    delivery_team = get_object_or_404(DeliveryTeam, user=request.user)
+    orders = Order.objects.filter(delivery_team=delivery_team)
 
-    # Get the user's pincode
-    user_pincode = request.user.pincode
+    return render(request, 'delivery_team_orders.html', {'orders': orders})
+# views.py
+from django.shortcuts import get_object_or_404, redirect
+from .models import Order
 
-    # Get delivery teams with the matching pincode
-    matching_delivery_teams = DeliveryTeam.objects.filter(pincode=user_pincode, active=True)
+def deliver_order(request, order_id):
+    order = get_object_or_404(Order, id=order_id)
 
-    # Add the delivery team information to each order
-    for order in orders:
-        # Check if the order already has a delivery team assigned
-        if order.delivery_team:
-            order.delivery_team_name = order.delivery_team.team_name
-        else:
-            # Find the matching delivery team based on pincode
-            matching_team = matching_delivery_teams.first()
-            order.delivery_team_name = matching_team.team_name if matching_team else None
+    if request.method == 'POST':
+        # Additional logic for order delivery (e.g., updating status)
+        order.status = 'Delivered'
+        order.save()
 
-    context = {
-        'orders': orders,
-    }
+        return redirect('delivery_team_orders')  # Redirect to the delivery team orders page
 
-    return render(request, 'order_management.html', context)
+    return render(request, 'deliver_order.html', {'order': order})
+# views.py
+from django.shortcuts import render, get_object_or_404, redirect
+from .models import Order, DeliveryTeam
+
+def assign_order(request, order_id):
+    order = get_object_or_404(Order, id=order_id)
+
+    if request.method == 'POST':
+        delivery_team_id = request.POST.get('delivery_team')
+        if delivery_team_id:
+            delivery_team = get_object_or_404(DeliveryTeam, id=delivery_team_id)
+
+            # Assign the delivery team to the order
+            order.delivery_team = delivery_team
+            order.status = 'Processing'  # You may want to update the status here
+            order.save()
+
+            return redirect('order_list')  # Redirect to the order list page
+
+    delivery_teams = DeliveryTeam.objects.filter(active=True)
+
+    return render(request, 'assign_order.html', {'order': order, 'delivery_teams': delivery_teams})

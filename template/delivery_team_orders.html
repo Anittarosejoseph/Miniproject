@@ -1,0 +1,39 @@
+<!-- delivery_team_orders.html -->
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Delivery Team Orders</title>
+</head>
+<body>
+    <h1>Your Assigned Orders</h1>
+
+    <table border="1">
+        <thead>
+            <tr>
+                <th>Order ID</th>
+                <th>Total Amount</th>
+                <th>Status</th>
+                <th>Action</th>
+            </tr>
+        </thead>
+        <tbody>
+            {% for order in orders %}
+                <tr>
+                    <td>{{ order.id }}</td>
+                    <td>{{ order.total_amount }}</td>
+                    <td>{{ order.status }}</td>
+                    <td>
+                        {% if order.status == 'Processing' %}
+                            <a href="{% url 'deliver_order' order.id %}">Deliver Order</a>
+                        {% endif %}
+                    </td>
+                </tr>
+            {% endfor %}
+        </tbody>
+    </table>
+
+    <a href="{% url 'home' %}">Back to Dashboard</a>
+</body>
+</html>

@@ -4,7 +4,6 @@ from django.db import models
 from datetime import date
 from django.db.models.signals import post_save
 from django.dispatch import receiver
-
 from django.contrib.auth.models import AbstractUser, BaseUserManager
 
 # Create your models here.
@@ -61,7 +60,7 @@ class CustomUser(AbstractUser):
     email = models.EmailField(max_length=100, unique=True)
     phone = models.CharField(max_length=10,blank=True)
     password = models.CharField(max_length=128)
-    pincode = models.CharField(max_length=50, blank=True, null=True)
+    city = models.CharField(max_length=50, blank=True, null=True, default=None)
 
 
     is_admin = models.BooleanField(default=False)
@@ -132,19 +131,36 @@ class UserProfile(models.Model):
 #cmd  -- python manage.py makemigrations
 #        python manage.py migrate
 
-
 class CustomerProfile(models.Model):
-    customer = models.ForeignKey(CustomUser, on_delete=models.CASCADE, default=None)
+    user = models.ForeignKey(CustomUser, on_delete=models.CASCADE, default=None)
     name = models.CharField(max_length=100)
     street_address=models.CharField(max_length=100,null=True,blank=True, default=None)
     country = models.CharField(max_length=15, default="India", blank=True, null=True)
     state = models.CharField(max_length=50, blank=True, null=True, default=None)
+
+    city = models.CharField(max_length=50, blank=True, null=True, default=None)
+    
     pincode = models.CharField(max_length=50, blank=True, null=True)
-   
+    phone = models.CharField(max_length=10, blank=True, null=True)
+
+    
+    pincode = models.CharField(max_length=50, blank=True, null=True)
     phone = models.CharField(max_length=10,blank=True, null=True)
 
     def str(self):
         return self.user.email 
+ 
+class DeliveryTeam(models.Model):
+    team_name = models.CharField(max_length=100, default='', null=True)  # Field for the delivery team's name
+    vehicle_number = models.CharField(max_length=20, default='', null=True)  # Field for the vehicle number
+    user = models.OneToOneField(CustomUser, on_delete=models.CASCADE)
+    pincode = models.CharField(max_length=50)
+    city = models.CharField(max_length=50, blank=True, null=True)  
+
+    active = models.BooleanField(default=True)
+
+    def __str__(self):
+        return f"{self.user.username} - {self.team_name}"
  
 from django.db import models
 
@@ -220,6 +236,9 @@ class Order(models.Model):
     payment_id = models.CharField(max_length=100, null=True, blank=True)
     payment_status = models.BooleanField(default=False)
     created_at = models.DateTimeField(auto_now_add=True)
+    delivery_team = models.ForeignKey(DeliveryTeam, on_delete=models.SET_NULL, null=True, blank=True)
+    status = models.CharField(max_length=20, default='Placed')  # Status: Placed, Processing, Delivered
+
     
     def __str__(self):
         return f"Order {self.id} by {self.user.username}"
@@ -260,12 +279,3 @@ class ShippingAddress(models.Model):
 
 from django.db import models
 
-class DeliveryTeam(models.Model):
-    team_name = models.CharField(max_length=100, default='', null=True)  # Field for the delivery team's name
-    vehicle_number = models.CharField(max_length=20, default='', null=True)  # Field for the vehicle number
-    user = models.OneToOneField(CustomUser, on_delete=models.CASCADE)
-    pincode = models.CharField(max_length=50)
-    active = models.BooleanField(default=True)
-
-    def __str__(self):
-        return f"{self.user.username} - {self.team_name}"
