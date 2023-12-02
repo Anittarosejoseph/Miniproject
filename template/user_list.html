@@ -52,9 +52,13 @@
                 <a href="{% url 'view_products' %}">View Products</a>
             </div>
         </div>
-        <a href="#">Technicians</a>
-     
+        <div class="dropdown-content">
+        <a href="{% url 'deliveryteamreg' %}">DeliveryTeam</a>
+        <a href="{% url 'delivery_team_list' %}">DeliveryTeamList</a>
+    </div>
+<!-- adminpanel.html -->
         <a href="{% url 'all_user_orders'%}">Orders</a>
+        <a href="{% url 'assign-orders' %}">Assign orders</a>
         <a href="#">Settings</a>
     </div>
     

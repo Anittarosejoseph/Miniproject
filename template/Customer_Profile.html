@@ -93,25 +93,14 @@
 
 <li class="nav-item" active>
                 <a class="nav-link" href="{% url 'Customer_Profile' %}"><i class="fa fa-user" aria-hidden="true"></i></a>
-              <!-- </li>
-              <a class="nav-link" href="{% url 'about' %}"></a>
-              <i class="fa fa-shopping-cart" aria-hidden="true"></i>
-            </a> -->
+              
           </div>            
-              <!-- <a href="">
-                <i class="fa fa-user" aria-hidden="true"></i>
-              </a>
-              <a href="">
-                <i class="fa fa-shopping-cart" aria-hidden="true"></i>
-              </a>
-            </div> -->
+              
           </div>
         </nav>
       </div>
     </header>
-<!-- <form method="POST" class="file-upload mt-1" style="background-color: white;" action="{% url 'Customer_Profile' %}">
-    {% csrf_token %}
-    <div class="row mb-5 gx-5"> -->
+
         <div class="container">
             <div class="row justify-content-center align-items-center vh-100">
                 <form method="POST" class="file-upload" style="background-color: #e6e6fa; padding: 20px; border-radius: 10px; box-shadow: 0 0 10px rgba(0, 0, 0, 0.2);">
@@ -148,12 +137,14 @@
                     </div>
                     <div class="col-md-6">
                       <label for="state" class="form-label">State *</label>
+                      
           <input type="text" class="form-control" id="state" name="state" placeholder="Enter State" required>
       </div>
 <br><br>
 <div class="col-md-6">
   <label for="city" class="form-label">City *</label>
-  <input type="text" class="form-control" id="city" name="city" placeholder="Enter your City" required>
+
+  <input type="text" class="form-control" id="city" name="city" placeholder="Enter your City" value="" required>
 </div>
 
 <!-- Pincode -->
@@ -220,7 +211,46 @@
                 <div class="gap-3 d-md-flex justify-content-md-center text-center">
                     <button type="submit" class="btn btn-danger btn" id="save_button">Save</button>
                     <button type="button" class="btn btn-primary btn" id="update_button">Update</button>
-                    
+                    </div>
+
+
+    <div id="display_data_section" style="{% if form_submitted %}display: block;{% else %}display: none;{% endif %}; margin-top: 20px;">
+        <h2>User Profile Information</h2>
+        <p><strong>Name:</strong> {{ user_profile.name }}</p>
+        <p><strong>Street Address:</strong> {{ user_profile.street_address }}</p>
+        <p><strong>City:</strong> {{ user_profile.city }}</p>
+        <p><strong>Country:</strong> {{ user_profile.country }}</p>
+        <p><strong>State:</strong> {{ user_profile.state }}</p>
+        <p><strong>Pincode:</strong> {{ user_profile.pincode }}</p>
+        <p><strong>Phone:</strong> {{ user_profile.phone }}</p>
+    </div>
+
+    <!-- ... Your existing HTML ... -->
+
+    <script>
+        // Add an event listener to the "Save" button
+        document.getElementById("save_button").addEventListener("click", function () {
+            // Perform your save logic here
+
+            // After a successful save, show the display section
+            document.getElementById("display_data_section").style.display = "block";
+        });
+
+        // Add an event listener to the "Update" button
+        document.getElementById("update_button").addEventListener("click", function () {
+            // Perform your update logic here
+
+            // After a successful update, show the display section
+            document.getElementById("display_data_section").style.display = "block";
+        });
+    </script>
+
+    <!-- ... Your existing HTML ... -->
+
+</body>
+
+
+
                   </div>
                     
                 </body>                </div>
@@ -233,6 +263,9 @@
   // JavaScript function to show the pop-up message
   function showSuccessMessage() {
       alert("Profile updated successfully!");
+      
+      // After a successful save, show the display section
+      document.getElementById("display_data_section").style.display = "block";
   }
 
   // Add an event listener to the "Update" button
@@ -243,27 +276,43 @@
       showSuccessMessage();
   });
 
-    function showSuccessMessage() {
-        alert("Profile updated successfully!");
-    }
+  document.getElementById("save_button").addEventListener("click", function () {
+      // Perform your save logic here
 
-    // Function to navigate to the placeorder.html page with data
-    function goToPlaceOrder() {
-        const name = document.getElementById("name").value;
-        const streetAddress = document.getElementById("street_address").value;
-        const country = document.getElementById("country").value;
-        const state = document.getElementById("state").value;
-        const pincode = document.getElementById("pincode").value;
-        const phone = document.getElementById("phone").value;
+      // After a successful save, call the function to show the pop-up message and display the section
+      showSuccessMessage();
+  });
 
-        // Construct the URL with parameters
-        const url = `/ordersummary.html?name=${name}&streetAddress=${streetAddress}&country=${country}&state=${state}&pincode=${pincode}&phone=${phone}`;
-        window.location.href = url;
-    }
+  // Function to navigate to the placeorder.html page with data
+  function goToPlaceOrder() {
+      const name = document.getElementById("name").value;
+      const streetAddress = document.getElementById("street_address").value;
+      const country = document.getElementById("country").value;
+      const state = document.getElementById("state").value;
+      const pincode = document.getElementById("pincode").value;
+      const phone = document.getElementById("phone").value;
 
-    document.getElementById("save_button").addEventListener("click", function () {
-    window.location.href = '/ordersummary.html';
-});
+      // Construct the URL with parameters
+      const url = `/ordersummary.html?name=${name}&streetAddress=${streetAddress}&country=${country}&state=${state}&pincode=${pincode}&phone=${phone}`;
+      window.location.href = url;
+  }
+
+  // Add an event listener to the "Update" button
+  document.getElementById("update_button").addEventListener("click", function () {
+      // Perform your update logic here
+
+      // After a successful update, show the display section
+      document.getElementById("display_data_section").style.display = "block";
+  });
+
+  // Add an event listener to the "Save" button
+  document.getElementById("save_button").addEventListener("click", function () {
+      // Perform your save logic here
+
+      // After a successful save, show the display section
+      document.getElementById("display_data_section").style.display = "block";
+  });
+</script>
 
 
 </script>

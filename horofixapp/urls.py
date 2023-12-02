@@ -53,14 +53,13 @@ urlpatterns = [
     path('deliveryindex/',views. deliveryindex, name='deliveryindex'),
     path('delivery_team_list/', views.delivery_team_list, name='delivery_team_list'),
     path('change_password/', views.change_password, name='change_password'),
- path('orders/<int:order_id>/assign/', views.assign_order, name='assign_order'),
-    path('delivery_team/orders/', views.delivery_team_orders, name='delivery_team_orders'),
-    path('orders/<int:order_id>/deliver/', views.deliver_order, name='deliver_order'),
-
     path('wishlist/', views.wishlist, name='wishlist'),
     path('remove_from_wishlist/<int:wishlist_item_id>/', views.remove_from_wishlist, name='remove_from_wishlist'),
     path('add_to_wishlist/<int:id>/', views.add_to_wishlist, name='add_to_wishlist'),
+    path('assign-orders/', views.admin_assign_orders, name='assign-orders'),
+    path('admin/assign-orders/assign/', views.assign_orders, name='assign_orders'),
 ]
+
 
 if settings.DEBUG:
     urlpatterns += static(settings.MEDIA_URL, document_root=settings.MEDIA_ROOT)

@@ -148,7 +148,7 @@ def Customer_Profile(request):
 
     context = {
         'user_profile': user_profile,
-        'form_submitted': False,
+        'form_submitted': True,
     }
     return render(request, 'Customer_Profile.html', context)
 
@@ -161,6 +161,7 @@ def custom_logout(request):
     return redirect('index')
 @login_required
 def adminpanel(request):
+    
     return render(request, 'adminpanel.html')
 
 
@@ -650,39 +651,6 @@ def add_to_wishlist(request, id):
             # The item is already in the wishlist
             messages.warning(request, f'{product.product_name} is already in your wishlist.')
     return redirect('wishlist')
-from django.shortcuts import render, redirect
-from .models import OrderItem, CustomerProfile
-
-def ordersummary(request):
-    if request.user.is_authenticated:
-        try:
-            # Try to fetch the customer profile for the logged-in user
-            customer_profile = CustomerProfile.objects.get(user=request.user)
-        except CustomerProfile.DoesNotExist:
-            # Handle the case where the CustomerProfile does not exist
-            # You can redirect the user to a profile creation page or display a message.
-            messages.warning(request, 'Please complete your profile to proceed.')
-            return redirect('Customer_Profile')  # Replace 'profile_creation' with your actual view name for profile creation
-
-        # Fetch only the orders with a paid status
-        order_items = OrderItem.objects.filter(order__user=request.user, order__payment_status=True)
-
-        total_amount = sum(item.item_total for item in order_items)
-
-        context = {
-            'order_items': order_items,
-            'total_amount': total_amount,
-            'shipping_address': customer_profile.street_address,
-            'country': customer_profile.country,
-            'state': customer_profile.state,
-            'phone': customer_profile.phone,
-            # Add other context variables as needed for the shipping address, etc.
-        }
-
-        return render(request, 'ordersummary.html', context)
-    else:
-        # Redirect the user to the login page
-        return redirect('login')  # Replace 'login' with your actual login view name
 
 from django.shortcuts import render, redirect
 from django.contrib.auth.decorators import login_required
@@ -694,8 +662,17 @@ def all_user_orders(request):
     user_orders = {}
     
     for user in users:
+        # Fetch the user's profile
+        user_profile = CustomerProfile.objects.get(user=user)
+
+        # Fetch orders for the user with payment_status=True
         orders = Order.objects.filter(user=user, payment_status=True)
-        user_orders[user] = orders
+
+        # Store user details and orders in a dictionary
+        user_orders[user] = {
+            'profile': user_profile,
+            'orders': orders
+        }
 
     return render(request, 'all_user_orders.html', {'user_orders': user_orders})
 
@@ -944,7 +921,14 @@ from django.contrib.auth import update_session_auth_hash
 from django.shortcuts import render
 
 def deliveryindex(request):
-    # Your view logic goes here
+    delivery_team = request.user.deliveryteam
+
+    # Fetch orders assigned to the delivery team
+    assigned_orders = Order.objects.filter(delivery_team=delivery_team)
+
+    context = {
+        'assigned_orders': assigned_orders,
+    }   
     return render(request, 'deliveryindex.html')  
 from django.shortcuts import render
 
@@ -988,49 +972,122 @@ def change_password(request):
             return JsonResponse({'error': 'Passwords do not match'}, status=400)
 
     return render(request, 'change_password.html')
-# views.py
-from django.shortcuts import render, get_object_or_404, redirect
-from .models import Order, DeliveryTeam
 
-def delivery_team_orders(request):
-    delivery_team = get_object_or_404(DeliveryTeam, user=request.user)
-    orders = Order.objects.filter(delivery_team=delivery_team)
+from django.shortcuts import render, redirect
+from .models import CustomUser, Address
 
-    return render(request, 'delivery_team_orders.html', {'orders': orders})
-# views.py
-from django.shortcuts import get_object_or_404, redirect
-from .models import Order
-
-def deliver_order(request, order_id):
-    order = get_object_or_404(Order, id=order_id)
-
+def add_address(request):
     if request.method == 'POST':
-        # Additional logic for order delivery (e.g., updating status)
-        order.status = 'Delivered'
-        order.save()
+        # Assuming you have a CustomUser instance for the current user
+        user = request.user  # Adjust this based on your authentication logic
 
-        return redirect('delivery_team_orders')  # Redirect to the delivery team orders page
+        # Address 1
+        street_address_1 = request.POST.get('street_address_1')
+        city_1 = request.POST.get('city_1')
+        country_1 = request.POST.get('country_1')  # Adjust based on your form fields
+        state_1 = request.POST.get('state_1')
+        pincode_1 = request.POST.get('pincode_1')
+        phone_1 = request.POST.get('phone_1')
+        is_default_1 = request.POST.get('is_default_1')
 
-    return render(request, 'deliver_order.html', {'order': order})
+        # Address 2
+        street_address_2 = request.POST.get('street_address_2')
+        city_2 = request.POST.get('city_2')
+        country_2 = request.POST.get('country_2')  # Adjust based on your form fields
+        state_2 = request.POST.get('state_2')
+        pincode_2 = request.POST.get('pincode_2')
+        phone_2 = request.POST.get('phone_2')
+        is_default_2 = request.POST.get('is_default_2')
+
+        # Create Address instances
+        address_1 = Address.objects.create(
+            user=user,
+            street_address=street_address_1,
+            city=city_1,
+            country=country_1,
+            state=state_1,
+            pincode=pincode_1,
+            phone=phone_1,
+            is_default=is_default_1 == 'on'  # Convert string 'on' to boolean
+        )
+
+        address_2 = Address.objects.create(
+            user=user,
+            street_address=street_address_2,
+            city=city_2,
+            country=country_2,
+            state=state_2,
+            pincode=pincode_2,
+            phone=phone_2,
+            is_default=is_default_2 == 'on'  # Convert string 'on' to boolean
+        )
+
+        # Redirect or perform additional logic as needed
+        return redirect('checkout.html')
+
+    return render(request, 'add_address.html')
+
 # views.py
-from django.shortcuts import render, get_object_or_404, redirect
+from django.shortcuts import render, redirect
 from .models import Order, DeliveryTeam
 
-def assign_order(request, order_id):
-    order = get_object_or_404(Order, id=order_id)
+def admin_assign_orders(request):
+    orders = Order.objects.filter(payment_status=True, user__customerprofile__city=True)
+    delivery_teams = DeliveryTeam.objects.filter(city=True)
 
+    return render(request, 'assign-orders.html', {'orders': orders, 'delivery_teams': delivery_teams})
+
+def assign_orders(request):
     if request.method == 'POST':
         delivery_team_id = request.POST.get('delivery_team')
-        if delivery_team_id:
-            delivery_team = get_object_or_404(DeliveryTeam, id=delivery_team_id)
+        orders_to_assign = request.POST.getlist('orders')
 
-            # Assign the delivery team to the order
-            order.delivery_team = delivery_team
-            order.status = 'Processing'  # You may want to update the status here
-            order.save()
+        # Perform the assignment logic and update orders with the selected delivery team
+        # ...
 
-            return redirect('order_list')  # Redirect to the order list page
+        return redirect('admin_assign_orders')
 
+    return redirect('admin_assign_orders')
+def ordersummary(request):
+    order_id = request.GET.get('order_id')
+    transID = request.GET.get('payment_id')
+    print("Order ID from GET parameters:", order_id)
+    try:
+   
+        order = Order.objects.get(id=order_id, payment_status=True)
+        print("Retrieved Order:", order)
+        ordered_products = OrderItem.objects.filter(order_id=order.id)
+
+        subtotal = 0
+        for i in ordered_products:
+            subtotal += i.product.sale_price * i.quantity
+        
+
+        context = {
+            'order': order,
+            'ordered_products': ordered_products,
+            'order_id': order.id,
+           'transID': transID,
+           'subtotal': subtotal,
+        }
+
+        return render(request, 'ordersummary.html', context)
+    except Order.DoesNotExist:
+        return redirect('/')
+def assign_orders_to_delivery_team():
+    # Get all active delivery teams
     delivery_teams = DeliveryTeam.objects.filter(active=True)
 
-    return render(request, 'assign_order.html', {'order': order, 'delivery_teams': delivery_teams})
+    for team in delivery_teams:
+        # Get orders with status 'Placed' or 'Processing' for the same city as the delivery team
+        orders_to_assign = Order.objects.filter(
+            delivery_team__isnull=True,
+            status__in=['Placed', 'Processing'],
+            user__city=team.city
+        )
+
+        # Assign orders to the delivery team
+        if orders_to_assign.exists():
+            order_to_assign = orders_to_assign.first()
+            order_to_assign.delivery_team = team
+            order_to_assign.save()

@@ -215,8 +215,9 @@ class Cart(models.Model):
         return f"Cart for {self.user.username}"
 
 class Address(models.Model):
-    user = models.ForeignKey( CustomUser, on_delete=models.CASCADE, related_name='addresses')
+    user = models.ForeignKey(CustomUser, on_delete=models.CASCADE, related_name='addresses')
     street_address = models.CharField(max_length=255)
+    city = models.CharField(max_length=255)  # Add city field
     country = models.CharField(max_length=255)
     state = models.CharField(max_length=255)
     pincode = models.CharField(max_length=10)
@@ -224,8 +225,7 @@ class Address(models.Model):
     is_default = models.BooleanField(default=False)
 
     def __str__(self):
-        return f"Address for {self.user.username}"
-
+        return f"{self.user.username}'s Address"
 from django.utils import timezone
 
 

@@ -1,0 +1,32 @@
+<!-- assign-orders.html -->
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <title>Assign Orders</title>
+</head>
+<body>
+    <h2>Assign Orders</h2>
+    <form method="post" action="{% url 'assign_orders' %}">
+        {% csrf_token %}
+        <!-- Display orders that meet conditions -->
+        <h3>Orders to Assign</h3>
+        <ul>
+            {% for order in orders %}
+                <li>{{ order }}</li>
+            {% endfor %}
+        </ul>
+        
+        <!-- Display delivery teams available for the selected city -->
+        <h3>Available Delivery Teams</h3>
+        <label for="delivery_team">Select Delivery Team:</label>
+        <select name="delivery_team" id="delivery_team">
+            {% for team in delivery_teams %}
+                <option value="{{ team.id }}">{{ team.team_name }} - {{ team.city }}</option>
+            {% endfor %}
+        </select>
+
+        <button type="submit">Assign Orders</button>
+    </form>
+</body>
+</html>

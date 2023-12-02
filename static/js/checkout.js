@@ -66,15 +66,20 @@ document.addEventListener('DOMContentLoaded', function () {
                             })
                             .then(data => {
                                 if (data.message === 'Payment successful') {
-                                    window.location.href = orderCompleteUrl;
-                                } else {
-                                    alert('Payment failed');
+                                    window.location.href = orderCompleteUrl + '?order_id=' + data.order_id + '&payment_id=' + data.transID;
+                                    console.log('Order ID:', data.order_id);
+                                    console.log('Payment ID:', data.transID);
                                 }
+                                else {
+                                    alert('Payment failed');
+                 }
+                                    
+                                
                             })
-                            .catch(error => {
-                                console.error('An error occurred while processing the payment.', error);
-                                alert('There was an issue processing your payment. Please try again.');
-                            });
+                            // .catch(error => {
+                            //     console.error('An error occurred while processing the payment.', error);
+                            //     alert('There was an issue processing your payment. Please try again.');
+                            // });
                     }
                 };
 
