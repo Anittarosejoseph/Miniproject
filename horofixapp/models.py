@@ -161,7 +161,8 @@ class DeliveryTeam(models.Model):
 
     def __str__(self):
         return f"{self.user.username} - {self.team_name}"
- 
+    def get_assigned_orders(self):
+        return Order.objects.filter(delivery_team=self)
 from django.db import models
 
 class WatchProduct(models.Model):
@@ -227,19 +228,25 @@ class Address(models.Model):
     def __str__(self):
         return f"{self.user.username}'s Address"
 from django.utils import timezone
-
-
 class Order(models.Model):
     user = models.ForeignKey(CustomUser, on_delete=models.CASCADE)
     products = models.ManyToManyField(WatchProduct, through='OrderItem')
+
     total_amount = models.DecimalField(max_digits=10, decimal_places=2)
     payment_id = models.CharField(max_length=100, null=True, blank=True)
     payment_status = models.BooleanField(default=False)
     created_at = models.DateTimeField(auto_now_add=True)
     delivery_team = models.ForeignKey(DeliveryTeam, on_delete=models.SET_NULL, null=True, blank=True)
-    status = models.CharField(max_length=20, default='Placed')  # Status: Placed, Processing, Delivered
+    status_choices = [
+        ('Placed', 'Placed'),
+        ('Processing', 'Processing'),
+        ('Delivered', 'Delivered'),
+    ]
+    status = models.CharField(max_length=20, choices=status_choices, default='Placed')
 
     
+   
+
     def __str__(self):
         return f"Order {self.id} by {self.user.username}"
    

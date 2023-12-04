@@ -33,6 +33,22 @@
         
         
     </script>
+    <style>.checkout-button {
+      display: inline-block;
+      background-color: #28a745; 
+      color: white;
+      padding: 10px 20px;
+      border-radius: 4px;
+      margin-top: 20px;
+      margin-left: 400px;
+      text-decoration: none;
+      font-weight: bold;
+      transition: background-color 0.3s;
+  }
+  
+  .checkout-button:hover {
+      background-color: #218838;
+  }</style>
 </head>
 <body>
 <div class="hero_area">
@@ -223,9 +239,11 @@
         <p><strong>State:</strong> {{ user_profile.state }}</p>
         <p><strong>Pincode:</strong> {{ user_profile.pincode }}</p>
         <p><strong>Phone:</strong> {{ user_profile.phone }}</p>
+        <a type="submit" class="checkout-button" href="{% url 'checkout' %}">Checkout</a>
+
     </div>
 
-    <!-- ... Your existing HTML ... -->
+  
 
     <script>
         // Add an event listener to the "Save" button
@@ -250,12 +268,6 @@
 </body>
 
 
-
-                  </div>
-                    
-                </body>                </div>
-                
-            </div>
         </div>
     </div> <!-- Row END -->
 </form>
@@ -313,7 +325,6 @@
       document.getElementById("display_data_section").style.display = "block";
   });
 </script>
-
 
 </script>
 

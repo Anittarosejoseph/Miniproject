@@ -38,7 +38,7 @@
                     <div class="input-container">
                         <input type="text" placeholder="USERNAME" name="username" required onchange="validateUsername(this)">
                         <input type="password" placeholder="PASSWORD" name="password" required onchange="validatePassword(this)">
-                        <button>LOGIN</button>
+                        <button id="test_id">LOGIN</button>
                         <p class="forgot-password"><a href="{% url 'reset_password' %}">Forgot Password?</a></p>
                         <p class="signup">Don't have an account? <a href="/register_user">Signup</a></p>
                         <a href="{% url 'google_login' %}">

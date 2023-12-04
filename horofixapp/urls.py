@@ -17,7 +17,7 @@ urlpatterns = [
     path('view_products/', views.view_products, name='view_products'),
     path('service/', views.service, name='service'),
     path('repair/', views.repair, name='repair'),
-
+ 
     path('reset_password/', auth_views.PasswordResetView.as_view(), name="reset_password"),
     path('reset_password_sent/', auth_views.PasswordResetDoneView.as_view(), name="password_reset_done"),
     path('reset/<uidb64>/<token>/', auth_views.PasswordResetConfirmView.as_view(), name="password_reset_confirm"),
@@ -54,10 +54,17 @@ urlpatterns = [
     path('delivery_team_list/', views.delivery_team_list, name='delivery_team_list'),
     path('change_password/', views.change_password, name='change_password'),
     path('wishlist/', views.wishlist, name='wishlist'),
+    path('myorders/', views.myorders, name='myorders'),
+    path('update-order-status/', views.update_order_status, name='update_order_status'),
+    path('deliverorders/', views.deliver_orders, name='deliverorders'),
+    path('all_orders/', views.all_orders, name='all_orders'),
+path('update-order-status/<int:order_id>/', views.update_order_status, name='update_order_status'),
+    path('delete-order/<int:order_id>/', views.delete_order, name='delete_order'),
+
+    path('delivery-team-orders/', views.delivery_team_orders, name='delivery_team_orders'),
+
     path('remove_from_wishlist/<int:wishlist_item_id>/', views.remove_from_wishlist, name='remove_from_wishlist'),
     path('add_to_wishlist/<int:id>/', views.add_to_wishlist, name='add_to_wishlist'),
-    path('assign-orders/', views.admin_assign_orders, name='assign-orders'),
-    path('admin/assign-orders/assign/', views.assign_orders, name='assign_orders'),
 ]
 
 

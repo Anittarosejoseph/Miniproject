@@ -1027,67 +1027,172 @@ def add_address(request):
 
     return render(request, 'add_address.html')
 
-# views.py
-from django.shortcuts import render, redirect
-from .models import Order, DeliveryTeam
+from django.shortcuts import render
+from django.http import JsonResponse
+from .models import Order, OrderItem
 
-def admin_assign_orders(request):
-    orders = Order.objects.filter(payment_status=True, user__customerprofile__city=True)
-    delivery_teams = DeliveryTeam.objects.filter(city=True)
 
-    return render(request, 'assign-orders.html', {'orders': orders, 'delivery_teams': delivery_teams})
-
-def assign_orders(request):
-    if request.method == 'POST':
-        delivery_team_id = request.POST.get('delivery_team')
-        orders_to_assign = request.POST.getlist('orders')
-
-        # Perform the assignment logic and update orders with the selected delivery team
-        # ...
-
-        return redirect('admin_assign_orders')
-
-    return redirect('admin_assign_orders')
+@login_required(login_url='login')
+def myorders(request):
+    orders = Order.objects.filter(user=request.user).order_by('-created_at')
+    context = {
+        'orders': orders,
+    }
+    return render(request, 'myorders.html',context)
 def ordersummary(request):
-    order_id = request.GET.get('order_id')
-    transID = request.GET.get('payment_id')
-    print("Order ID from GET parameters:", order_id)
-    try:
-   
-        order = Order.objects.get(id=order_id, payment_status=True)
-        print("Retrieved Order:", order)
-        ordered_products = OrderItem.objects.filter(order_id=order.id)
+    # Fetch the latest order for the logged-in user (or implement your logic)
+    order = Order.objects.filter(user=request.user).latest('created_at')
+    return render(request, 'billinvoice.html', {'order': order})
 
-        subtotal = 0
-        for i in ordered_products:
-            subtotal += i.product.sale_price * i.quantity
-        
+# views.py
+from django.shortcuts import render
+from .models import Order, OrderItem
 
-        context = {
-            'order': order,
-            'ordered_products': ordered_products,
+def myorders(request):
+    # Fetch orders with payment_status as True
+    orders = Order.objects.filter(payment_status=True)
+
+    # Create a list to store order details
+    order_details = []
+
+    for order in orders:
+        order_items = OrderItem.objects.filter(order=order)
+
+        # Calculate total amount for the order
+        total_amount = sum(item.item_total for item in order_items)
+
+        # Aggregate order items to avoid duplicates
+        unique_items = {}
+        for item in order_items:
+            key = (item.product.id, item.product.product_name)  # Use a tuple as the key
+            if key in unique_items:
+                unique_items[key]['quantity'] += item.quantity
+            else:
+                unique_items[key] = {
+                    'quantity': item.quantity,
+                    'product_name': item.product.product_name,
+                    # Add more fields as needed
+                }
+
+        order_detail = {
             'order_id': order.id,
-           'transID': transID,
-           'subtotal': subtotal,
+            'order_date': order.created_at.date(),
+            'order_time': order.created_at.time(),
+            'status': order.status,
+            'payment_status': order.payment_status,
+            'total_amount': total_amount,
+            'items': unique_items.values(),
         }
 
-        return render(request, 'ordersummary.html', context)
-    except Order.DoesNotExist:
-        return redirect('/')
-def assign_orders_to_delivery_team():
-    # Get all active delivery teams
-    delivery_teams = DeliveryTeam.objects.filter(active=True)
+        order_details.append(order_detail)
+
+    return render(request, 'myorders.html', {'order_details': order_details})
+
+# views.py
+from django.shortcuts import render, get_object_or_404
+from .models import Order, DeliveryTeam
+from django.contrib.auth.decorators import login_required
+
+@login_required
+def delivery_team_orders(request):
+    # Retrieve the delivery team associated with the logged-in user
+    delivery_team = DeliveryTeam.objects.get(user=request.user)
+
+    # Fetch orders assigned to the delivery team's city
+    assigned_orders = Order.objects.filter(delivery_team__city=delivery_team.city)
+
+    return render(request, 'delivery_team_orders.html', {'assigned_orders': assigned_orders})
+# views.py
+from django.shortcuts import redirect, get_object_or_404
+from .models import Order
+from django.http import HttpResponseForbidden
+from django.views.decorators.http import require_POST
+
+@require_POST
+def update_order_status(request):
+    order_id = request.POST.get('order_id')
+    new_status = request.POST.get('new_status')
+
+    order = get_object_or_404(Order, id=order_id)
+
+    # Add logic to ensure the delivery team matches the logged-in user
+    if request.user != order.delivery_team.user:
+        return HttpResponseForbidden("You don't have permission to update this order.")
+
+    # Update the order status
+    order.status = new_status
+    order.save()
+
+    # Redirect to the delivery team orders page
+    return redirect('delivery_team_orders')
+# views.py
+from django.shortcuts import render
+from .models import Order, DeliveryTeam
+from django.contrib.auth.decorators import login_required
+
+@login_required
+def delivery_team_orders_by_city(request, city):
+    # Retrieve the delivery team associated with the logged-in user
+    delivery_team = DeliveryTeam.objects.get(user=request.user)
+
+    # Fetch orders assigned to the delivery team's city
+    assigned_orders = Order.objects.filter(delivery_team__city=city)
+
+    return render(request, 'delivery_team_orders_by_city.html', {'assigned_orders': assigned_orders})
+from django.shortcuts import render, redirect
+from django.contrib.auth.decorators import login_required
+from .models import Order, CustomUser, CustomerProfile, DeliveryTeam
+
+@login_required
+def deliver_orders(request, city=None):
+    # If a city is provided, filter delivery teams based on that city
+    if city:
+        delivery_teams = DeliveryTeam.objects.filter(city=city, active=True)
+    else:
+        # If no city is provided, get all active delivery teams
+        delivery_teams = DeliveryTeam.objects.filter(active=True)
+
+    orders_by_team = {}
 
     for team in delivery_teams:
-        # Get orders with status 'Placed' or 'Processing' for the same city as the delivery team
-        orders_to_assign = Order.objects.filter(
-            delivery_team__isnull=True,
-            status__in=['Placed', 'Processing'],
-            user__city=team.city
-        )
+        # Fetch orders assigned to the delivery team with payment_status=True
+        orders = Order.objects.filter(delivery_team=team, payment_status=True)
 
-        # Assign orders to the delivery team
-        if orders_to_assign.exists():
-            order_to_assign = orders_to_assign.first()
-            order_to_assign.delivery_team = team
-            order_to_assign.save()
+        # Store team details and orders in a dictionary
+        orders_by_team[team] = {
+            'team_name': team.team_name,
+            'orders': orders
+        }
+
+    context = {'orders_by_team': orders_by_team, 'selected_city': city}
+    return render(request, 'deliverorders.html', context)
+from django.shortcuts import render
+from django.contrib.auth.decorators import login_required
+from .models import Order, CustomUser
+
+@login_required
+def all_orders(request):
+    # Fetch all users excluding superadmin
+    users = CustomUser.objects.filter(is_superadmin=False)
+    orders = Order.objects.filter(payment_status=True)
+
+    return render(request, 'all_orders.html', {'orders': orders})
+from django.shortcuts import render, redirect
+from django.contrib import messages
+from .models import Order
+
+def update_order_status(request, order_id):
+    if request.method == 'POST':
+        status = request.POST.get('status')
+        order = Order.objects.get(id=order_id)
+        order.status = status
+        order.save()
+        messages.success(request, f"Order {order_id} status updated to {status}.")
+    return redirect('all_orders')
+
+def delete_order(request, order_id):
+    if request.method == 'POST':
+        order = Order.objects.get(id=order_id)
+        order.delete()
+        messages.success(request, f"Order {order_id} deleted successfully.")
+    return redirect('all_orders')

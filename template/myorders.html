@@ -268,50 +268,63 @@
             </nav>
         </div>
     </header>
+    <style>
+        body {
+            padding: 20px;
+        }
 
-        <link rel="stylesheet" href="{% static 'css/cart.css' %}">
-        <div class="container">
-            <div class="cart-header">
-                <h1>Your Cart</h1>
-            </div>
-            <ul>
-                {% for item in cart_items %}
-                <li class="cart-item">
-                    <div class="cart-item-details">
-                        <div class="cart-item-image">
-                            <img src="{{ item.product.watch_image.url }}" alt="{{ item.product.product_name }}">
-                        </div>
-                        <div class="cart-item-name">{{ item.product.product_name }}</div>
-                        <form action="{% url 'remove-from-cart' item.product.id %}" method="post">
-                            {% csrf_token %}
-                            <button class="remove-from-cart-btn" type="submit">Remove</button>
-                        </form>
-                    </div>
-                    <div class="cart-item-quantity">
-                        <form action="{% url 'increase-cart-item' item.product.id %}" method="post">
-                            {% csrf_token %}
-                            <button class="quantity-btn increase-quantity" type="submit">+</button>
-                        </form>
-                        <span class="item-quantity">{{ item.quantity }}</span>
-                        <form action="{% url 'decrease-cart-item' item.product.id %}" method="post">
-                            {% csrf_token %}
-                            <button class="quantity-btn decrease-quantity" type="submit">-</button>
-                        </form>
-                    </div>
-                    <div class="cart-item-price" data-price="{{ item.product.product_sale_price }}">
-                        <span class="sale-price">${{ item.product.product_sale_price }}</span>
-                    </div>
-                </li>
+        h1 {
+            margin-bottom: 20px;
+        }
+
+        .order-details {
+            border: 1px solid #ccc;
+            padding: 15px;
+            margin-bottom: 20px;
+        }
+
+        .order-details p {
+            margin-bottom: 5px;
+        }
+
+        .order-items {
+            list-style-type: none;
+            padding: 0;
+        }
+
+        .order-items li {
+            margin-bottom: 5px;
+        }
+    </style>
+</head>
+<body>
+    <h1>My Orders</h1>
+
+    {% for order_detail in order_details %}
+        <div class="order-details">
+            <p><strong>Order ID:</strong> {{ order_detail.order_id }}</p>
+            <p><strong>Order Date:</strong> {{ order_detail.order_date }}</p>
+            <p><strong>Order Time:</strong> {{ order_detail.order_time }}</p>
+            <p><strong>Status:</strong> {{ order_detail.status }}</p>
+            <p><strong>Payment Status:</strong> {{ order_detail.payment_status }}</p>
+            <p><strong>Total Amount:</strong> {{ order_detail.total_amount }}</p>
+
+            <ul class="order-items">
+                {% for item in order_detail.items %}
+                    <li>
+                        <strong>Product:</strong> {{ item.product_name }}
+                        <strong>Quantity:</strong> {{ item.quantity }}
+                    </li>
                 {% endfor %}
             </ul>
-            <p class="total-price-data"><span id="total-price"></span></p>
-
-            
-    <a class="checkout-button" href="{% url 'Customer_Profile' %}">Checkout</a>
-
-            </div>
-            <a class="continue-shopping-link" href="{% url 'customer_products' %}">Continue Shopping</a>
         </div>
-        <script src="{% static 'js/cart.js'%}"
-    {% endblock %}
-    
+        <hr>
+    {% endfor %}
+
+    <!-- Include Bootstrap JS (optional, if needed) -->
+    <script src="https://code.jquery.com/jquery-3.5.1.slim.min.js"></script>
+    <script src="https://cdn.jsdelivr.net/npm/@popperjs/core@2.10.2/dist/umd/popper.min.js"></script>
+    <script src="https://maxcdn.bootstrapcdn.com/bootstrap/4.5.2/js/bootstrap.min.js"></script>
+</body>
+</html>
+{% endblock %}

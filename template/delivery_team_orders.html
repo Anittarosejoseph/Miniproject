@@ -5,35 +5,51 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Delivery Team Orders</title>
+    <link rel="stylesheet" href="https://code.jquery.com/ui/1.12.1/themes/base/jquery-ui.css">
+    <script src="https://code.jquery.com/jquery-3.6.4.min.js"></script>
+    <script src="https://code.jquery.com/ui/1.12.1/jquery-ui.js"></script>
+    <script>
+        $(function() {
+            $(".draggable").draggable({
+                revert: "invalid",
+                cursor: "move",
+            });
+
+            $(".droppable").droppable({
+                accept: ".draggable",
+                drop: function(event, ui) {
+                    // Update the order status and submit the form
+                    var orderId = ui.draggable.data('order-id');
+                    var newStatus = $(this).data('status');
+
+                    // Update the hidden form input with the new status
+                    $(`#order_status_${orderId}`).val(newStatus);
+
+                    // Submit the form
+                    $(`#update_status_form_${orderId}`).submit();
+                }
+            });
+        });
+    </script>
 </head>
 <body>
-    <h1>Your Assigned Orders</h1>
+    <h1>Orders Assigned to Your Team</h1>
 
-    <table border="1">
-        <thead>
-            <tr>
-                <th>Order ID</th>
-                <th>Total Amount</th>
-                <th>Status</th>
-                <th>Action</th>
-            </tr>
-        </thead>
-        <tbody>
-            {% for order in orders %}
-                <tr>
-                    <td>{{ order.id }}</td>
-                    <td>{{ order.total_amount }}</td>
-                    <td>{{ order.status }}</td>
-                    <td>
-                        {% if order.status == 'Processing' %}
-                            <a href="{% url 'deliver_order' order.id %}">Deliver Order</a>
-                        {% endif %}
-                    </td>
-                </tr>
-            {% endfor %}
-        </tbody>
-    </table>
+    <div class="droppable" data-status="Placed">
+        <h2>Placed</h2>
+        <form method="post" id="update_status_form_{{ order.id }}" action="{% url 'update_order_status' %}">
+            {% csrf_token %}
+            <input type="hidden" name="order_id" value="{{ order.id }}">
+            <input type="hidden" name="new_status" value="Placed">
+            <div class="draggable" data-order-id="{{ order.id }}">
+                <p><strong>Order ID:</strong> {{ order.id }}</p>
+                <p><strong>Status:</strong> {{ order.status }}</p>
+                <!-- Add other order details as needed -->
+            </div>
+        </form>
+    </div>
 
-    <a href="{% url 'home' %}">Back to Dashboard</a>
+    <!-- Repeat the above block for 'Processing' and 'Delivered' status -->
+
 </body>
 </html>

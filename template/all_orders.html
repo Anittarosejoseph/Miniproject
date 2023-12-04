@@ -1,0 +1,60 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>All Orders</title>
+</head>
+<body>
+    <h1>All Orders</h1>
+
+    <div class="container">
+        <table class="table">
+            <thead>
+                <tr>
+                    <th>Order ID</th>
+                    <th>User</th>
+                    <th>Address</th>
+                    <th>Total Amount</th>
+                    <th>Payment Status</th>
+                    <th>Status</th>
+                    <th>Action</th>
+                    <!-- Add more columns as needed -->
+                </tr>
+            </thead>
+            <tbody>
+                {% for order in orders %}
+                    <tr>
+                        <td>{{ order.id }}</td>
+                        <td>{{ order.user.username }}</td>
+                        <td>{{ order.user.customerprofile.street_address }}, {{ order.user.customerprofile.city }}, {{ order.user.customerprofile.state }}, {{ order.user.customerprofile.pincode }}</td>
+                        <td>{{ order.total_amount }}</td>
+                        <td>{{ order.payment_status }}</td>
+                        <td>
+                            <form method="post" action="{% url 'update_order_status' order.id %}">
+                                {% csrf_token %}
+                                <select name="status">
+                                    <option value="Placed" {% if order.status == 'Placed' %} selected {% endif %}>Placed</option>
+                                    <option value="Processing" {% if order.status == 'Processing' %} selected {% endif %}>Processing</option>
+                                    <option value="Delivered" {% if order.status == 'Delivered' %} selected {% endif %}>Delivered</option>
+                                </select>
+                                <button type="submit">Update Status</button>
+                            </form>
+                        </td>
+                        <td>
+                            {% if order.status == 'Delivered' %}
+                                <!-- If status is Delivered, provide a delete button -->
+                                <form method="post" action="{% url 'delete_order' order.id %}">
+                                    {% csrf_token %}
+                                    <button type="submit">Delete Order</button>
+                                </form>
+                            {% endif %}
+                        </td>
+                        <!-- Add more columns and order details as needed -->
+                    </tr>
+                {% endfor %}
+            </tbody>
+        </table>
+    </div>
+</body>
+</html>
