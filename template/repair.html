@@ -1,0 +1,232 @@
+{% load static %}
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Watch Repair Service</title>
+    <!-- Bootstrap core CSS -->
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.0.2/dist/css/bootstrap.min.css" rel="stylesheet"
+        integrity="sha384-EVSTQN3/azprG1Anm3QDgpJLIm9Nao0Yz1ztcQTwFspd3yD65VohhpuuCOmLASjC" crossorigin="anonymous">
+    <!-- Custom styles -->
+    <link rel="stylesheet" type="text/css" href="{% static 'css/stc.css' %}">
+    <link rel="stylesheet" type="text/css" href="{% static '/css/bootstrap.css' %}" />
+    <link href="https://fonts.googleapis.com/css2?family=Roboto:wght@400;500;700;900&display=swap" rel="stylesheet">
+    <link href="{% static '/css/font-awesome.min.css' %}" rel="stylesheet" />
+    <link href="{% static '/css/style.css' %}" rel="stylesheet" />
+    <link href="{% static '/css/responsive.css' %}" rel="stylesheet">
+    <script>
+        // JavaScript function to navigate to the index page
+        function goToIndex() {
+            window.location.href = '/'; // Replace '/' with the actual URL of your index page
+        }
+    </script>
+    <style>
+        body {
+            font-family: Arial, sans-serif;
+            margin: 0;
+            padding: 0;
+            background-color: #f4f4f4;
+            color: #333;
+        }
+
+        header {
+            padding: 1em;
+            text-align: center;
+        }
+
+        main {
+            max-width: 500px; /* Adjust the max-width as needed */
+            margin: 20px auto;
+            padding: 20px;
+            background-color: #fff;
+            box-shadow: 0 0 10px rgba(0, 0, 0, 0.1);
+            border-radius: 8px;
+        }
+
+        h1, h2, h3 {
+            color: #007bff;
+        }
+
+        p {
+            line-height: 1.6;
+        }
+
+        form {
+            max-width: 600px;
+            margin: 0 auto;
+        }
+
+        label {
+            display: block;
+            margin-bottom: 8px;
+            color: #007bff; 
+        }
+
+        /* Colors for specific labels */
+        label[for="brand"] { color: #e44d26; } /* Watch Brand */
+        label[for="model"] { color: #3b5998; } /* Watch Model */
+        label[for="serialNumber"] { color: #55acee; } /* Serial Number */
+        label[for="issueDescription"] { color: #dd4b39; } /* Issue Description */
+        label[for="customerName"] { color: #007bb5; } /* Your Name */
+        label[for="watchImage"] { color: #4caf50; } /* Watch Image */
+
+        input, textarea {
+            width: 100%;
+            padding: 10px;
+            margin-bottom: 16px;
+            box-sizing: border-box;
+            border: 1px solid #ddd;
+            border-radius: 4px;
+        }
+
+        input:focus, textarea:focus {
+            outline: none;
+            border-color: #007bff;
+        }
+
+        button {
+            background-color: #007bff;
+            color: #fff;
+            padding: 12px 20px;
+            border: none;
+            border-radius: 4px;
+            cursor: pointer;
+        }
+
+        button:hover {
+            background-color: #0056b3;
+        }
+
+        .watch-image {
+            max-width: 100%;
+            height: auto;
+            border: 1px solid #ddd;
+            border-radius: 4px;
+            margin-bottom: 16px;
+        }
+
+        .drag-drop-container {
+            border: 2px dashed #007bff;
+            padding: 20px;
+            text-align: center;
+            cursor: pointer;
+            margin-bottom: 16px;
+        }
+
+        /* Color for Select Watch Issue label */
+        label[for="selectedIssue"] { color: #ff9800; } 
+
+        select {
+            width: 100%;
+            padding: 10px;
+            margin-bottom: 16px;
+            box-sizing: border-box;
+            border: 1px solid #ddd;
+            border-radius: 4px;
+        }
+    </style>
+</head>
+
+<body>
+    <div class="hero_area">
+        <!-- header section starts -->
+        <header class="header_section">
+            <div class="container-fluid">
+                <nav class="navbar navbar-expand-lg custom_nav-container ">
+                    <a class="navbar-brand" href="index.html">
+                        <span>
+                            HandTime
+                        </span>
+                    </a>
+
+                    <button class="navbar-toggler" type="button" data-toggle="collapse" data-target="#navbarSupportedContent" aria-controls="navbarSupportedContent" aria-expanded="false" aria-label="Toggle navigation">
+                        <span class=""> </span>
+                    </button>
+
+                    <div class="collapse navbar-collapse" id="navbarSupportedContent">
+                        <ul class="navbar-nav  ">
+                            <li class="nav-item ">
+                                <a class="nav-link" href="{% url 'index' %}">Home</a>
+                            </li>
+                            <li class="nav-item">
+                                <a class="nav-link" href="{% url 'about' %}">About</a>
+                            </li>
+                            <li class="nav-item">
+                                <a class="nav-link" href="{% url 'customer_products' %}">Products</a>
+                            </li>
+                            <li class="nav-item">
+                                <a class="nav-link" href="{% url 'service' %}">Services</a>
+                            </li>
+                            <li class="nav-item">
+                                <a class="nav-link" href="testimonial.html">Testimonial</a>
+                            </li>
+                            <li class="nav-item">
+                                <a class="nav-link" href="contact.html">Contact Us</a>
+                            </li>
+
+                            <div class="user_optio_box">
+                                {% if request.session.is_authenticated %}
+                                <!-- Display "Logout" button when the user is authenticated -->
+                                <a href="{% url 'logout' %}">
+                                    <i class="fa fa-sign-out" aria-hidden="true"></i> Logout<span class="sr-only">(current)</span>
+                                </a>
+                                {% else %}
+                                <!-- Display "Login" link when the user is not authenticated -->
+                                <a href="{% url 'login' %}">
+                                    <i class="fa fa-sign-in" aria-hidden="true"></i> Login
+                                </a>
+                                {% endif %}
+
+                                <li class="nav-item" active>
+                                    <a class="nav-link" href="{% url 'Customer_Profile' %}"><i class="fa fa-user" aria-hidden="true"></i></a>
+                                </li>
+                            </div>
+                        </ul>
+                    </div>
+                </nav>
+            </div>
+        </header>
+
+
+    <!-- ... (previous HTML code) ... -->
+
+<label for="customerName">Your Name:</label>
+<input type="text" id="customerName" name="customerName" required>
+
+<label for="model">Watch Model:</label>
+<input type="text" id="model" name="model" required>
+
+<label for="serialNumber">Serial Number:</label>
+<input type="text" id="serialNumber" name="serialNumber" required>
+
+<label for="issueDescription">Issue Description:</label>
+<textarea id="issueDescription" name="issueDescription" rows="4" required></textarea>
+
+<label for="watchImage">Watch Image:</label>
+<input type="file" id="watchImage" name="watchImage" accept="image/*" class="watch-image">
+
+<div class="drag-drop-container" id="dragDropContainer" ondrop="drop(event)" ondragover="allowDrop(event)">
+    Drag and drop your watch issues here
+</div>
+
+<label for="watchname">Watch Name:</label>
+<span id="watchname"></span>
+
+<label for="selectedIssue">Select Watch Issue:</label>
+<select id="selectedIssue" name="selectedIssue">
+    <option value="" disabled selected>Select an issue</option>
+    <option value="Unable to turn on">Unable to turn on</option>
+    <option value="Battery requires service">Battery requires service</option>
+    <option value="Charging tips or troubleshooting">Charging tips or troubleshooting</option>
+    <option value="Unexpected shutdown or restart">Unexpected shutdown or restart</option>
+    <option value="Display has blank screen or no backlight">Display has blank screen or no backlight</option>
+    <!-- Add more options as needed -->
+</select>
+
+<form>
+    <button type="submit">Submit Repair Request</button>
+</form>
+
+<!-- ... (remaining HTML code) ... -->

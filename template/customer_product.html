@@ -128,11 +128,9 @@
                         <a class="nav-link" href="{% url 'customer_products' %}">Products</a>
                       </li>
                       <li class="nav-item">
-                        <a class="nav-link" href="testimonial.html">Testimonial</a>
+                        <a class="nav-link" href="{% url 'service' %}">Services</a>
                       </li>
-                      <li class="nav-item">
-                        <a class="nav-link" href="contact.html">Contact Us</a>
-                      </li>
+                      
         
                     
                       
@@ -156,6 +154,10 @@
                         <li class="nav-item" >
                           <a class="nav-link" href="{% url 'view_cart' %}"> <i class="fa fa-shopping-cart" aria-hidden="true"></i>
                           </a> 
+                          <li class="nav-item" ></li>
+                          <a href="{% url 'order_history' %}">
+                            <i class="fa fa-sign-in" aria-hidden="true"></i> OrderHistory
+                          </a>
                                    
                   </div>            
                       

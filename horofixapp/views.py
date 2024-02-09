@@ -22,6 +22,7 @@ from django.shortcuts import get_object_or_404
 @never_cache
 def index(request):
     return render(request, 'index.html')
+@login_required
 def service(request):
     return render(request, 'service.html')
 def repair(request):
@@ -101,7 +102,7 @@ def login_user(request):
                     return redirect('deliveryindex')
                 elif user.is_superadmin:
                     request.session["username"] = user.username
-                    return redirect('adminpanel')
+                    return redirect('panel')
             else:
                 # Invalid credentials - user not authenticated
                 messages.error(request, "Invalid credentials.")
@@ -273,6 +274,37 @@ def add_product(request):
     
     return render(request, 'add_product.html')
 
+from django.shortcuts import render
+from .models import Order
+
+from django.shortcuts import render
+from .models import Order
+
+def admin_order_list(request):
+    # Filter orders with payment_status=True
+    orders = Order.objects.filter(payment_status=True)
+    return render(request, 'admin_order_list.html', {'orders': orders})
+
+from django.shortcuts import render, redirect, get_object_or_404
+from .models import Order, DeliveryTeam
+
+def assign_delivery_team(request, order_id):
+    order = get_object_or_404(Order, id=order_id)
+    delivery_teams = DeliveryTeam.objects.all()
+
+    if request.method == 'POST':
+        selected_delivery_team_id = request.POST.get('delivery_team')
+
+        if selected_delivery_team_id:
+            selected_delivery_team = get_object_or_404(DeliveryTeam, id=selected_delivery_team_id)
+
+            # Assign the selected delivery team to the order
+            order.delivery_team = selected_delivery_team
+            order.save()
+
+            return redirect('admin_order_list')
+
+    return render(request, 'assign_delivery_team.html', {'delivery_teams': delivery_teams, 'order_id': order_id})
 
 from django.shortcuts import render, get_object_or_404, redirect
 
@@ -316,37 +348,17 @@ def remove_from_cart(request, product_id):
         pass
     
     return redirect('view_cart')
-
-from django.shortcuts import render, redirect
-from .models import Cart
-@login_required(login_url='login')
 def view_cart(request):
-    # Check if the user is authenticated
-    if request.user.is_authenticated:
-        try:
-            # Try to get the user's cart
-            cart = request.user.cart
-        except Cart.DoesNotExist:
-            # If the cart does not exist, create a new one
-            cart = Cart.objects.create(user=request.user)
+    cart = request.user.cart
+    cart_items = CartItem.objects.filter(cart=cart)
+    for item in cart_items:
+        item.total_price = item.product.product_sale_price * item.quantity
+    
+    total_amount = sum(item.total_price for item in cart_items)
 
-        # Now you can access the user's cart and retrieve cart items
-        cart_items = CartItem.objects.filter(cart=cart)
+    return render(request, 'view_cart.html', {'cart_items': cart_items,'total_amount': total_amount})
 
-        context = {
-            'cart_items': cart_items,
-            'cart': cart,
-        }
-
-        return render(request, 'view_cart.html', context)
-    else:
-        # If the user is not authenticated, you may want to redirect them to the login page
-        return redirect('login')  # Replace 'login' with the actual name of your login URL pattern
-
-
-
-
-    from django.shortcuts import get_object_or_404, redirect
+from django.shortcuts import get_object_or_404, redirect
 from django.contrib.auth.decorators import login_required
 
 from django.shortcuts import get_object_or_404, redirect
@@ -656,25 +668,28 @@ from django.shortcuts import render, redirect
 from django.contrib.auth.decorators import login_required
 from .models import Order, CustomUser
 
+from django.shortcuts import render
+from django.contrib.auth.decorators import login_required
+from .models import Order  # Import your Order model
+
+from django.shortcuts import render
+from django.contrib.auth.decorators import login_required
+from .models import Order
+
+from django.shortcuts import render
+from django.contrib.auth.decorators import login_required
+from .models import Order
+
 @login_required
 def all_user_orders(request):
-    users = CustomUser.objects.filter(is_superadmin=False)
-    user_orders = {}
-    
-    for user in users:
-        # Fetch the user's profile
-        user_profile = CustomerProfile.objects.get(user=user)
+    # Retrieve orders for the current user with payment_status=True
+    user_orders = Order.objects.filter(user=request.user, payment_status=True)
 
-        # Fetch orders for the user with payment_status=True
-        orders = Order.objects.filter(user=user, payment_status=True)
+    context = {
+        'user_orders': user_orders,
+    }
 
-        # Store user details and orders in a dictionary
-        user_orders[user] = {
-            'profile': user_profile,
-            'orders': orders
-        }
-
-    return render(request, 'all_user_orders.html', {'user_orders': user_orders})
+    return render(request, 'all_user_orders.html', context)
 
 # Add a function to handle approval and disapproval (in the same view)
 from django.core.mail import send_mail
@@ -867,17 +882,9 @@ def remove_order_item(request, item_id):
     # Redirect back to the order summary page or any desired page
     return redirect('ordersummary')
 
-# views.py
-# views.py
-
-from django.core.mail import send_mail
-from django.shortcuts import render, redirect
-from django.conf import settings
-from .models import CustomUser
-
 def delivery_team_registration(request):
     if request.method == 'POST':
-        name = request.POST.get('name')
+        name = request.POST.get('name')  # Make sure 'name' is present in your form
         username = request.POST.get('username')
         email = request.POST.get('email')
         phone = request.POST.get('phone')
@@ -885,14 +892,14 @@ def delivery_team_registration(request):
         team_name = request.POST.get('team_name')
         vehicle_number = request.POST.get('vehicle_number')
         pincode = request.POST.get('pincode')
-        city = request.POST.get('city')  # Add this line for the city field
+        city = request.POST.get('city')
 
         user_type = 'DELIVERYTEAM'
 
         if CustomUser.objects.filter(username=username, user_type=user_type).exists():
             return render(request, 'delivery_team_list.html')
         else:
-            user = CustomUser.objects.create_user(name=name, email=email, phone=phone, password=password, username=username)
+            user = CustomUser.objects.create_user(name=name, username=username, email=email, phone=phone, password=password)
             user.user_type = user_type
             user.is_deliveryteam = True
             user.is_customer = False
@@ -912,7 +919,6 @@ def delivery_team_registration(request):
             return redirect('delivery_team_list')
     else:
         return render(request, 'deliveryteamreg.html')
-
 
 # views.py
 from django.http import JsonResponse
@@ -1028,21 +1034,69 @@ def add_address(request):
     return render(request, 'add_address.html')
 
 from django.shortcuts import render
-from django.http import JsonResponse
+from django.contrib.auth.decorators import login_required
+from .models import Order
+
+
+# views.py
+
+from django.shortcuts import render
+from .models import Order, OrderItem, CustomUser
+
+def all_orders(request):
+    # Fetch all orders with payment complete
+    orders = Order.objects.filter(payment_status=True)
+
+    # Create a list to store order details with associated user details
+    order_details = []
+
+    for order in orders:
+        # Fetch user details associated with the order
+        user = CustomUser.objects.get(id=order.user_id)
+
+        # Fetch order items associated with the order
+        order_items = OrderItem.objects.filter(order=order)
+
+        # Create a dictionary to store order details and associated user details
+        order_detail = {
+            'user': user,
+            'order': order,
+            'order_items': order_items,
+        }
+
+        # Append the dictionary to the order_details list
+        order_details.append(order_detail)
+
+    context = {'order_details': order_details}
+    return render(request, 'myorders.html', context)
+
+
+from django.shortcuts import render
+from django.contrib.auth.decorators import login_required
+from .models import Order
+
+from django.shortcuts import render
+from django.contrib.auth.decorators import login_required
+from .models import Order
+
+from django.contrib.auth.decorators import login_required
+from django.shortcuts import render
 from .models import Order, OrderItem
 
-
-@login_required(login_url='login')
-def myorders(request):
-    orders = Order.objects.filter(user=request.user).order_by('-created_at')
-    context = {
-        'orders': orders,
-    }
-    return render(request, 'myorders.html',context)
+@login_required
 def ordersummary(request):
-    # Fetch the latest order for the logged-in user (or implement your logic)
-    order = Order.objects.filter(user=request.user).latest('created_at')
-    return render(request, 'billinvoice.html', {'order': order})
+    # Retrieve the latest order for the currently logged-in user
+    order = Order.objects.filter(user=request.user).order_by('-id').first()
+
+    # Retrieve order items for the order
+    order_items = OrderItem.objects.filter(order=order)
+
+    # Pass the order and order_items to the template
+    context = {'order': order, 'order_items': order_items}
+
+    # Render the template
+    return render(request, 'billinvoice.html', context)
+
 
 # views.py
 from django.shortcuts import render
@@ -1196,3 +1250,94 @@ def delete_order(request, order_id):
         order.delete()
         messages.success(request, f"Order {order_id} deleted successfully.")
     return redirect('all_orders')
+from django.shortcuts import render
+from django.contrib.auth.decorators import login_required
+from .models import Order
+
+# views.py
+
+from django.shortcuts import render
+from .models import Order, OrderItem
+
+def order_history(request):
+    orders = Order.objects.filter(user=request.user)
+    
+    # Fetching order_date and order_time from OrderItem
+    order_items = OrderItem.objects.filter(order__user=request.user)
+    
+    for order_item in order_items:
+        order_item.order_date  # Use this in your template
+        order_item.order_time  # Use this in your template
+
+    context = {
+        'orders': orders,
+        'order_items': order_items,
+    }
+
+    return render(request, 'order_history.html', context)
+@login_required
+def bill(request):
+    # Fetch the latest order for the logged-in user (or implement your logic)
+    order = Order.objects.filter(user=request.user).latest('created_at')
+    return render(request, 'bill.html', {'order':order})
+from django.shortcuts import render, get_object_or_404, redirect
+
+@login_required
+def panel(request):
+    if request.user.is_superuser:
+      
+        total_users = CustomUser.objects.filter(is_superuser=False).count()
+
+        context = {
+            'total_users': total_users,
+        }
+
+        return render(request, 'panel.html', context)
+    else:
+        # Handle the case where the user is not a superuser (optional)
+        return render(request, 'access_denied.html')
+
+from django.shortcuts import render, redirect
+from django.core.mail import send_mail
+from django.conf import settings
+from django.contrib.auth import get_user_model
+from .models import Technician
+
+CustomUser = get_user_model()
+
+def techreg(request):
+    if request.method == 'POST':
+        name = request.POST.get('name')
+        username = request.POST.get('username')
+        email = request.POST.get('email')
+        phone = request.POST.get('phone')
+        password = request.POST.get('password')
+        experience = request.POST.get('experience')
+        city = request.POST.get('city')
+        pincode = request.POST.get('pincode')
+
+        user_type = 'TECHNICIAN'
+
+        if CustomUser.objects.filter(username=username, user_type=user_type).exists():
+            return render(request, 'technician_list.html')  # Redirect or render a specific page for existing technicians
+        else:
+            user = CustomUser.objects.create_user(name=name, username=username, email=email, phone=phone, password=password)
+            user.user_type = user_type
+            user.is_technician = True
+            user.is_customer = False
+            user.save()
+
+            technician = Technician(user=user,  experience=experience, city=city, pincode=pincode)
+            technician.save()
+
+            # Send a welcome email to the newly registered technician
+            subject = 'Technician Login Details'
+            message = f'Registered as a technician. Your username: {user.username}, Password: {password}'
+            from_email = settings.EMAIL_HOST_USER
+            recipient_list = [user.email]
+
+            send_mail(subject, message, from_email, recipient_list)
+
+            return redirect('technician_list')  # Redirect to a page displaying a list of registered technicians
+    else:
+        return render(request, 'techreg.html')

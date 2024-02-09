@@ -1,142 +1,134 @@
-<!DOCTYPE html>
-<html lang="en">
-<head>
-    <meta charset="UTF-8">
-    <meta http-equiv="X-UA-Compatible" content="IE=edge">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Bill Invoice</title>
 
-    <style>
-        body {
-            font-family: Arial, sans-serif;
-            background-color: #f0f0f0;
-            margin: 0;
-            padding: 0;
-        }
+           
+            
+            {% extends "base.html" %}
 
-        header {
-            background-color: #112418;
-            color: white;
-            text-align: center;
-            padding: 30px ;
-        }
-        .logout-icon {
-            position: absolute;
-            right: 10px;
-            top: 5px;
-            text-decoration: none;
-            color: #fff;
-        }
+            {% block content %}
+                {% load static %}
+                <!DOCTYPE html>
+                <html lang="en">
+            
+                <head>
+                    <meta charset="UTF-8">
+                    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+                    <title>horofix</title>
+            
+                    <!-- Fonts style -->
+                    <link href="https://fonts.googleapis.com/css2?family=Roboto:wght@400;500;700;900&display=swap" rel="stylesheet">
+            
+                    <!-- Font Awesome style -->
+                    <link href="{% static '/css/font-awesome.min.css' %}" rel="stylesheet" />
+            
+                    <!-- Custom styles for this template -->
+                    <link href="{% static '/css/style.css' %}" rel="stylesheet" />
+            
+                    <!-- Responsive style -->
+                    <link href="{% static '/css/responsive.css' %}" rel="stylesheet" />
+            
+                    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.0.2/dist/css/bootstrap.min.css" rel="stylesheet" integrity="sha384-EVSTQN3/azprG1Anm3QDgpJLIm9Nao0Yz1ztcQTwFspd3yD65VohhpuuCOmLASjC"
+                        crossorigin="anonymous">
+                </head>
+            
+                <body>
+                    <div class="hero_area">
+                        <header class="header_section">
+                            <div class="container-fluid">
+                                <nav class="navbar navbar-expand-lg custom_nav-container ">
+                                    <span class=""> </span>
+                  </button>
+        
+                  <div class="collapse navbar-collapse" id="navbarSupportedContent">
+                    <ul class="navbar-nav  ">
+                      <li class="nav-item ">
+                        <a class="nav-link" href="{% url 'index' %}">Home </a>
+                      </li>
+                      <li class="nav-item">
+                        <a class="nav-link" href="{% url 'about' %}"> About</a>
+                      </li>
+                      <li class="nav-item">
+                        <a class="nav-link" href="{% url 'customer_products' %}">Products</a>
+                      </li>
+                      <li class="nav-item">
+                        <a class="nav-link" href="testimonial.html">Testimonial</a>
+                      </li>
+                      <li class="nav-item">
+                        <a class="nav-link" href="contact.html">Contact Us</a>
+                      </li>
+        
+                    
+                      
+        
+                      <div class="user_optio_box">
+                
+                        {% if user.is_authenticated %}
+                          <li>Welcome,{{user.username}}</li>
+                            <a href="{% url 'logout' %}">
+                              <i class="fa fa-sign-out" aria-hidden="true"></i> Logout
+                            </a>
+                        {% else %}
+                          <a href="{% url 'login' %}">
+                            <i class="fa fa-sign-in" aria-hidden="true"></i> Login
+                          </a>
+                        {% endif %}
+          
+        
+        <li class="nav-item" >
+                        <a class="nav-link" href="{% url 'Customer_Profile' %}"><i class="fa fa-user" aria-hidden="true"></i></a>
+                        <li class="nav-item" >
+                          <a class="nav-link" href="{% url 'view_cart' %}"> <i class="fa fa-shopping-cart" aria-hidden="true"></i>
+                          </a> 
+                          <li class="nav-item" ></li>
+                          <a href="{% url 'order_history' %}">
+                            <i class="fa fa-sign-in" aria-hidden="true"></i> OrderHistory
+                          </a>
+                                   
+                  </div>            
+                      
+                  </div>
+               
+                                </nav>
+                            </div>
+                        </header>
+            
+                        <div class="order-summary-container">
+                            <div class="container text-center my-4">
+                                <img src="https://upload.wikimedia.org/wikipedia/commons/8/8b/Eo_circle_green_white_checkmark.svg" alt="Successful"
+                                    height="80" width="80" class="mb-2">
+                                <h1>Payment Successful</h1>
+                                <br>
+            
+                                {% if order %}
+                                    <p><strong>Order ID:</strong> {{ order.id }}</p>
+                                    <p><strong>Order Date:</strong> {{ order.created_at.date }}</p>
+                                    <p><strong>Order Time:</strong> {{ order.created_at.time }}</p>
+                                    <p><strong>Order Status:</strong> {{ order.status }}</p>
+            
+                                    <!-- Display ordered products and quantities -->
+                                    <div class="order-details">
+                                        <h2>Ordered Products</h2>
+                                        <ul>
+                                            {% for item in order.orderitem_set.all %}
+                                                <li>
+                                                    <p><strong>Product:</strong> {{ item.product.product_name }}</p>
+                                                    <p><strong>Quantity:</strong> {{ item.quantity }}</p>
+                                                    
 
-        h1 {
-            color: #3498db;
-        }
-
-        table {
-            width: 100%;
-            border-collapse: collapse;
-            margin-top: 20px;
-        }
-
-        th, td {
-            border: 1px solid #ddd;
-            padding: 10px;
-            text-align: left;
-        }
-
-        th {
-            background-color: #f2f2f2;
-        }
-        button {
-            background-color: red;
-            color: white;
-            margin-top: 10px;
-            font-size: 18px; /* Adjust the font size */
-            padding: 10px 20px;
-        }
-    </style>
-</head>
-<body>
-    <header>
-        <a href="{% url 'myorders' %}" class="logout-icon">myorderss</a> 
-        </a>
-    </header>
-    <h1>Bill Invoice</h1>
-
-    {% if order %}
-        <table>
-            <tr>
-                <th>Order Number</th>
-                <td>{{ order.id }}</td>
-            </tr>
-            <tr>
-                <th>Total Amount</th>
-                <td>{{ order.total_amount }}</td>
-            </tr>
-            <tr>
-                <th>Payment Status</th>
-                <td>{% if order.payment_status %}Paid{% else %}Pending{% endif %}</td>
-            </tr>
-            <tr>
-                <th>Order Date</th>
-                <td>{{ order.created_at }}</td>
-            </tr>
-        </table>
-
-        <h2>Order Details</h2>
-        <table>
-            <tr>
-                <th>Product</th>
-                <th>Quantity</th>
-                <th>Item Total</th>
-            </tr>
-            {% for item in order.orderitem_set.all %}
-                <tr>
-                    <td>{{ item.product.product_name }}</td>
-                    <td>{{ item.quantity }}</td>
-                    <td>{{ item.item_total }}</td>
-                </tr>
-            {% endfor %}
-        </table>
-<!-- ... previous HTML code ... -->
-
-<h2>Customer Details</h2>
-<table>
-    <tr>
-        <th>Name</th>
-        <td>{{ order.customerprofile.name }}</td>
-    </tr>
-    <tr>
-        <th>Email</th>
-        <td>{{ order.user.email }}</td>
-    </tr>
-    <tr>
-        <th>Phone Number</th>
-        <td>{{ order.customerprofile.phone }}</td>
-    </tr>
-    <tr>
-        <th>Address</th>
-        <td>{{ order.customerprofile.street_address }}</td>
-    </tr>
-    <tr>
-        <th>City</th>
-        <td>{{ order.customerprofile.city }}</td>
-    </tr>
-    <tr>
-        <th>State</th>
-        <td>{{ order.customerprofile.state }}</td>
-    </tr>
-    <tr>
-        <th>Pincode</th>
-        <td>{{ order.customerprofile.pincode }}</td>
-    </tr>
-</table>
-
-<center><button onclick="window.print()">Print</button></center>
-
-{% else %}
-    <p>No order details found.</p>
-{% endif %}
-
-</body>
-</html>
+                                                </li>
+                                            {% endfor %}
+                                        </ul>
+                                        <p><strong>Order Date:</strong> {{ item.order_date }}</p>
+                        <p><strong>Order Time:</strong> {{ item.order_time }}</p>
+                                        <p><strong>Total Amount:</strong> ${{ order.total_amount }}</p>
+                                    </div>
+                                    <a href="{% url 'bill' %}">View Detailed Bill</a>
+                                    {% else %}                                
+                                    <p>No orders found.</p>
+                                {% endif %}
+                            </div>
+                        </div>
+                    </div>
+                </body>
+            
+                </html>
+            {% endblock %}
+            

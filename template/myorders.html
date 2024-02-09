@@ -1,330 +1,87 @@
-{% extends "base.html" %}
-{% block content %}
+<!-- myorders.html -->
 
-{% load static %}
 <!DOCTYPE html>
 <html lang="en">
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>horofix</title>
-
-    <!-- fonts style -->
-    <link href="https://fonts.googleapis.com/css2?family=Roboto:wght@400;500;700;900&display=swap" rel="stylesheet">
-
-    <!-- font awesome style -->
-    <link href="{% static '/css/font-awesome.min.css' %}" rel="stylesheet" />
-
-    <!-- Custom styles for this template -->
-    <link href="{% static '/css/style.css' %}" rel="stylesheet" />
-    <!-- responsive style -->
-    <link href="{% static '/css/responsive.css' %}" rel="stylesheet" />
-    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.0.2/dist/css/bootstrap.min.css" rel="stylesheet" integrity="sha384-EVSTQN3/azprG1Anm3QDgpJLIm9Nao0Yz1ztcQTwFspd3yD65VohhpuuCOmLASjC" crossorigin="anonymous">
-</head>
-<script>
-    
-    // JavaScript function to navigate to the index page
-    function goToIndex() {
-        window.location.href = '/'; // Replace '/' with the actual URL of your index page
-    }
-</script>
-
+    <title>All Orders</title>
     <style>
-        body {
-            font-family: Arial, sans-serif;
-            margin: 0;
-            padding: 0;
-            background-color: #f0f0f0;
+        table {
+            width: 100%;
+            border-collapse: collapse;
+            margin-top: 20px;
         }
 
-        /* Style the container */
-        .container {
-            max-width: 1200px;
-            margin: 0 auto;
-            padding: 20px;
-            background-color: #fff;
-        }
-
-        /* Style the heading */
-        h1 {
-            text-align: center;
-            color: #333;
-        }
-
-        .product-card {
-            background-color: #fff;
+        th, td {
             border: 1px solid #ddd;
-            padding: 20px;
-            text-align: center;
-            margin-bottom: 20px;
-            width: 31%; /* Set the width to approximately 31% for three products in one row */
-            display: inline-block; /* Display products side by side */
-            margin-right: 2%; /* Add some space between products */
-            box-sizing: border-box; /* Include padding and border in the width */
+            padding: 8px;
+            text-align: left;
         }
 
-        /* Style product images */
-        .product-card img {
-            max-width: 100%;
-            height: auto;
-            margin-bottom: 10px;
-        }
-
-        /* Style product titles */
-        .product-card h3 {
-            font-size: 1.5rem;
-            margin: 10px 0;
-            color: #333;
-        }
-
-        /* Style product details */
-        .product-card p {
-            font-size: 1rem;
-            margin: 5px 0;
-        }
-        .cart-item-price .original-price {
-    text-decoration: line-through;
-    color: #777; /* Change the color to your preference */
-}
-
-
-        /* Style buttons */
-        .btn {
-            padding: 10px 20px;
-            font-size: 1rem;
-            margin: 5px;
-            cursor: pointer;
-        }
-
-        .btn-primary {
-            background-color: #007bff;
-            color: #fff;
-            border: none;
-        }
-
-        .btn-success {
-            background-color: #28a745;
-            color: #fff;
-            border: none;
-        }
-
-
-
-
-
-        .container {
-    max-width: 800px;
-    margin: 0 auto;
-    padding: 20px;
-    background-color: #f4f4f4;
-    border-radius: 8px;
-    box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
-}
-
-.cart-header {
-    text-align: center;
-    margin-bottom: 20px;
-}
-
-.cart-item {
-    display: flex;
-    justify-content: space-between;
-    align-items: center;
-    padding: 10px;
-    border-bottom: 1px solid #ddd;
-}
-
-.cart-item-details {
-    display: flex;
-    align-items: center;
-}
-
-.cart-item-name {
-    font-weight: bold;
-    margin-right: 10px;
-    flex: 1;
-    white-space: nowrap;
-    overflow: hidden;
-    text-overflow: ellipsis;
-}
-
-.remove-from-cart-btn,
-.quantity-btn {
-    background-color: #ff6347;
-    color: white;
-    border: none;
-    border-radius: 4px;
-    padding: 5px 10px;
-    cursor: pointer;
-    transition: background-color 0.3s;
-}
-
-.remove-from-cart-btn:hover,
-.quantity-btn:hover {
-    background-color: #e74c3c;
-}
-.remove-from-cart-btn:hover,
-.quantity-btn:hover {
-    background-color: #e74c3c;
-}
-
-.cart-item-quantity {
-    display: flex;
-    align-items: center;
-    margin-right: 10px;
-}
-
-.cart-item-price {
-    font-weight: bold;
-}
-
-.continue-shopping-link {
-    display: inline-block;
-    margin-top: 20px;
-    text-decoration: none;
-    color: #3498db;
-    font-weight: bold;
-}
-
-.continue-shopping-link:hover {
-    text-decoration: underline;
-}
-
-.checkout-button {
-    display: inline-block;
-    background-color: #28a745; 
-    color: white;
-    padding: 10px 20px;
-    border-radius: 4px;
-    margin-top: 20px;
-    margin-left: 400px;
-    text-decoration: none;
-    font-weight: bold;
-    transition: background-color 0.3s;
-}
-
-.checkout-button:hover {
-    background-color: #218838;
-}
-    </style>
-</head>
-<body>
-<div class="hero_area">
-    <header class="header_section">
-        <div class="container-fluid">
-            <nav class="navbar navbar-expand-lg custom_nav-container ">
-                <a class="navbar-brand" href="index.html">
-                    <span>
-                        HandTime
-                    </span>
-                </a>
-
-                <button class="navbar-toggler" type="button" data-toggle="collapse" data-target="#navbarSupportedContent" aria-controls="navbarSupportedContent" aria-expanded="false" aria-label="Toggle navigation">
-                    <span class=""> </span>
-                </button>
-
-                <div class="collapse navbar-collapse" id="navbarSupportedContent">
-                    <ul class="navbar-nav  ">
-                        <li class="nav-item ">
-                            <a class="nav-link" href="{% url 'index' %}">Home </a>
-                        </li>
-                        <li class="nav-item">
-                            <a class="nav-link" href="{% url 'about' %}"> About</a>
-                        </li>
-                        <li class="nav-item">
-                            <a class="nav-link" href="{% url 'customer_products' %}">Products</a>
-                        </li>
-                        <li class="nav-item">
-                            <a class="nav-link" href="testimonial.html">Testimonial</a>
-                        </li>
-                        <li class="nav-item">
-                            <a class="nav-link" href="contact.html">Contact Us</a>
-                        </li>
-
-                        <div class="user_optio_box">
-                            <!-- Inside your user_optio_box div -->
-                            <div class="user_optio_box" >
-                                {% if request.session.is_authenticated %}
-                                    <!-- Display "Logout" button when the user is authenticated -->
-                                    <a href="{% url 'logout' %}">
-                                        <i class="fa fa-sign-out" aria-hidden="true"></i> Logout<span class="sr-only">(current)</span>
-                                    </a>
-                                {% else %}
-                                    <!-- Display "Login" link when the user is not authenticated -->
-                                    <a href="{% url 'login' %}">
-                                        <i class="fa fa-sign-in" aria-hidden="true"></i> Login
-                                    </a>
-                                {% endif %}
-
-                                <li class="nav-item" >
-                                    <a class="nav-link" href="{% url 'Customer_Profile' %}"><i class="fa fa-user" aria-hidden="true"></i></a>
-                                </li>
-                            </li>
-                           
-                            </div>
-                        </div>
-                    </ul>
-                </div>
-            </nav>
-        </div>
-    </header>
-    <style>
-        body {
-            padding: 20px;
-        }
-
-        h1 {
-            margin-bottom: 20px;
-        }
-
-        .order-details {
-            border: 1px solid #ccc;
-            padding: 15px;
-            margin-bottom: 20px;
-        }
-
-        .order-details p {
-            margin-bottom: 5px;
-        }
-
-        .order-items {
-            list-style-type: none;
-            padding: 0;
-        }
-
-        .order-items li {
-            margin-bottom: 5px;
+        th {
+            background-color: #f2f2f2;
         }
     </style>
 </head>
 <body>
-    <h1>My Orders</h1>
+    <h1>All Orders with Payment Complete</h1>
 
-    {% for order_detail in order_details %}
-        <div class="order-details">
-            <p><strong>Order ID:</strong> {{ order_detail.order_id }}</p>
-            <p><strong>Order Date:</strong> {{ order_detail.order_date }}</p>
-            <p><strong>Order Time:</strong> {{ order_detail.order_time }}</p>
-            <p><strong>Status:</strong> {{ order_detail.status }}</p>
-            <p><strong>Payment Status:</strong> {{ order_detail.payment_status }}</p>
-            <p><strong>Total Amount:</strong> {{ order_detail.total_amount }}</p>
+    {% if order_details %}
+        {% for order_detail in order_details %}
+            <section>
+                <h2>User Details</h2>
+                <table>
+                    <tr>
+                        <th>User:</th>
+                        <td>{{ order_detail.user.username }}</td>
+                    </tr>
+                    <tr>
+                        <th>Email:</th>
+                        <td>{{ order_detail.user.email }}</td>
+                    </tr>
+                    <!-- Add other user details as needed -->
+                </table>
 
-            <ul class="order-items">
-                {% for item in order_detail.items %}
-                    <li>
-                        <strong>Product:</strong> {{ item.product_name }}
-                        <strong>Quantity:</strong> {{ item.quantity }}
-                    </li>
-                {% endfor %}
-            </ul>
-        </div>
-        <hr>
-    {% endfor %}
+                <h2>Order Details</h2>
+                <table>
+                    <tr>
+                        <th>Order ID:</th>
+                        <td>{{ order_detail.order.id }}</td>
+                    </tr>
+                    <tr>
+                        <th>Total Amount:</th>
+                        <td>${{ order_detail.order.total_amount }}</td>
+                    </tr>
+                    <tr>
+                        <th>Created At:</th>
+                        <td>{{ order_detail.order.created_at }}</td>
+                    </tr>
+                    <!-- Add other order details as needed -->
+                </table>
 
-    <!-- Include Bootstrap JS (optional, if needed) -->
-    <script src="https://code.jquery.com/jquery-3.5.1.slim.min.js"></script>
-    <script src="https://cdn.jsdelivr.net/npm/@popperjs/core@2.10.2/dist/umd/popper.min.js"></script>
-    <script src="https://maxcdn.bootstrapcdn.com/bootstrap/4.5.2/js/bootstrap.min.js"></script>
+                <h2>Ordered Items</h2>
+                <table>
+                    <thead>
+                        <tr>
+                            <th>Product</th>
+                            <th>Quantity</th>
+                            <th>Item Total</th>
+                        </tr>
+                   
+                        {% for order_item in order_detail.order_items %}
+                            <tr>
+                                <td>{{ order_item.product.product_name }}</td>
+                                <td>{{ order_item.quantity }}</td>
+                                <td>${{ order_item.item_total }}</td>
+                            </tr>
+                        {% endfor %}
+                    </tbody>
+                </table>
+            </section>
+        {% endfor %}
+    {% else %}
+        <p>No orders with payment complete found.</p>
+    {% endif %}
 </body>
 </html>
-{% endblock %}

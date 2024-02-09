@@ -48,6 +48,7 @@ class CustomUser(AbstractUser):
         ('VENDOR', 'Vendor'),
         ('DELIVERYTEAM', 'Deliveryteam'),
         ('CUSTOMER', 'Customer'),
+        ('TECHNICIAN',' Technician')
     )
 
     user_type = models.CharField(max_length=20,choices=USER_TYPES,blank=True, null=True, default='CUSTOMER')
@@ -69,6 +70,7 @@ class CustomUser(AbstractUser):
     is_superadmin = models.BooleanField(default=False)
     is_customer = models.BooleanField(default=True)
     is_deliveryteam = models.BooleanField(default=False)
+    is_technician=models.BooleanField(default=False)
 
     REQUIRED_FIELDS = []
    
@@ -83,9 +85,8 @@ class CustomUser(AbstractUser):
     def has_module_perms(self, app_label):
         return True
     def set_delivery_team_role(self):
-        self.user_types = self.DELIVERYTEAM  # Assign the integer value associated with DELIVERYTEAM
+        self.user_type = 'DELIVERYTEAM'
         self.save()
-
 
 class UserProfile(models.Model):
 
@@ -132,23 +133,30 @@ class UserProfile(models.Model):
 #        python manage.py migrate
 
 class CustomerProfile(models.Model):
-    user = models.ForeignKey(CustomUser, on_delete=models.CASCADE, default=None)
+    user = models.OneToOneField(CustomUser, on_delete=models.CASCADE, default=None)
     name = models.CharField(max_length=100)
-    street_address=models.CharField(max_length=100,null=True,blank=True, default=None)
+    street_address = models.CharField(max_length=100, null=True, blank=True, default=None)
     country = models.CharField(max_length=15, default="India", blank=True, null=True)
     state = models.CharField(max_length=50, blank=True, null=True, default=None)
-
     city = models.CharField(max_length=50, blank=True, null=True, default=None)
-    
     pincode = models.CharField(max_length=50, blank=True, null=True)
     phone = models.CharField(max_length=10, blank=True, null=True)
 
-    
-    pincode = models.CharField(max_length=50, blank=True, null=True)
-    phone = models.CharField(max_length=10,blank=True, null=True)
+    def __str__(self):
+        return self.user.email
+class Technician(models.Model):
+    user = models.OneToOneField(
+        'CustomUser',
+        on_delete=models.CASCADE,
+        primary_key=True,
+    )
+    experience = models.PositiveIntegerField()
+    city = models.CharField(max_length=100)
+    pincode = models.CharField(max_length=6)
 
-    def str(self):
-        return self.user.email 
+    def __str__(self):
+        return self.user.username
+    
  
 class DeliveryTeam(models.Model):
     team_name = models.CharField(max_length=100, default='', null=True)  # Field for the delivery team's name
@@ -163,10 +171,13 @@ class DeliveryTeam(models.Model):
         return f"{self.user.username} - {self.team_name}"
     def get_assigned_orders(self):
         return Order.objects.filter(delivery_team=self)
+    
 from django.db import models
 
 class WatchProduct(models.Model):
-    product_name = models.CharField(max_length=255, unique=True) 
+    product_name = models.CharField(max_length=255, unique=True,null=True) 
+    watch_model = models.CharField(max_length=255,unique=True,null=True)
+    watch_serial_number = models.CharField(max_length=255,unique=True,null=True)
     watch_description = models.TextField()
     watch_image = models.ImageField(upload_to='watch_images/', null=True, blank=True)
     product_price = models.DecimalField(max_digits=10, decimal_places=2, null=True)
@@ -284,5 +295,20 @@ class ShippingAddress(models.Model):
     def __str__(self):
         return f"{self.street_address}, {self.city}, {self.state} - {self.pincode}"
 
-from django.db import models
 
+class Repair(models.Model):
+    watch = models.ForeignKey(WatchProduct, on_delete=models.CASCADE)
+    issue_description = models.TextField()
+    requested_by = models.ForeignKey(CustomUser, on_delete=models.CASCADE)
+    date_requested = models.DateTimeField(auto_now_add=True)
+    status_choices = [
+        ('Pending', 'Pending'),
+        ('In Progress', 'In Progress'),
+        ('Completed', 'Completed'),
+    ]
+    status = models.CharField(max_length=20, choices=status_choices, default='Pending')
+
+    def __str__(self):
+        return f"Repair for {self.watch.brand} - {self.watch.model}"
+
+# ... (your existing code continues)

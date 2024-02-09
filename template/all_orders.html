@@ -1,15 +1,178 @@
+{% load static %}
 <!DOCTYPE html>
 <html lang="en">
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>All Orders</title>
+    <title>Admin Dashboard</title>
+
+    <!-- Include Bootstrap CSS and jQuery -->
+    <link rel="stylesheet" href="https://maxcdn.bootstrapcdn.com/bootstrap/4.5.2/css/bootstrap.min.css">
+    <script src="https://code.jquery.com/jquery-3.6.0.min.js"></script>
+    <script src="https://maxcdn.bootstrapcdn.com/bootstrap/4.5.2/js/bootstrap.min.js"></script>
+
+    <style>
+        /* Sidebar Styles */
+        .sidebar {
+            height: 100%;
+            width: 200px;
+            position: fixed;
+            top: 0;
+            left: 0;
+            background-color: #ca619e;
+            padding-top: 20px;
+        }
+
+        .sidebar a {
+            padding: 15px;
+            text-decoration: none;
+            font-size: 15px;
+            color: white;
+            display: block;
+        }
+
+        .sidebar a:hover {
+            background-color: #ca619e;
+        }
+
+        /* Content Styles */
+        .content {
+            margin-left: 200px;
+            padding: 15px;
+        }
+
+        /* Flex Container for Small Boxes */
+        .small-box-container {
+            display: flex;
+            justify-content: space-between; /* Align boxes in one row */
+        }
+
+        /* Individual Small Box Styles */
+        .small-box {
+            flex: 1; /* Distribute available space equally among boxes */
+            margin: 10px; /* Add some spacing between boxes */
+            padding: 20px;
+            background-color: #f8f9fa;
+            box-shadow: 0 4px 8px rgba(0, 0, 0, 0.2);
+        }
+
+        /* Logout Button Styles */
+        .logout-button {
+            text-decoration: none;
+            color: white;
+            margin-top: 1px;
+            background-color: red; /* Red color */
+            padding: 10px 15px; /* Add padding to the button */
+            border-radius: 5px; /* Rounded corners */
+            float: right; /* Float to the right to align with the right side of the page */
+        }
+    </style>
 </head>
 <body>
-    <h1>All Orders</h1>
+    <div class="sidebar">
+        <a href="{% url 'index' %}">Home</a>
+    
+     
+        <a href="{% url 'change_password' %}">Change password</a>
+<!-- adminpanel.html -->
+        
+<a href="{% url 'all_orders' %}">Assigned Jobs</a>
+        <a href="#">Settings</a>
+    </div>
+    <a href="{% url 'logout' %}" class="logout-button">Logout</a>
+    <title>All Orders</title>
+    <!-- Link to Bootstrap CSS -->
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.0.2/dist/css/bootstrap.min.css" rel="stylesheet" integrity="sha384-EVSTQN3/azprG1Anm3QDgpJLIm9Nao0Yz1ztcQTwFspd3yD65VohhpuuCOmLASjC"
+    crossorigin="anonymous">
+    <style>
+        body {
+            font-family: 'Arial', sans-serif;
+            margin: 20px;
+            background-color: #f4f4f4;
+        }
 
+        h1 {
+            text-align: center;
+            margin-bottom: 30px;
+        }
+
+        .container {
+            max-width: 800px;
+            margin: 0 auto;
+        }
+
+        .table {
+            width: 100%;
+            margin-bottom: 1rem;
+            color: #212529;
+            border-collapse: collapse;
+            border-spacing: 0;
+        }
+
+        .table th,
+        .table td {
+            padding: .75rem;
+            vertical-align: top;
+            border-top: 1px solid #dee2e6;
+        }
+
+        .table thead th {
+            vertical-align: bottom;
+            border-bottom: 2px solid #dee2e6;
+        }
+
+        .table tbody + tbody {
+            border-top: 2px solid #dee2e6;
+        }
+
+        .table-sm th,
+        .table-sm td {
+            padding: .3rem;
+        }
+
+        select {
+            width: 100%;
+            padding: .375rem .75rem;
+            font-size: 1rem;
+            line-height: 1.5;
+            color: #495057;
+            background-color: #fff;
+            background-clip: padding-box;
+            border: 1px solid #ced4da;
+            border-radius: .25rem;
+            transition: border-color .15s ease-in-out,box-shadow .15s ease-in-out;
+        }
+
+        button {
+            display: inline-block;
+            font-weight: 400;
+            color: #212529;
+            text-align: center;
+            vertical-align: middle;
+            user-select: none;
+            background-color: transparent;
+            border: 1px solid transparent;
+            padding: .375rem .75rem;
+            font-size: 1rem;
+            line-height: 1.5;
+            border-radius: .25rem;
+            transition: color .15s ease-in-out,
+            background-color .15s ease-in-out,
+            border-color .15s ease-in-out,
+            box-shadow .15s ease-in-out;
+        }
+
+        button:hover {
+            color: #fff;
+            background-color: #007bff;
+            border-color: #007bff;
+        }
+    </style>
+</head>
+<body>
     <div class="container">
-        <table class="table">
+        <h1>All Orders</h1>
+        <table class="table table-bordered">
             <thead>
                 <tr>
                     <th>Order ID</th>
@@ -19,7 +182,6 @@
                     <th>Payment Status</th>
                     <th>Status</th>
                     <th>Action</th>
-                    <!-- Add more columns as needed -->
                 </tr>
             </thead>
             <tbody>
@@ -27,30 +189,34 @@
                     <tr>
                         <td>{{ order.id }}</td>
                         <td>{{ order.user.username }}</td>
-                        <td>{{ order.user.customerprofile.street_address }}, {{ order.user.customerprofile.city }}, {{ order.user.customerprofile.state }}, {{ order.user.customerprofile.pincode }}</td>
+                        <td>
+                            {{ order.user.customerprofile.street_address }}, 
+                            {{ order.user.customerprofile.city }}, 
+                            {{ order.user.customerprofile.state }}, 
+                            {{ order.user.customerprofile.pincode }}
+                        </td>
+                        
                         <td>{{ order.total_amount }}</td>
                         <td>{{ order.payment_status }}</td>
                         <td>
                             <form method="post" action="{% url 'update_order_status' order.id %}">
                                 {% csrf_token %}
-                                <select name="status">
+                                <select name="status" class="form-select">
                                     <option value="Placed" {% if order.status == 'Placed' %} selected {% endif %}>Placed</option>
                                     <option value="Processing" {% if order.status == 'Processing' %} selected {% endif %}>Processing</option>
                                     <option value="Delivered" {% if order.status == 'Delivered' %} selected {% endif %}>Delivered</option>
                                 </select>
-                                <button type="submit">Update Status</button>
+                                <button type="submit" class="btn btn-primary">Update Status</button>
                             </form>
                         </td>
                         <td>
                             {% if order.status == 'Delivered' %}
-                                <!-- If status is Delivered, provide a delete button -->
                                 <form method="post" action="{% url 'delete_order' order.id %}">
                                     {% csrf_token %}
-                                    <button type="submit">Delete Order</button>
+                                    <button type="submit" class="btn btn-danger">Delete Order</button>
                                 </form>
                             {% endif %}
                         </td>
-                        <!-- Add more columns and order details as needed -->
                     </tr>
                 {% endfor %}
             </tbody>

@@ -1,109 +1,707 @@
+{% load static %}
 <!DOCTYPE html>
 <html lang="en">
+
 <head>
     <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Admin Dashboard</title>
+    <meta http-equiv="X-UA-Compatible"content="IE=edge">
+    <meta name="viewport"content="width=device-width,initial-scale=1.0">
+    <title>admin</title>
+    <link rel="stylesheet" href="{% static '/assets/css/maicons.css'%}">
 
-    <!-- Include Bootstrap CSS and jQuery -->
-    <link rel="stylesheet" href="https://maxcdn.bootstrapcdn.com/bootstrap/4.5.2/css/bootstrap.min.css">
-    <script src="https://code.jquery.com/jquery-3.6.0.min.js"></script>
-    <script src="https://maxcdn.bootstrapcdn.com/bootstrap/4.5.2/js/bootstrap.min.js"></script>
+    <link rel="stylesheet" href="{% static '/assets/css/bootstrap.css'%}">
 
-    <style>
-        /* Sidebar Styles */
-        .sidebar {
-            height: 100%;
-            width: 200px;
-            position: fixed;
-            top: 0;
-            left: 0;
-            background-color: #007bff;
-            padding-top: 20px;
-        }
+    <link rel="stylesheet" href="{% static '/assets/vendor/owl-carousel/css/owl.carousel.css'%}">
 
-        .sidebar a {
-            padding: 15px;
-            text-decoration: none;
-            font-size: 15px;
-            color: white;
-            display: block;
-        }
+    <link rel="stylesheet" href="{% static '/assets/vendor/animate/animate.css'%}">
 
-        .sidebar a:hover {
-            background-color: #0056b3;
-        }
+    <link rel="stylesheet" href="{% static '/assets/css/theme.css' %}">
 
-        /* Content Styles */
-        .content {
-            margin-left: 200px;
-            padding: 15px;
-        }
-
-        /* Logout Button Styles */
-        .logout-button {
-            text-decoration: none;
-            color: white;
-            margin-top: 1px;
-            background-color: red; /* Red color */
-            padding: 10px 15px; /* Add padding to the button */
-            border-radius: 5px; /* Rounded corners */
-            float: right; /* Float to the right to align with the right side of the page */
-        }
-    </style>
-</head>
-<body>
-    <div class="sidebar">
-        <a href="{% url 'adminpanel' %}">Dashboard</a>
-        <a href="{% url 'user_list' %}">Users</a>
-        <div class="dropdown">
-            <a href="#" class="dropbtn">Product</a>
-            <div class="dropdown-content">
-                <a href="{% url 'add_product' %}">Add Product</a>
-                <a href="{% url 'view_products' %}">View Products</a>
-            </div>
-        </div>
-        <div class="dropdown-content">
-        <a href="{% url 'deliveryteamreg' %}">DeliveryTeam</a>
-        <a href="{% url 'delivery_team_list' %}">DeliveryTeamList</a>
-    </div>
-<!-- adminpanel.html -->
-        <a href="{% url 'all_user_orders'%}">Orders</a>
-        <a href="#">Settings</a>
-    </div>
-
-    <div class="content">
-        <!-- Header -->
-        <div class="header">
-           
-            <a href="{% url 'index' %}" class="logout-button">Logout</a>
-        </div>
-    </div>
+    
 <style>
-        body {
-            font-family: Arial, sans-serif;
-        }
+            /* Main CSS Here */
 
-        .container {
+
+            * {
+    margin: 0;
+    padding: 0;
+    box-sizing: border-box;
+    font-family: "Poppins", sans-serif;
+}
+
+:root {
+    --background-color1: #fafaff;
+    --background-color2: #ffffff;
+    --background-color3: #ededed;
+    --background-color4: #cbe2deac;
+    --primary-color:#ae095b;
+    --secondary-color: #ae095b;
+    --Border-color: #ae095b;
+    --one-use-color: #ae095b;
+    --two-use-color:#ae095b;
+}
+
+body {
+    background-color: var(--background-color4);
+    max-width: 100%;
+    overflow-x: hidden;
+}
+
+header {
+    height: 70px;
+    width: 100vw;
+    padding: 0 30px;
+    background-color: var(--background-color1);
+    position: fixed;
+    z-index: 100;
+    box-shadow: 1px 1px 15px rgba(216, 42, 164, 0.825);
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+}
+
+.logo {
+    font-size: 27px;
+    font-weight: 600;
+    color:rgb(218, 68, 155);
+}
+
+.icn {
+    height: 30px;
+}
+
+.menuicn {
+    cursor: pointer;
+}
+
+.searchbar,
+.message,
+.logosec {
+    display: flex;
+    align-items: center;
+    justify-content: center;
+}
+
+.searchbar2 {
+    display: none;
+}
+
+.logosec {
+    gap: 60px;
+}
+
+.searchbar input {
+    width: 250px;
+    height: 42px;
+    border-radius: 50px 0 0 50px;
+    background-color: var(--background-color3);
+    padding: 0 20px;
+    font-size: 15px;
+    outline: none;
+    border: none;
+}
+
+.searchbtn {
+    width: 50px;
+    height: 42px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    border-radius: 0px 50px 50px 0px;
+    background-color: #fafaff;
+    cursor: pointer;
+}
+
+.message {
+    gap: 40px;
+    position: relative;
+    cursor: pointer;
+}
+
+.circle {
+    height: 7px;
+    width: 7px;
+    position: absolute;
+    background-color: #fa7bb4;
+    border-radius: 50%;
+    left: 19px;
+    top: 8px;
+}
+
+.dp {
+    height: 40px;
+    width: 40px;
+    background-color: #626262;
+    border-radius: 50%;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    overflow: hidden;
+}
+
+.main-container {
+    display: flex;
+    width: 100vw;
+    position: relative;
+    top: 70px;
+    z-index: 1;
+}
+
+.dpicn {
+    height: 42px;
+}
+
+.main {
+    height: calc(100vh - 70px);
+    width: 100%;
+    overflow-y: scroll;
+    overflow-x: hidden;
+    padding: 40px 30px 30px 30px;
+}
+
+.main::-webkit-scrollbar-thumb {
+    background-image: linear-gradient(to bottom, rgb(252, 73, 243), rgb(235, 61, 211));
+}
+
+.main::-webkit-scrollbar {
+    width: 5px;
+}
+
+.main::-webkit-scrollbar-track {
+    background-color: #d62a2ab2;
+}
+
+.box-container {
+    display: flex;
+    justify-content: space-evenly;
+    align-items: center;
+    flex-wrap: wrap;
+    gap: 50px;
+}
+
+.nav {
+    min-height: 91vh;
+    width: 250px;
+    background-color: var(--background-color2);
+    position: absolute;
+    top: 0px;
+    left: 0;
+    box-shadow: 1px 1px 10px rgba(223, 31, 191, 0.825);
+    display: flex;
+    flex-direction: column;
+    justify-content: space-between;
+    overflow: hidden;
+    padding: 30px 0 20px 10px;
+}
+
+.navcontainer {
+    height: calc(100vh - 70px);
+    width: 350px;
+    position: relative;
+    overflow-y: scroll;
+    overflow-x: hidden;
+    transition: all 0.5s ease-in-out;
+}
+
+.navcontainer::-webkit-scrollbar {
+    display: none;
+}
+
+.navclose {
+    width: 80px;
+}
+
+.nav-option {
+    font-size: 9px;
+}
+
+.nav-option {
+    width: 250px;
+    height: 50px;
+    display: flex;
+    align-items: center;
+    padding: 0 30px 0 20px;
+    gap: 20px;
+    transition: all 0.1s ease-in-out;
+}
+
+.nav-option:hover {
+    border-left: 5px solid #a2a2a2;
+    background-color: #dadada;
+    cursor: pointer;
+}
+
+.nav-img {
+    height: 30px;
+}
+
+.nav-upper-options {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    gap: 30px;
+}
+
+.option1 {
+    border-left: 5px solid #f0d8ecaf;
+    background-color: var(--Border-color);
+    color: white;
+    cursor: pointer;
+    }
+    .option1:hover {
+    border-left: 5px solid #40d0a0af;
+    background-color: var(--Border-color);
+    }
+.box {
+    height: 130px;
+    width: 230px;
+    border-radius: 20px;
+    box-shadow: 3px 3px 10px rgba(240, 65, 147, 0.751);
+    padding: 20px;
+    display: flex;
+    align-items: center;
+    justify-content: space-around;
+    cursor: pointer;
+    transition: transform 0.3s ease-in-out;
+}
+
+.box:hover {
+    transform: scale(1.08);
+}
+
+.box:nth-child(1) {
+    background-color: var(--one-use-color);
+}
+
+.box:nth-child(2) {
+    background-color: var(--two-use-color);
+}
+
+.box:nth-child(3) {
+    background-color: var(--one-use-color);
+}
+
+.box:nth-child(4) {
+    background-color: var(--two-use-color);
+}
+
+.box img {
+    height: 50px;
+}
+
+.box .text {
+    color: white;
+}
+
+.topic {
+    font-size: 13px;
+    font-weight: 400;
+    letter-spacing: 1px;
+}
+
+.topic-heading {
+    font-size: 30px;
+    letter-spacing: 3px;
+}
+
+.report-container {
+    min-height: 300px;
+    max-width: 1200px;
+    margin: 70px auto 0px auto;
+    background-color: #ffffff;
+    border-radius: 30px;
+    box-shadow: 3px 3px 10px rgb(188, 188, 188);
+    padding: 0px 20px 20px 20px;
+}
+
+.report-header {
+    height: 80px;
+    width: 100%;
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    padding: 20px 20px 10px 20px;
+    border-bottom: 2px solid rgba(220, 86, 187, 0.59);
+}
+
+.recent-Articles {
+    font-size: 30px;
+    font-weight: 600;
+    color: #ec0b87;
+}
+
+.view {
+    height: 35px;
+    width: 90px;
+    border-radius: 8px;
+    background-color: #c43799;
+    color: white;
+    font-size: 15px;
+    border: none;
+    cursor: pointer;
+}
+
+.report-body {
+    max-width: 1160px;
+    overflow-x: auto;
+    padding: 20px;
+}
+
+.report-topic-heading,
+.item1 {
+    width: 1120px;
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+}
+
+.t-op {
+    font-size: 18px;
+    letter-spacing: 0px;
+}
+
+.items {
+    width: 1120px;
+    margin-top: 15px;
+}
+
+.item1 {
+    margin-top: 20px;
+}
+
+.t-op-nextlvl {
+    font-size: 14px;
+    letter-spacing: 0px;
+    font-weight: 600;
+}
+
+.label-tag {
+    width: 100px;
+    text-align: center;
+    background-color: rgb(231, 113, 186);
+    color: white;
+    border-radius: 4px;
+}
+
+.container {
+    max-width: 1000px;
+    margin: 20px auto;
+    padding: 20px;
+    background-color: #fff;
+    border-radius: 5px;
+}
+
+table {
+    width: 100%;
+    border-collapse: collapse;
+    margin-top: 20px;
+    background-color: #fff;
+    border-radius: 10px;
+    box-shadow: 0 0 10px rgba(168, 236, 226, 0.1);
+}
+
+th {
+    background-color:#ae095b;
+    color: #fff;
+    font-weight: bold;
+    padding: 10px;
+    text-align: left;
+}
+
+tr {
+    transition: background-color 0.3s;
+}
+
+tr:nth-child(even) {
+    background-color: #f2f2f2;
+}
+
+th, td {
+    padding: 10px;
+    border-bottom: 1px solid #ddd;
+    text-align: left;
+}
+
+th.action-header {
+    width: 100px;
+}
+
+.btn-edit, .btn-delete {
+    padding: 5px 9px;
+    margin-right: 5px;
+    border: none;
+    border-radius: 3px;
+    cursor: pointer;
+    font-size: 12px;
+    color: #fff;
+    transition: background-color 0.3s;
+}
+
+.btn-edit {
+    background-color: #ae095b;
+}
+
+.btn-delete {
+    background-color: #ae095b;
+}
+
+.btn-edit:hover {
+    background-color: #ae095b;
+}
+
+.btn-delete:hover {
+    background-color: #ae095b;
+}
+
+.dropdown .btn-secondary {
+    background-color: #ae095b;
+    color: #fff;
+    border: none;
+    border-radius: 3px;
+    cursor: pointer;
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    transition: background-color 0.3s ease, color 0.3s ease;
+    padding: 5px 15px;
+}
+
+.dropdown .btn-secondary:hover {
+    background-color: #bb0b86;
+    color: #fff;
+}
+
+.user-icon {
+    width: 30px;
+    height: 30px;
+    margin-right: 10px;
+    border-radius: 50%;
+}
+
+.dropdown-menu {
+    background-color: #333;
+    color: #fff;
+}
+
+.dropdown-item {
+    color: #fff;
+    transition: background-color 0.3s ease, color 0.3s ease;
+}
+
+.dropdown-item:hover {
+    background-color: #e92bc0;
+    color: #fff;
+}
+
+.button-link {
+    display: inline-block;
+    padding: 10px 10px;
+    background-color: rgb(224, 48, 171);
+    color: white;
+    text-decoration: none;
+    border: none;
+    border-radius: 6px;
+}
+
+.button-link:hover {
+    background-color: #c524a2;
+}
+
+.message-toaster {
+    position: fixed;
+    top: 0;
+    left: 50%;
+    text-align: center;
+    z-index: 9999;
+    transform: translateX(-50%);
+    padding: 30px 0;
+}
+.container {
             max-width: 800px;
-            margin: 0 auto;
+            margin: 50px auto;
+            background-color: #fff;
             padding: 20px;
+            border-radius: 10px;
+            box-shadow: 0 0 10px rgba(0, 0, 0, 0.1);
         }
 
-        th {
-            background-color: #f2f2f2;
+        form {
+            display: flex;
+            flex-direction: column;
+            gap: 15px;
         }
 
-        img {
-            max-width: 100px;
+        label {
+            font-weight: bold;
         }
 
-        .action-buttons a {
+        input,
+        textarea,
+        select {
+            width: 100%;
+            padding: 10px;
+            border: 1px solid #ddd;
+            border-radius: 5px;
+            box-sizing: border-box;
+        }
+
+        .error-message {
+            color: red;
+        }
+
+        /* Align buttons */
+        input[type="submit"],
+        input[type="button"] {
+            width: auto;
+            padding: 10px 20px;
+            cursor: pointer;
+        }
+
+        /* Add some spacing between buttons */
+        input[type="submit"] {
             margin-right: 10px;
         }
+
     </style>
-</head>
-<body>
+    </head>
+    
+    <body>
+    
+        <header>
+    
+            <div class="logosec">
+                <div class="logo">HOROFIX</div>
+                  
+            </div>
+    
+            <div class="searchbar">
+                <input type="text" id="searchInput" placeholder="Search" oninput="searchTable()">
+                <div class="searchbtn" onclick="performSearch()">
+                    <img src="{% static '/images/search.png' %}" class="icn srchicn" alt="search-icon">
+                </div>
+            </div>
+            
+            
+            
+                   <div class="dropdown">
+                        <button class="btn btn-secondary dropdown-toggle" type="button" id="userProfileDropdown" data-toggle="dropdown" aria-haspopup="true" aria-expanded="false">
+                        <div class="user-profile">
+                        <img src="{% static '/images/picon.png' %}" alt="User Icon" class="user-icon">
+                        {{ user.username }}
+                    </div>
+                        </button>
+            <div class="dropdown-menu" aria-labelledby="userProfileDropdown">
+                
+                <a class="dropdown-item" href="{% url 'logout' %}">Logout</a>
+            </div>
+        </div>
+            </div>
+    
+        </header>
+       
+        <div class="main-container">
+            <div class="navcontainer">
+                <nav class="nav">
+                    <div class="nav-upper-options">
+                        {% if user.is_superuser %}
+                        <a href="{% url 'panel' %}">
+                        <div class="nav-option option1">
+                            
+                            <h3 style="font-size: 17px;"> Dashboard</h3>
+                        </div>
+                        </a>
+                        {% endif %}
+                        {% if user.is_superuser %}
+                    <a href="{% url 'user_list' %}">
+                        <div class="option2 nav-option">
+                            <img src=
+    "https://media.geeksforgeeks.org/wp-content/uploads/20221210183322/9.png"
+                                class="nav-img"
+                                alt="articles">
+                            <h3 style="font-size: 17px;"> Registered Users</h3>
+                        </div>
+                    </a>
+                    {% endif %}
+                    <a href="{% url 'admin_order_list'%}">
+                        <div class="nav-option option3">
+                            <img src=
+    "https://media.geeksforgeeks.org/wp-content/uploads/20221210183320/5.png"
+                                class="nav-img"
+                                alt="report">
+                            <h3 style="font-size: 17px;"> Orders</h3>
+                        </div>
+                    </a>
+                    {% if user.is_superuser %}
+                        <a href="">
+                        <div class="nav-option option3">
+                            <img src=
+    "https://media.geeksforgeeks.org/wp-content/uploads/20221210183320/5.png"
+                                class="nav-img"
+                                alt="report">
+                            <h3 style="font-size: 17px;">Repair Requests</h3>
+                        </div>
+                        </a>
+                        {% endif %}
+                        <a href="{% url 'delivery_team_list' %}">
+                        <div class="nav-option option4">
+                            <img src=
+    "https://media.geeksforgeeks.org/wp-content/uploads/20221210183321/6.png"
+                                class="nav-img"
+                                alt="institution">
+                            <h3 style="font-size: 17px;"> DeliveryTeam</h3>
+                        </div>
+                    </a>
+                    {% if user.is_superuser %}
+                        <a href="">
+                        <div class="nav-option option3">
+                            <img src=
+    "https://media.geeksforgeeks.org/wp-content/uploads/20221210183320/5.png"
+                                class="nav-img"
+                                alt="report">
+                            <h3 style="font-size: 17px;"> Technicians</h3>
+                        </div>
+                        </a>
+                        {% endif %}
+    
+                    </div>
+                </nav>
+            </div>    
+        <script src="{% static '/assets/js/jquery-3.5.1.min.js'%}"></script>
+
+        <script src="{% static '/assets/js/bootstrap.bundle.min.js'%}"></script>
+    
+        <script src="{% static '/assets/vendor/owl-carousel/js/owl.carousel.min.js'%}"></script>
+    
+        <script src="{% static '/assets/vendor/wow/wow.min.js'%}"></script>
+    
+        <script src="{% static '/assets/js/theme.js'%}"></script>
+      
+        <script>
+            function searchTable() {
+                var input, filter, table, tr, td, i, txtValue;
+                input = document.getElementById("searchInput");
+                filter = input.value.toUpperCase();
+                table = document.querySelector("table"); // Replace with the actual table ID or class
+                tr = table.getElementsByTagName("tr");
+        
+                for (i = 0; i < tr.length; i++) {
+                    td = tr[i].getElementsByTagName("td")[0]; // Change index to match the column you want to search
+                    if (td) {
+                        txtValue = td.textContent || td.innerText;
+                        if (txtValue.toUpperCase().indexOf(filter) > -1) {
+                            tr[i].style.display = "";
+                        } else {
+                            tr[i].style.display = "none";
+                        }
+                    }
+                }
+            }
+        
+            function performSearch() {
+                searchTable(); // Call the searchTable function when the search icon is clicked
+            }
+        </script>
+
     <div class="container">
         <h1>View Products</h1>
         <table class="table table-striped">
@@ -132,10 +730,7 @@
                     <td>{{ product.status }}</td>
                     <td class="action-buttons">
                         <a href="{% url 'edit_product' product.id %}" class="btn btn-primary">Edit</a>
-                        <!-- <form method="post" id="deleteForm-{{ product.id }}" action="{% url 'delete_product' product.id %}">
-                            {% csrf_token %}
-                            <button class="btn btn-danger" type="button" onclick="confirmDelete({{ product.id }})">Delete</button>
-                        </form> -->
+                        
                     </td>
                 </tr>
                 {% endfor %}

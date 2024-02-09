@@ -58,13 +58,20 @@ urlpatterns = [
     path('update-order-status/', views.update_order_status, name='update_order_status'),
     path('deliverorders/', views.deliver_orders, name='deliverorders'),
     path('all_orders/', views.all_orders, name='all_orders'),
-path('update-order-status/<int:order_id>/', views.update_order_status, name='update_order_status'),
+    path('update-order-status/<int:order_id>/', views.update_order_status, name='update_order_status'),
     path('delete-order/<int:order_id>/', views.delete_order, name='delete_order'),
-
+    path('order_history/', views.order_history, name='order_history'),
+    path('bill/', views.bill, name='bill'),
+    path('admin_order_list/', views.admin_order_list, name='admin_order_list'),
+    path('assign_delivery_team/', views.assign_delivery_team, name='assign_delivery_team'),
+    
     path('delivery-team-orders/', views.delivery_team_orders, name='delivery_team_orders'),
 
     path('remove_from_wishlist/<int:wishlist_item_id>/', views.remove_from_wishlist, name='remove_from_wishlist'),
     path('add_to_wishlist/<int:id>/', views.add_to_wishlist, name='add_to_wishlist'),
+    path('panel/',views.panel,name='panel'),
+    path('techreg/', views.techreg, name='techreg')
+
 ]
 
 

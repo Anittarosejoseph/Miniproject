@@ -1,0 +1,202 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>horofix</title>
+
+    <!-- Fonts style -->
+    <link href="https://fonts.googleapis.com/css2?family=Roboto:wght@400;500;700;900&display=swap" rel="stylesheet">
+
+    <!-- Font Awesome style -->
+    <link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/5.15.3/css/all.min.css" rel="stylesheet" />
+
+    <!-- Bootstrap styles -->
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.0.2/dist/css/bootstrap.min.css" rel="stylesheet"
+        integrity="sha384-EVSTQN3/azprG1Anm3QDgpJLIm9Nao0Yz1ztcQTwFspd3yD65VohhpuuCOmLASjC" crossorigin="anonymous">
+
+    <style>
+        body {
+            font-family: 'Roboto', sans-serif;
+            background-color: #f4f4f4;
+            margin: 0;
+            padding: 0;
+        }
+
+        .hero_area {
+            padding: 20px;
+        }
+
+        .custom_nav-container {
+            background-color: #ffffff;
+            box-shadow: 0 4px 8px rgba(0, 0, 0, 0.1);
+        }
+
+        .navbar-brand span {
+            font-weight: 700;
+        }
+
+        .navbar-nav .nav-item {
+            margin-right: 10px;
+        }
+
+        .user_optio_box {
+            display: flex;
+            align-items: center;
+        }
+
+        .order-history-container {
+            max-width: 800px;
+            margin: 20px auto;
+            background-color: #fff;
+            padding: 40px;
+            border-radius: 30px;
+            box-shadow: 0 4px 8px rgba(0, 0, 0, 0.1);
+        }
+
+        .order-history-container h1 {
+            text-align: center;
+            color: #333;
+            margin-bottom: 20px;
+        }
+
+        .order-history-container ul {
+            list-style: none;
+            padding: 0;
+        }
+
+        .order-history-container li {
+            margin-bottom: 40px;
+            border: 2px solid #ddd;
+            padding: 20px;
+            border-radius: 15px;
+        }
+
+        .order-details table {
+            width: 100%;
+            border-collapse: collapse;
+            margin-top: 20px;
+        }
+
+        .order-details th,
+        .order-details td {
+            border: 1px solid #ddd;
+            padding: 10px;
+            text-align: left;
+        }
+
+        .order-details th {
+            background-color: #f2f2f2;
+        }
+    </style>
+</head>
+
+<body>
+    <div class="hero_area">
+        <header class="header_section">
+            <div class="container-fluid">
+
+                <nav class="navbar navbar-expand-lg custom_nav-container ">
+                    <a class="navbar-brand" href="index.html">
+                      <span>
+                        HandTime
+                      </span>
+                    </a>
+          
+                    <button class="navbar-toggler" type="button" data-toggle="collapse" data-target="#navbarSupportedContent" aria-controls="navbarSupportedContent" aria-expanded="false" aria-label="Toggle navigation">
+                      <span class=""> </span>
+                    </button>
+          
+                    <div class="collapse navbar-collapse" id="navbarSupportedContent">
+                      <ul class="navbar-nav  ">
+                        <li class="nav-item ">
+                          <a class="nav-link" href="{% url 'index' %}">Home </a>
+                        </li>
+                        <li class="nav-item">
+                          <a class="nav-link" href="{% url 'about' %}"> About</a>
+                        </li>
+                        <li class="nav-item">
+                          <a class="nav-link" href="{% url 'customer_products' %}">Products</a>
+                        </li>
+                       
+          
+                      
+                        
+          
+                        <div class="user_optio_box">
+                  
+                          {% if user.is_authenticated %}
+                            <li>Welcome,{{user.username}}</li>
+                              <a href="{% url 'logout' %}">
+                                <i class="fa fa-sign-out" aria-hidden="true"></i> Logout
+                              </a>
+                          {% else %}
+                            <a href="{% url 'login' %}">
+                              <i class="fa fa-sign-in" aria-hidden="true"></i> Login
+                            </a>
+                          {% endif %}
+            
+          
+          <li class="nav-item" >
+                          <a class="nav-link" href="{% url 'Customer_Profile' %}"><i class="fa fa-user" aria-hidden="true"></i></a>
+                          <li class="nav-item" >
+                            <a class="nav-link" href="{% url 'view_cart' %}"> <i class="fa fa-shopping-cart" aria-hidden="true"></i>
+                            </a> 
+                            <li class="nav-item" ></li>
+                            <a href="{% url 'order_history' %}">
+                              <i class="fa fa-sign-in" aria-hidden="true"></i> OrderHistory
+                            </a>
+                                     
+                    </div>            
+                        
+                    </div>
+                  </nav>
+                
+                </nav>
+            </div>
+        </header>
+
+        <div class="order-history-container">
+            <h1>Order History</h1>
+
+            {% if orders %}
+            <ul>
+                {% for order in orders %}
+                <li>
+                    <p><strong>Order ID:</strong> {{ order.id }}</p>
+                    <p><strong>Order Date:</strong> {{ order.created_at.date }}</p>
+                    <p><strong>Order Time:</strong> {{ order.created_at.time }}</p>
+                    <p><strong>Order Status:</strong> {{ order.status }}</p>
+
+                   <div class="order-details">
+    <table>
+        <tr>
+            <th>Product Name</th>
+            <th>Quantity</th>
+        </tr>
+        {% for item in order.orderitem_set.all %}
+        <tr>
+            <td>{{ item.product.product_name }}</td>
+            <td>{{ item.quantity }}</td>
+        </tr>
+        {% endfor %}
+    </table>
+</div>
+
+<p><strong>Total Amount:</strong> {{ order.total_amount }}</p>
+
+
+
+
+                </li>
+                {% endfor %}
+            </ul>
+            {% else %}
+            <p>No order history found.</p>
+            {% endif %}
+        </div>
+    </div>
+</body>
+
+</html>

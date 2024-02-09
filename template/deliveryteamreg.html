@@ -3,151 +3,149 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Admin Dashboard</title>
+    <title>Delivery Team Registration</title>
 
-    <!-- Include Bootstrap CSS and jQuery -->
-    <link rel="stylesheet" href="https://maxcdn.bootstrapcdn.com/bootstrap/4.5.2/css/bootstrap.min.css">
-    <script src="https://code.jquery.com/jquery-3.6.0.min.js"></script>
-    <script src="https://maxcdn.bootstrapcdn.com/bootstrap/4.5.2/js/bootstrap.min.js"></script>
+    <!-- Bootstrap CSS -->
+    <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap@5.0.2/dist/css/bootstrap.min.css"
+          integrity="sha384-EVSTQN3/azprG1Anm3QDgpJLIm9Nao0Yz1ztcQTwFspd3yD65VohhpuuCOmLASjC" crossorigin="anonymous">
 
     <style>
-        /* Sidebar Styles */
-        .sidebar {
-            height: 100%;
-            width: 200px;
-            position: fixed;
-            top: 0;
-            left: 0;
-            background-color: #007bff;
-            padding-top: 20px;
+        body {
+            font-family: 'Arial', sans-serif;
+            background-color: #f4f4f4;
+            margin: 50px;
         }
 
-        .sidebar a {
-            padding: 15px;
-            text-decoration: none;
-            font-size: 15px;
-            color: white;
-            display: block;
+        h1 {
+            text-align: center;
+            margin-bottom: 30px;
         }
 
-        .sidebar a:hover {
-            background-color: #0056b3;
-        }
-
-        /* Content Styles */
-        .content {
-            margin-left: 200px;
-            padding: 15px;
-        }
-
-        /* Flex Container for Small Boxes */
-        .small-box-container {
-            display: flex;
-            justify-content: space-between; /* Align boxes in one row */
-        }
-
-        /* Individual Small Box Styles */
-        .small-box {
-            flex: 1; /* Distribute available space equally among boxes */
-            margin: 10px; /* Add some spacing between boxes */
+        form {
+            max-width: 400px;
+            margin: 0 auto;
+            background-color: #fff;
             padding: 20px;
-            background-color: #f8f9fa;
-            box-shadow: 0 4px 8px rgba(0, 0, 0, 0.2);
+            border-radius: 10px;
+            box-shadow: 0 0 10px rgba(0, 0, 0, 0.1);
         }
 
-        /* Logout Button Styles */
-        .logout-button {
-            text-decoration: none;
-            color: white;
-            margin-top: 1px;
-            background-color: red; /* Red color */
-            padding: 10px 15px; /* Add padding to the button */
-            border-radius: 5px; /* Rounded corners */
-            float: right; /* Float to the right to align with the right side of the page */
+        label {
+            display: block;
+            margin-bottom: 8px;
+        }
+
+        input {
+            width: 100%;
+            padding: 8px;
+            margin-bottom: 15px;
+            box-sizing: border-box;
+        }
+
+        select {
+            width: 100%;
+            padding: 8px;
+            margin-bottom: 15px;
+            box-sizing: border-box;
+        }
+
+        button {
+            background-color: #007bff;
+            color: #fff;
+            padding: 10px 20px;
+            border: none;
+            border-radius: 5px;
+            cursor: pointer;
+        }
+
+        button:hover {
+            background-color: #0056b3;
         }
     </style>
 </head>
 <body>
-    <div class="sidebar">
-        <a href="{% url 'adminpanel' %}">Dashboard</a>
-        <a href="{% url 'user_list' %}">Users</a>
-        <div class="dropdown">
-            <a href="#" class="dropbtn">Product</a>
-            <div class="dropdown-content">
-                <a href="{% url 'add_product' %}">Add Product</a>
-                <a href="{% url 'view_products' %}">View Products</a>
-            </div>
-        </div>
-        <div class="dropdown-content">
-        <a href="{% url 'deliveryteamreg' %}">DeliveryTeam</a>
-        <a href="{% url 'delivery_team_list' %}">DeliveryTeamList</a>
-    </div>
-<!-- adminpanel.html -->
-        <a href="{% url 'all_user_orders'%}">Orders</a>
-        <a href="#">Settings</a>
+
+<h1>Delivery Team Registration</h1>
+
+<form method="post" action="{% url 'deliveryteamreg' %}" onsubmit="return validateForm()">
+    {% csrf_token %}
+    
+    <div class="form-group">
+        <label for="name">Name:</label>
+        <input type="text" id="name" name="name" class="form-control" required pattern="[A-Za-z ]+">
     </div>
 
-    <div class="content">
-        <!-- Header -->
-        <div class="header">
-            <div class="welcome-admin">
-                <h1>Welcome, Admin!</h1>
-            </div>
-            <a href="{% url 'logout' %}" class="logout-button">Logout</a>
-        </div>
-<head>
-    <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Delivery Team Registration</title>
-</head>
+    <div class="form-group">
+        <label for="username">Username:</label>
+        <input type="text" id="username" name="username" class="form-control" required>
+    </div>
 
-<body>
+    <div class="form-group">
+        <label for="email">Email:</label>
+        <input type="email" id="email" name="email" class="form-control" required>
+    </div>
 
-    <body>
+    <div class="form-group">
+        <label for="phone">Phone:</label>
+        <input type="text" id="phone" name="phone" class="form-control" required pattern="\d{10}">
+    </div>
 
-        <h1>Delivery Team Registration</h1>
-    
-        <form method="post" action="{% url 'deliveryteamreg' %}">
-            {% csrf_token %}
-            <label for="name">Name:</label>
-            <input type="text" id="name" name="name" required><br>
-    
-            <label for="username">Username:</label>
-            <input type="text" id="username" name="username" required><br>
-    
-            <label for="email">Email:</label>
-            <input type="email" id="email" name="email" required><br>
-    
-            <label for="phone">Phone:</label>
-            <input type="text" id="phone" name="phone" required><br>
-    
-            <label for="password">Password:</label>
-            <input type="password" id="password" name="password" required><br>
-    
-            <label for="team_name">Team Name:</label>
-            <input type="text" id="team_name" name="team_name" required><br>
-    
-            <label for="vehicle_number">Vehicle Number:</label>
-            <input type="text" id="vehicle_number" name="vehicle_number" required><br>
-    <!-- deliveryteamreg.html -->
+    <div class="form-group">
+        <label for="password">Password:</label>
+        <input type="password" id="password" name="password" class="form-control" required>
+    </div>
 
-<!-- ... Your existing HTML ... -->
+    <div class="form-group">
+        <label for="team_name">Team Name:</label>
+        <input type="text" id="team_name" name="team_name" class="form-control" required>
+    </div>
 
-<!-- City -->
-<div class="form-group">
-    <label for="city">City:</label>
-    <input type="text" class="form-control" id="city" name="city" placeholder="Enter your City" required>
-</div>
+    <div class="form-group">
+        <label for="vehicle_number">Vehicle Number:</label>
+        <input type="text" id="vehicle_number" name="vehicle_number" class="form-control" required>
+    </div>
+    <div class="form-group">
+        <label for="City">CITY:</label>
+        <input type="text" id="City" name="City" class="form-control" required>
+    </div>
 
-<!-- ... Your existing HTML ... -->
+   
 
+    <div class="form-group">
+        <label for="pincode">Pincode:</label>
+        <input type="text" id="pincode" name="pincode" class="form-control" required pattern="\d{6}">
+    </div>
 
-            <label for="pincode">Pincode:</label>
-<input type="text" id="pincode" name="pincode" required><br>
-    
-            <button type="submit">Register</button>
-        </form>
-    
-    </body>
-    </html>
-    
+    <button type="submit">Register</button>
+</form>
+
+<script>
+    function validateForm() {
+        // Add your JavaScript validation logic here
+        // Example: You can use regular expressions to validate fields
+
+        // Example: Validate phone number
+        var phoneInput = document.getElementById('phone');
+        var phoneRegex = /^\d{10}$/;
+        if (!phoneRegex.test(phoneInput.value)) {
+            alert('Please enter a valid 10-digit phone number.');
+            return false;
+        }
+
+        // Example: Validate pincode
+        var pincodeInput = document.getElementById('pincode');
+        var pincodeRegex = /^\d{6}$/;
+        if (!pincodeRegex.test(pincodeInput.value)) {
+            alert('Please enter a valid 6-digit pincode.');
+            return false;
+        }
+
+        return true;
+    }
+</script>
+
+<!-- Bootstrap JS (if needed) -->
+<script src="https://cdn.jsdelivr.net/npm/bootstrap@5.0.2/dist/js/bootstrap.min.js"
+        integrity="sha384-LVEd8s8FfFE2dgB/YckPIjg1w+h73ltzgDXE1gyvT7h5v8qUvMnOAp/g5MFLKjy" crossorigin="anonymous"></script>
+</body>
+</html>

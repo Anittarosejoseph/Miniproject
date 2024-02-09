@@ -1,0 +1,32 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <title>Delivery Team Profile</title>
+</head>
+<body>
+
+<h1>Delivery Team Profile</h1>
+
+<h2>Delivery Team Details</h2>
+<p>Team Name: {{ delivery_team.team_name }}</p>
+<p>Vehicle Number: {{ delivery_team.vehicle_number }}</p>
+<p>City: {{ delivery_team.city }}</p>
+
+<h2>Assigned Orders</h2>
+{% if assigned_orders %}
+    <ul>
+        {% for order in assigned_orders %}
+            <li>
+                Order ID: {{ order.id }}<br>
+                Total Amount: {{ order.total_amount }}<br>
+                Status: {{ order.status }}<br>
+                <!-- Add more order details as needed -->
+            </li>
+        {% endfor %}
+    </ul>
+{% else %}
+    <p>No orders assigned to this delivery team.</p>
+{% endif %}
+
+</body>
+</html>

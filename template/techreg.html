@@ -306,7 +306,7 @@ header {
 
 .report-container {
     min-height: 300px;
-    max-width: 2200px;
+    max-width: 1200px;
     margin: 70px auto 0px auto;
     background-color: #ffffff;
     border-radius: 30px;
@@ -384,7 +384,7 @@ header {
 }
 
 .container {
-    max-width: auto;
+    max-width: 1000px;
     margin: 20px auto;
     padding: 20px;
     background-color: #fff;
@@ -712,60 +712,85 @@ th.action-header {
                 searchTable(); // Call the searchTable function when the search icon is clicked
             }
         </script>
-    <div class="container">
-        <h1>Edit Product</h1>
-        <form method="post">
-            {% csrf_token %}
-            <div class="form-group">
-                <label for="product_name">Product Name:</label>
-                <input type="text" class="form-control" id="product_name" name="product_name" value="{{ product.product_name }}" required>
-            </div>
-            <div class="form-group">
-                <label for="category">Category:</label>
-                <select class="form-control" id="category" name="category">
-                    <option value="Men" {% if product.category == 'Men' %}selected{% endif %}>Men</option>
-                    <option value="Women" {% if product.category == 'Women' %}selected{% endif %}>Women</option>
-                    <!-- Add more <option> elements for other categories if needed -->
-                </select>
-            </div>
-            <div class="form-group">
-                <label for="product_price">Product Price:</label>
-                <input type="number" class="form-control" id="product_price" name="product_price" value="{{ product.product_price }}" step="0.01" min="0" required onchange="calculateSalePrice()">
-            </div>
-            <div class="form-group">
-                <label for="product_sale_price">Product Sale Price:</label>
-                <input type="number" class="form-control" id="product_sale_price" name="product_sale_price" value="{{ product.product_sale_price }}" step="0.01" min="0" required>
-            </div>
-            <div class="form-group">
-                <label for="discount">Discount Percentage:</label>
-                <input type="number" class="form-control" id="discount" name="discount" value="{{ product.discount }}" step="0.01" min="0" max="100" required onchange="calculateSalePrice()">
-            </div>
-            <div class="form-group">
-                <label for="watch_description">Watch Description:</label>
-                <textarea class="form-control" id="watch_description" name="watch_description" rows="4" required>{{ product.watch_description }}</textarea>
-            </div>
-            <div class="form-group">
-                <label for="product_image">Product Image (PNG or JPG only):</label>
-                <input type="file" class="form-control-file" id="product_image" name="product_image" accept="image/png, image/jpeg">
-                {% if product.product_image %}
-                    <img src="{{ product.watch_image.url }}" alt="Product Image" class="img-thumbnail" style="max-width: 200px;">
-                {% endif %}
-            </div>
-            
-            
-            <button type="submit" class="btn btn-primary">Save Changes</button>
-        </form>
+
+
+<h1>Technician Registration</h1>
+
+<form method="post" action="{% url 'techreg' %}" onsubmit="return validateForm()">
+    {% csrf_token %}
+    
+    <div class="form-group">
+        <label for="name">Name:</label>
+        <input type="text" id="name" name="name" class="form-control" required pattern="[A-Za-z ]+">
     </div>
-    <script>
-        function calculateSalePrice() {
-            const productPrice = parseFloat(document.getElementById("product_price").value);
-            const discount = parseFloat(document.getElementById("discount").value);
 
-            if (!isNaN(productPrice) && !isNaN(discount)) {
-                const salePrice = productPrice * (1 - discount / 100);
-                document.getElementById("product_sale_price").value = salePrice.toFixed(2);
-            }
+    <div class="form-group">
+        <label for="username">Username:</label>
+        <input type="text" id="username" name="username" class="form-control" required>
+    </div>
+
+    <div class="form-group">
+        <label for="email">Email:</label>
+        <input type="email" id="email" name="email" class="form-control" required>
+    </div>
+
+    <div class="form-group">
+        <label for="phone">Phone:</label>
+        <input type="text" id="phone" name="phone" class="form-control" required pattern="\d{10}">
+    </div>
+
+    <div class="form-group">
+        <label for="password">Password:</label>
+        <input type="password" id="password" name="password" class="form-control" required>
+    </div>
+
+    
+
+    <div class="form-group">
+        <label for="experience">Experience (in years):</label>
+        <input type="number" id="experience" name="experience" class="form-control" required min="0">
+    </div>
+
+    <div class="form-group">
+        <label for="city">City:</label>
+        <input type="text" id="city" name="city" class="form-control" required>
+    </div>
+
+    <div class="form-group">
+        <label for="pincode">Pincode:</label>
+        <input type="text" id="pincode" name="pincode" class="form-control" required pattern="\d{6}">
+    </div>
+
+    <button type="submit">Register</button>
+</form>
+
+<script>
+    function validateForm() {
+        // Add your JavaScript validation logic here
+        // Example: You can use regular expressions to validate fields
+
+        // Example: Validate phone number
+        var phoneInput = document.getElementById('phone');
+        var phoneRegex = /^\d{10}$/;
+        if (!phoneRegex.test(phoneInput.value)) {
+            alert('Please enter a valid 10-digit phone number.');
+            return false;
         }
-    </script>
 
+        // Example: Validate pincode
+        var pincodeInput = document.getElementById('pincode');
+        var pincodeRegex = /^\d{6}$/;
+        if (!pincodeRegex.test(pincodeInput.value)) {
+            alert('Please enter a valid 6-digit pincode.');
+            return false;
+        }
+
+        return true;
+    }
+</script>
+
+<!-- Bootstrap JS (if needed) -->
+<script src="https://cdn.jsdelivr.net/npm/bootstrap@5.0.2/dist/js/bootstrap.min.js"
+        integrity="sha384-LVEd8s8FfFE2dgB/YckPIjg1w+h73ltzgDXE1gyvT7h5v8qUvMnOAp/g5MFLKjy" crossorigin="anonymous"></script>
+</body>
 </html>

@@ -1,0 +1,25 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta http-equiv="X-UA-Compatible" content="IE=edge">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Assign Delivery Team</title>
+</head>
+<body>
+    <h1>Assign Delivery Team</h1>
+
+    <form method="post" action="{% url 'assign_delivery_team' order_id %}">
+        {% csrf_token %}
+        
+        <label for="delivery_team">Select Delivery Team:</label>
+        <select id="delivery_team" name="delivery_team">
+            {% for team in delivery_teams %}
+                <option value="{{ team.id }}">{{ team.team_name }}</option>
+            {% endfor %}
+        </select>
+
+        <button type="submit">Assign Delivery Team</button>
+    </form>
+</body>
+</html>

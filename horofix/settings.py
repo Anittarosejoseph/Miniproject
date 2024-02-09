@@ -112,14 +112,15 @@ AUTH_PASSWORD_VALIDATORS = [
 
 # settings.py
 
-# Email configuration
+# settings.py
+
 EMAIL_BACKEND = 'django.core.mail.backends.smtp.EmailBackend'
 EMAIL_HOST = 'smtp.gmail.com'
 EMAIL_PORT = 587
 EMAIL_USE_TLS = True
-EMAIL_HOST_USER = 'anittarosejoseph2024a@mca.ajce.in'  # Replace with your Gmail email address
-EMAIL_HOST_PASSWORD = 'Anitta@07'  # Replace with your Gmail password
-#DEFAULT_FROM_EMAIL = 'anittarosejoseph2024a@mca.ajce.in'  # Replace with your Gmail email address
+EMAIL_HOST_USER = 'anittarosejoseph2024a@mca.ajce.in'  # Replace with your Gmail email
+EMAIL_HOST_PASSWORD = 'nblhdzqquntvbaxm'
+
 
 
 # Internationalization

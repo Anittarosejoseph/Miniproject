@@ -306,7 +306,7 @@ header {
 
 .report-container {
     min-height: 300px;
-    max-width: 2200px;
+    max-width: 1200px;
     margin: 70px auto 0px auto;
     background-color: #ffffff;
     border-radius: 30px;
@@ -384,7 +384,7 @@ header {
 }
 
 .container {
-    max-width: auto;
+    max-width: 1000px;
     margin: 20px auto;
     padding: 20px;
     background-color: #fff;
@@ -516,51 +516,6 @@ th.action-header {
     transform: translateX(-50%);
     padding: 30px 0;
 }
-.container {
-            max-width: 800px;
-            margin: 50px auto;
-            background-color: #fff;
-            padding: 20px;
-            border-radius: 10px;
-            box-shadow: 0 0 10px rgba(0, 0, 0, 0.1);
-        }
-
-        form {
-            display: flex;
-            flex-direction: column;
-            gap: 15px;
-        }
-
-        label {
-            font-weight: bold;
-        }
-
-        input,
-        textarea,
-        select {
-            width: 100%;
-            padding: 10px;
-            border: 1px solid #ddd;
-            border-radius: 5px;
-            box-sizing: border-box;
-        }
-
-        .error-message {
-            color: red;
-        }
-
-        /* Align buttons */
-        input[type="submit"],
-        input[type="button"] {
-            width: auto;
-            padding: 10px 20px;
-            cursor: pointer;
-        }
-
-        /* Add some spacing between buttons */
-        input[type="submit"] {
-            margin-right: 10px;
-        }
 
     </style>
     </head>
@@ -712,60 +667,56 @@ th.action-header {
                 searchTable(); // Call the searchTable function when the search icon is clicked
             }
         </script>
-    <div class="container">
-        <h1>Edit Product</h1>
-        <form method="post">
-            {% csrf_token %}
-            <div class="form-group">
-                <label for="product_name">Product Name:</label>
-                <input type="text" class="form-control" id="product_name" name="product_name" value="{{ product.product_name }}" required>
-            </div>
-            <div class="form-group">
-                <label for="category">Category:</label>
-                <select class="form-control" id="category" name="category">
-                    <option value="Men" {% if product.category == 'Men' %}selected{% endif %}>Men</option>
-                    <option value="Women" {% if product.category == 'Women' %}selected{% endif %}>Women</option>
-                    <!-- Add more <option> elements for other categories if needed -->
-                </select>
-            </div>
-            <div class="form-group">
-                <label for="product_price">Product Price:</label>
-                <input type="number" class="form-control" id="product_price" name="product_price" value="{{ product.product_price }}" step="0.01" min="0" required onchange="calculateSalePrice()">
-            </div>
-            <div class="form-group">
-                <label for="product_sale_price">Product Sale Price:</label>
-                <input type="number" class="form-control" id="product_sale_price" name="product_sale_price" value="{{ product.product_sale_price }}" step="0.01" min="0" required>
-            </div>
-            <div class="form-group">
-                <label for="discount">Discount Percentage:</label>
-                <input type="number" class="form-control" id="discount" name="discount" value="{{ product.discount }}" step="0.01" min="0" max="100" required onchange="calculateSalePrice()">
-            </div>
-            <div class="form-group">
-                <label for="watch_description">Watch Description:</label>
-                <textarea class="form-control" id="watch_description" name="watch_description" rows="4" required>{{ product.watch_description }}</textarea>
-            </div>
-            <div class="form-group">
-                <label for="product_image">Product Image (PNG or JPG only):</label>
-                <input type="file" class="form-control-file" id="product_image" name="product_image" accept="image/png, image/jpeg">
-                {% if product.product_image %}
-                    <img src="{{ product.watch_image.url }}" alt="Product Image" class="img-thumbnail" style="max-width: 200px;">
-                {% endif %}
-            </div>
-            
-            
-            <button type="submit" class="btn btn-primary">Save Changes</button>
-        </form>
+<body>
+    <div class="container mt-5">
+        <h1 class="mb-4">Order List - Admin</h1>
+
+        <table class="table table-bordered">
+            <thead>
+                <tr>
+                    <th>Order ID</th>
+                    <th>Customer</th>
+                    <th>Product Name</th>
+                    <th>Total Amount</th>
+                    <th>Payment Status</th>
+                    <th>Status</th>
+                    <th>Delivery Team</th>
+                    <th>Delivery Team City</th>
+                    <th>Created At</th>
+                    <th>Action</th>
+                </tr>
+            </thead>
+            <tbody>
+                {% for order in orders %}
+                    <tr>
+                        <td>{{ order.id }}</td>
+                        <td>{{ order.user.username }}</td>
+                        <td>
+                            {% for order_item in order.orderitem_set.all %}
+                                {{ order_item.product.product_name }}
+                                {% if not forloop.last %}, {% endif %}
+                            {% endfor %}
+                        </td>
+                        <td>{{ order.total_amount }}</td>
+                        <td>{{ order.payment_status }}</td>
+                        <td>{{ order.status }}</td>
+                        <td>{{ order.delivery_team }}</td>
+                        <td>{{ order.get_delivery_team_city }}</td>
+                        <td>{{ order.created_at }}</td>
+                        <td>
+                            {% if order.payment_status %}
+                                <button class="btn btn-assign">Assign Delivery Team</button>
+                            {% endif %}
+                        </td>
+                    </tr>
+                {% endfor %}
+            </tbody>
+        </table>
     </div>
-    <script>
-        function calculateSalePrice() {
-            const productPrice = parseFloat(document.getElementById("product_price").value);
-            const discount = parseFloat(document.getElementById("discount").value);
 
-            if (!isNaN(productPrice) && !isNaN(discount)) {
-                const salePrice = productPrice * (1 - discount / 100);
-                document.getElementById("product_sale_price").value = salePrice.toFixed(2);
-            }
-        }
-    </script>
-
+    <!-- Add Bootstrap JS and Popper.js scripts here -->
+    <script src="https://code.jquery.com/jquery-3.5.1.slim.min.js" integrity="sha384-DfXdz2htPH0lsSSs5nCTpuj/zy4C+OGpamoFVy38MVBnE+IbbVYUew+OrCXaRkfj" crossorigin="anonymous"></script>
+    <script src="https://cdn.jsdelivr.net/npm/@popperjs/core@2.9.1/dist/umd/popper.min.js" integrity="sha384-pzjw8+uJpKl0U02BFn7fZfiIQbwmZNRKF6ZLIb5U5fag11pjFqAeg8kpYxs17NPw" crossorigin="anonymous"></script>
+    <script src="https://stackpath.bootstrapcdn.com/bootstrap/4.5.2/js/bootstrap.min.js" integrity="sha384-B4gt1jrGC7Jh4AgTPSdUtOBvfO8sh+Wy8RAHmMSfD" crossorigin="anonymous"></script>
+</body>
 </html>

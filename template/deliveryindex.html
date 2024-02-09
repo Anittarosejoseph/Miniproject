@@ -19,7 +19,7 @@
             position: fixed;
             top: 0;
             left: 0;
-            background-color: #007bff;
+            background-color: #ca619e;
             padding-top: 20px;
         }
 
@@ -32,7 +32,7 @@
         }
 
         .sidebar a:hover {
-            background-color: #0056b3;
+            background-color: #ca619e;
         }
 
         /* Content Styles */
@@ -94,16 +94,6 @@
 
 <body>        
 
-  <h2>Delivery Team Dashboard</h2>
   
-  {% if assigned_orders %}
-    <h3>Assigned Orders:</h3>
-    <ul>
-      {% for order in assigned_orders %}
-        <li>{{ order.id }} - {{ order.user.username }} - {{ order.status }}</li>
-      {% endfor %}
-    </ul>
-  {% else %}
-    <p>No assigned orders at the moment.</p>
-  {% endif %}
+ 
   </body>
