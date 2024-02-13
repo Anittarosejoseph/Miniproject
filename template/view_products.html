@@ -702,51 +702,44 @@ th.action-header {
             }
         </script>
 
-    <div class="container">
-        <h1>View Products</h1>
-        <table class="table table-striped">
-            <thead>
-                <tr>
-                    <th>Watch Name</th>
-                    <th>Category</th>
-                    <th>Product Price</th>
-                    <th>Product Sale Price</th>
-                    <th>Discount</th>
-                    <th>Watch Image</th>
-                    <th>Watch Description</th>
-                    <th>Action</th>
-                </tr>
-            </thead>
-            <tbody>
-                {% for product in products %}
-                <tr>
-                    <td>{{ product.product_name }}</td>
-                    <td>{{ product.category }}</td>
-                    <td>${{ product.product_price }}</td>
-                    <td>${{ product.product_sale_price }}</td>
-                    <td>{{ product.discount }}%</td>
-                    <td><img src="{{ product.watch_image.url }}" alt="{{ product.product_name }}"></td>
-                    <td>{{ product.watch_description }}</td>
-                    <td>{{ product.status }}</td>
-                    <td class="action-buttons">
-                        <a href="{% url 'edit_product' product.id %}" class="btn btn-primary">Edit</a>
-                        
-                    </td>
-                </tr>
-                {% endfor %}
-            </tbody>
-        </table>
-    </div>
-
-    <script>
-        // Function to show a confirmation dialog
-        function confirmDelete(productId) {
-            if (confirm("Do you want to delete this product?")) {
-                // If the user clicks "OK" in the confirmation dialog,
-                // submit the form to delete the product
-                document.getElementById("deleteForm-" + productId).submit();
-            }
-        }
-    </script>
-</body>
-</html>
+<div class="container">
+    <h1>View Products</h1>
+    <table class="table table-striped">
+        <thead>
+            <tr>
+                <th>Watch Name</th>
+                <th>Category</th>
+                <th>Watch Model Number</th>
+                <th>Watch Serial Number</th>
+                <th>Product Price</th>
+                <th>Product Sale Price</th>
+                <th>Discount</th>
+                <th>Watch Image</th>
+                <th>Watch Description</th>
+                <th>Status</th>
+                <th>Action</th>
+            </tr>
+        </thead>
+        <tbody>
+            {% for product in products %}
+            <tr>
+                <td>{{ product.product_name }}</td>
+                <td>{{ product.category }}</td>
+                <td>{{ product.watch_model_number }}</td>
+                <td>{{ product.watch_serial_number }}</td>
+                <td>${{ product.product_price }}</td>
+                <td>${{ product.product_sale_price }}</td>
+                <td>{{ product.discount }}%</td>
+                <td><img src="{{ product.watch_image.url }}" alt="{{ product.product_name }}"></td>
+                <td>{{ product.watch_description }}</td>
+                <td>{{ product.status }}</td>
+                <td class="action-buttons">
+                    <a href="{% url 'edit_product' product.id %}" class="btn btn-primary">Edit</a>
+                    <!-- You can add more action buttons if needed -->
+                    <button class="btn btn-danger" onclick="confirmDelete('{{ product.id }}')">Delete</button>
+                </td>
+            </tr>
+            {% endfor %}
+        </tbody>
+    </table>
+</div>

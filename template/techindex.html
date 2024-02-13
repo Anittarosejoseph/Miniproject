@@ -516,51 +516,6 @@ th.action-header {
     transform: translateX(-50%);
     padding: 30px 0;
 }
-.container {
-            max-width: 800px;
-            margin: 50px auto;
-            background-color: #fff;
-            padding: 20px;
-            border-radius: 10px;
-            box-shadow: 0 0 10px rgba(0, 0, 0, 0.1);
-        }
-
-        form {
-            display: flex;
-            flex-direction: column;
-            gap: 15px;
-        }
-
-        label {
-            font-weight: bold;
-        }
-
-        input,
-        textarea,
-        select {
-            width: 100%;
-            padding: 10px;
-            border: 1px solid #ddd;
-            border-radius: 5px;
-            box-sizing: border-box;
-        }
-
-        .error-message {
-            color: red;
-        }
-
-        /* Align buttons */
-        input[type="submit"],
-        input[type="button"] {
-            width: auto;
-            padding: 10px 20px;
-            cursor: pointer;
-        }
-
-        /* Add some spacing between buttons */
-        input[type="submit"] {
-            margin-right: 10px;
-        }
 
     </style>
     </head>
@@ -622,13 +577,13 @@ th.action-header {
                         </div>
                     </a>
                     {% endif %}
-                    <a href="{% url 'admin_order_list'%}">
+                    <a href=" ">
                         <div class="nav-option option3">
                             <img src=
     "https://media.geeksforgeeks.org/wp-content/uploads/20221210183320/5.png"
                                 class="nav-img"
                                 alt="report">
-                            <h3 style="font-size: 17px;"> Orders</h3>
+                            <h3 style="font-size: 17px;">Repair Request </h3>
                         </div>
                     </a>
                     {% if user.is_superuser %}
@@ -642,13 +597,13 @@ th.action-header {
                         </div>
                         </a>
                         {% endif %}
-                        <a href="{% url 'delivery_team_list' %}">
+                        <a href=" ">
                         <div class="nav-option option4">
                             <img src=
     "https://media.geeksforgeeks.org/wp-content/uploads/20221210183321/6.png"
                                 class="nav-img"
                                 alt="institution">
-                            <h3 style="font-size: 17px;"> DeliveryTeam</h3>
+                            <h3 style="font-size: 17px;">Assigned Jobs</h3>
                         </div>
                     </a>
                     {% if user.is_superuser %}
@@ -662,21 +617,11 @@ th.action-header {
                         </div>
                         </a>
                         {% endif %}
-    
 
-    
-    
-    
-                      
-    
                     </div>
                 </nav>
             </div>
-         
-                   
-              
-    
-               
+             
         <script src="{% static '/assets/js/jquery-3.5.1.min.js'%}"></script>
 
         <script src="{% static '/assets/js/bootstrap.bundle.min.js'%}"></script>
@@ -712,127 +657,31 @@ th.action-header {
                 searchTable(); // Call the searchTable function when the search icon is clicked
             }
         </script>
-<div class="container">
-    <h1>Add Watch Product</h1>
-    <form id="addProductForm" action="{% url 'add_product' %}" method="post" enctype="multipart/form-data">
-        {% csrf_token %}
-        <label for="category">Category:</label>
-<select id="category" name="category" required>
-    <option value="Men">Men</option>
-    <option value="Women">Women</option>
-    <option value="Kids">Kids</option>
-</select>
-     
+<body></body>
+{% block content %}
+    <div class="container">
+        <h1>Welcome, {{ user.username }}!</h1>
 
-<label for="productName">Watch Name:</label>
-<select id="productName" name="productName" required>
-    <option value="horofix1">horofix1</option>
-    <option value="horofix2">horofix2</option>
-    <option value="horofix3">horofix3</option>
-    <option value="horofix4">horofix4</option>
-    <option value="horofix5">horofix5</option>
-    <option value="horofix6">horofix6</option>
-    <option value="horofix7">horofix7</option>
-    <option value="horofix8">horofix8</option>
-    <option value="horofix9">horofix9</option>
-    <option value="horofix10">horofix10</option>
-    <option value="horofix11">horofix11</option>
-    <option value="horofix12">horofix12</option>
-    <option value="horofix13">horofix13</option>
-    <option value="horofix14">horofix14</option>
-</select>
-
-<label for="watchModelNumber">Watch Model Number:</label>
-<select id="watchModelNumber" name="watch_modelnumber" required>
-    <option value="h-101">h-101</option>
-    <option value="h-102">h-102</option>
-    <option value="h-103">h-103</option>
-    <option value="h-104">h-104</option>
-    <option value="h-105">h-105</option>
-    <option value="h-106">h-106</option>
-    <option value="h-107">h-107</option>
-</select>
-
-
-<label for="watchSerialNumber">Watch Serial Number:</label>
-<input type="text" id="watchSerialNumber" name="watchSerialNumber" required>
-
-
-        <label for="productPrice">Product Price:</label>
-        <input type="number" id="productPrice" name="productPrice" step="0.01" min="1" required>
-
-        <label for="productSalePrice">Product Sale Price:</label>
-        <input type="number" id="productSalePrice" name="productSalePrice" step="0.01" min="1" readonly>
-
-        <label for="discount">Discount Percentage:</label>
-        <input type="number" id="discount" name="discount" step="0.01" min="0" max="100" required>
-
-        <label for="watchDescription">Watch Description:</label>
-        <textarea id="watchDescription" name="watchDescription" rows="4" required></textarea>
-        <label for="warranty">Warranty:</label>
-        <input type="number" id="warranty" name="warranty" min="0" required>
-
-
-        <label for="stock">Stock:</label>
-        <input type="number" id="stock" name="stock" min="1" required>
-
-        <label for="watchImage">Watch Image (JPG or PNG only):</label>
-        <input type="file" id="watchImage" name="watchImage" accept=".jpg, .jpeg, .png" required>
-        <span class="error-message" id="imageError"></span>
-        <br>
-        <input type="submit" value="Add Product">
-        <a href="{% url 'adminpanel' %}"><input type="button" value="Cancel"></a>
-    </form>
-</div>
-
-<script>
-    // JavaScript to calculate the sale price based on product price and discount percentage
-    document.getElementById("discount").addEventListener("input", function () {
-        var productPrice = parseFloat(document.getElementById("productPrice").value);
-        var discountPercentage = parseFloat(this.value);
-        var salePrice = productPrice - (productPrice * (discountPercentage / 100));
-        document.getElementById("productSalePrice").value = salePrice.toFixed(2);
-        
-        var discountError = document.getElementById("discountError");
-        var productSalePrice = parseFloat(document.getElementById("productSalePrice").value);
-        
-        if (discountPercentage < 0 || discountPercentage > 100) {
-            discountError.textContent = "Discount should be between 0 and 100.";
-        } else {
-            discountError.textContent = "";
-        }
-        
-        var productSalePriceError = document.getElementById("productSalePriceError");
-        if (productSalePrice < 0) {
-            productSalePriceError.textContent = "Sale price should not be negative.";
-        } else {
-            productSalePriceError.textContent = "";
-        }
-    });
-
-    // JavaScript to validate image file format
-    document.getElementById("watchImage").addEventListener("change", function () {
-        var allowedExtensions = /(\.jpg|\.jpeg|\.png)$/i;
-        var imageError = document.getElementById("imageError");
-
-        if (!allowedExtensions.exec(this.value)) {
-            imageError.textContent = "Invalid file format. Please select a JPG or PNG image.";
-            this.value = "";
-        } else {
-            imageError.textContent = "";
-        }
-    });
-    document.getElementById("stock").addEventListener("input", function () {
-        var stockValue = parseFloat(this.value);
-        var stockError = document.getElementById("stockError");
-
-        if (isNaN(stockValue) || stockValue < 0 || stockValue > 1) {
-            stockError.textContent = "Stock should be a positive value between 0 and 1.";
-        } else {
-            stockError.textContent = "";
-        }
-    });
-</script>
-
-
-</body>
+        <h2>Repair Requests:</h2>
+        <table class="table">
+            <thead>
+                <tr>
+                    <th>Title</th>
+                    <th>Description</th>
+                    <!-- Add more columns as needed -->
+                </tr>
+            </thead>
+            <tbody>
+                {% for request in repair_requests %}
+                    <tr>
+                        <td>{{ request.title }}</td>
+                        <td>{{ request.description }}</td>
+                        
+                    </tr>
+                {% endfor %}
+            </tbody>
+        </table>
+    </div>
+    </div>
+    </body>
+{% endblock %}

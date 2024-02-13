@@ -176,16 +176,17 @@ from django.db import models
 
 class WatchProduct(models.Model):
     product_name = models.CharField(max_length=255, unique=True,null=True) 
-    watch_model = models.CharField(max_length=255,unique=True,null=True)
-    watch_serial_number = models.CharField(max_length=255,unique=True,null=True)
+    watch_modelnumber = models.CharField(max_length=255, unique=True, null=True)
+    watch_serial_number = models.CharField(max_length=255, unique=True, null=True)
     watch_description = models.TextField()
     watch_image = models.ImageField(upload_to='watch_images/', null=True, blank=True)
     product_price = models.DecimalField(max_digits=10, decimal_places=2, null=True)
     product_sale_price = models.DecimalField(max_digits=10, decimal_places=2, null=True)
     discount = models.DecimalField(max_digits=5, decimal_places=2, null=True)
-    category = models.CharField(max_length=10, choices=[('Men', 'Men'), ('Women', 'Women')], default=None)
+    category = models.CharField(max_length=10, choices=[('Men', 'Men'), ('Women', 'Women'),('Kids', 'Kids'),], default=None)
     stock = models.PositiveIntegerField(default=1, null=True)  # Add the 'stock' field
     ratings = models.IntegerField(default=0) 
+    warranty = models.IntegerField(null=True) 
     # Modify the STATUS_CHOICES
     STATUS_CHOICES = [
         ('In Stock', 'In Stock'),
@@ -312,3 +313,32 @@ class Repair(models.Model):
         return f"Repair for {self.watch.brand} - {self.watch.model}"
 
 # ... (your existing code continues)
+class Customer(models.Model):
+    user = models.OneToOneField(CustomUser, on_delete=models.CASCADE)
+    latitude = models.DecimalField(max_digits=9, decimal_places=6, null=True, blank=True)
+    longitude = models.DecimalField(max_digits=9, decimal_places=6, null=True, blank=True)
+    location = models.CharField(max_length=100, blank=True, null=True)
+    pincode = models.CharField(max_length=10, blank=True, null=True) 
+    # Add any customer-specific fields here
+
+    def __str__(self):
+        return self.user.email
+
+
+from django.db import models
+from django.utils import timezone
+
+class WatchRepairRequest(models.Model):
+    user = models.ForeignKey(CustomUser, on_delete=models.CASCADE)
+    watch_name = models.CharField(max_length=255, null=True)
+    watch_model_number = models.CharField(max_length=255, null=True)
+    issue_type = models.CharField(max_length=255, null=True)
+    issue_description = models.TextField(null=True)
+    image_upload = models.ImageField(upload_to='watch_images/', null=True, blank=True)
+    additional_info = models.TextField(blank=True, null=True)
+    purchase_date = models.DateField(null=True)
+    warranty_duration = models.IntegerField(null=True)
+    created_at = models.DateTimeField(default=timezone.now)  # Set default value
+
+    def __str__(self):
+        return f"{self.user.name}'s Watch Repair Request"

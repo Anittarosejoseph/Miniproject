@@ -76,13 +76,7 @@ from .models import CustomUser
 def login_user(request):
     if request.user.is_authenticated:
         return redirect('/')
-        # Example redirection based on session (commented out)
-        # if 'username' in request.session:
-        #     return redirect('/userhome')
-        # elif 'username' in request.session:
-        #     return redirect('/pumphome')
-        # elif 'username' in request.session:
-        #     return redirect('/adminhome')
+      
 
     if request.method == 'POST':
         username = request.POST.get("username")
@@ -100,6 +94,9 @@ def login_user(request):
                 elif user.is_deliveryteam :
                     request.session["username"] = user.username
                     return redirect('deliveryindex')
+                elif user.is_technician :
+                    request.session["username"] = user.username
+                    return redirect('techindex')
                 elif user.is_superadmin:
                     request.session["username"] = user.username
                     return redirect('panel')
@@ -231,41 +228,49 @@ def edit_product(request, product_id):
             messages.error(request, "Invalid numerical input.")
 
     return render(request, 'edit_product.html', {'product': product})
-
-
-
+from django.shortcuts import render, redirect
+from django.contrib import messages
+from .models import WatchProduct
 
 @never_cache
 def add_product(request):
     if request.method == 'POST':
+        category = request.POST['category']
         product_name = request.POST['productName']
+        watch_model_number = request.POST['watchModelNumber']
+        watch_serial_number = request.POST['watchSerialNumber']
         product_price = request.POST['productPrice']
         product_sale_price = request.POST['productSalePrice']
         discount = request.POST['discount']
         watch_description = request.POST['watchDescription']
+        warranty = request.POST['warranty']
+        stock = request.POST['stock']
         watch_image = request.FILES['watchImage']
-        category = request.POST['category']  # Get the category field from the form
 
-        # Check if a product with the same name and category already exists
-        if WatchProduct.objects.filter(product_name=product_name, category=category).exists():
-            messages.error(request, f"A product with the name '{product_name}' in the category '{category}' already exists.")
+        if WatchProduct.objects.filter(product_name=product_name, category=category, watch_modelnumber=watch_model_number).exists():
+            messages.error(request, f"A product with the name '{product_name}', category '{category}', and watch model number '{watch_model_number}' already exists.")
         else:
             try:
-                # Ensure the numerical fields are valid numbers before saving
                 product_price = float(product_price)
                 product_sale_price = float(product_sale_price)
                 discount = float(discount)
-                
-                # Create a new WatchProduct instance and save it
+                warranty = int(warranty)
+                stock = int(stock)
+
                 WatchProduct.objects.create(
+                    category=category,
                     product_name=product_name,
+                    watch_modelnumber=watch_model_number,
+                    watch_serial_number=watch_serial_number,
                     product_price=product_price,
                     product_sale_price=product_sale_price,
                     discount=discount,
                     watch_description=watch_description,
-                    watch_image=watch_image,
-                    category=category  # Set the category field
+                    warranty=warranty,
+                    stock=stock,
+                    watch_image=watch_image
                 )
+
                 messages.success(request, "Product added successfully.")
             except (ValueError, TypeError):
                 messages.error(request, "Invalid numerical input.")
@@ -273,6 +278,9 @@ def add_product(request):
         return redirect('view_products')
     
     return render(request, 'add_product.html')
+
+
+
 
 from django.shortcuts import render
 from .models import Order
@@ -1319,7 +1327,7 @@ def techreg(request):
         user_type = 'TECHNICIAN'
 
         if CustomUser.objects.filter(username=username, user_type=user_type).exists():
-            return render(request, 'technician_list.html')  # Redirect or render a specific page for existing technicians
+            return render(request, 'techlist.html')  # Redirect or render a specific page for existing technicians
         else:
             user = CustomUser.objects.create_user(name=name, username=username, email=email, phone=phone, password=password)
             user.user_type = user_type
@@ -1338,6 +1346,183 @@ def techreg(request):
 
             send_mail(subject, message, from_email, recipient_list)
 
-            return redirect('technician_list')  # Redirect to a page displaying a list of registered technicians
+            return redirect('techlist')  # Redirect to a page displaying a list of registered technicians
     else:
         return render(request, 'techreg.html')
+# views.py
+
+from django.shortcuts import render
+from .models import Technician  # Import the Technician model (adjust the import path as needed)
+
+def techlist(request):
+    technicians = Technician.objects.all()  # Fetch all Technician objects from the database
+    return render(request, 'techlist.html', {'technicians': technicians})
+# views.py
+
+# views.py
+
+from django.shortcuts import render
+from django.contrib.auth.decorators import login_required
+from .models import Repair  # Import the correct model
+
+@login_required(login_url='login')  # Ensure the user is logged in
+def techindex(request):
+    # Assuming you have a foreign key from Repair to Technician
+    repair_requests = Repair.objects.filter(requested_by=request.user)
+
+    return render(request, 'techindex.html', {'repair_requests': repair_requests})
+
+
+from django.shortcuts import render, redirect
+from django.contrib import messages
+from .models import CustomUser
+
+def edit_profile(request):
+    # Assuming the user is already authenticated, you can access the user instance
+    user = request.user
+
+    if request.method == 'POST':
+        # Handle form submission
+        name = request.POST.get('name')
+        mobile = request.POST.get('mobile')
+        address = request.POST.get('address')
+        latitude = request.POST.get('latitude')
+        longitude = request.POST.get('longitude')
+
+        # Update user fields
+        user.name = name
+        user.phone = mobile
+        user.save()
+
+        messages.success(request, 'Profile updated successfully!')
+        return redirect('edit_profile')  # Redirect to the same page after successful form submission
+
+    return render(request, 'edit_profile.html', {'user': user})
+
+
+def repairing(request):
+    return render(request, 'repairing.html')
+
+def thank_you_page(request):
+    return render(request, 'thank_you_page.html')
+
+
+
+from django.shortcuts import render, redirect
+from django.core.mail import send_mail
+from django.template.loader import render_to_string
+from django.contrib import messages
+from .models import WatchRepairRequest
+from django.conf import settings
+@login_required
+def repair(request):
+    if request.method == 'POST':
+        # Retrieve form data
+        user = request.user
+        watch_name = request.POST.get('watchName')
+        watch_model_number = request.POST.get('watchBrand')
+        issue_type = request.POST.get('issueType')
+        issue_description = request.POST.get('issueDescription')
+        image_upload = request.FILES.get('imageUpload')
+        additional_info = request.POST.get('additionalInfo')
+        purchase_date = request.POST.get('purchaseDate')
+        warranty_duration = request.POST.get('warrantyDuration')
+
+        # Save data to the database
+        repair_request = WatchRepairRequest.objects.create(
+            user=user,
+            watch_name=watch_name,
+            watch_model_number=watch_model_number,
+            issue_type=issue_type,
+            issue_description=issue_description,
+            image_upload=image_upload,
+            additional_info=additional_info,
+            purchase_date=purchase_date,
+            warranty_duration=warranty_duration,
+        )
+
+        # Send email
+        subject = 'Watch Repair Request Submitted'
+        message = render_to_string('email_template.html', {'repair_request': repair_request})
+        from_email = settings.DEFAULT_FROM_EMAIL
+        to_email = [user.email]  # You can add additional recipients if needed
+        send_mail(subject, message, from_email, to_email, fail_silently=True)
+
+        # Redirect to thank-you page
+        messages.success(request, 'Your watch repair request has been submitted successfully!')
+        return redirect('thank_you_page')
+    return render(request, 'repair.html')
+
+
+from django.core.mail import EmailMessage
+from django.shortcuts import render, redirect
+from django.template.loader import render_to_string
+from django.utils.html import strip_tags
+from django.conf import settings
+
+def email_template(request):
+    # Your logic to get user and other data
+    user = request.user  # Replace with your actual way of getting the user
+
+    # Render the email template with user data
+    context = {'user': user}
+    email_html_message = render_to_string('email_template.html', context)
+    email_plaintext_message = strip_tags(email_html_message)
+
+    # Your email subject, 'from' address, and 'to' address for repair request
+    subject = 'Subject of Your Repair Request Email'
+    from_email = settings.DEFAULT_FROM_EMAIL
+    to_email = [user.email]  # Replace with the actual email address
+
+    # Create the EmailMessage object for repair request
+    email_message = EmailMessage(
+        subject,
+        email_plaintext_message,
+        from_email,
+        to_email,
+    )
+
+    # Attach the HTML content for repair request
+    email_message.attach_alternative(email_html_message, "text/html")
+
+    # Send the email for repair request
+    email_message.send()
+
+    # Your logic after sending the repair request email
+
+    # Render the thank-you email template
+    thank_you_html_message = render_to_string('thank_you_template.html', context)
+    thank_you_plaintext_message = strip_tags(thank_you_html_message)
+
+    # Your email subject, 'from' address, and 'to' address for thank-you message
+    thank_you_subject = 'Subject of Your Thank You Email'
+    thank_you_to_email = [user.email]  # Replace with the actual email address
+
+    # Create the EmailMessage object for thank-you message
+    thank_you_email_message = EmailMessage(
+        thank_you_subject,
+        thank_you_plaintext_message,
+        from_email,
+        thank_you_to_email,
+    )
+
+    # Attach the HTML content for thank-you message
+    thank_you_email_message.attach_alternative(thank_you_html_message, "text/html")
+
+    # Send the thank-you email
+    thank_you_email_message.send()
+
+    # Your logic after sending the thank-you email (e.g., redirect to a thank-you page)
+    return render(request, 'thank_you_page.html')  # Replace with the actual template name
+
+# app_name/admin/views.py
+
+from django.shortcuts import render
+from .models import WatchRepairRequest
+
+def watchrepairrequest_list(request):
+    # Retrieve all WatchRepairRequest objects from the database
+    repair_requests = WatchRepairRequest.objects.all()
+
+    # Render the template with the list of repair requests
+    return render(request, 'watchrepairrequest_list.html', {'repair_requests': repair_requests})

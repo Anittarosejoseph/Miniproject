@@ -70,7 +70,19 @@ urlpatterns = [
     path('remove_from_wishlist/<int:wishlist_item_id>/', views.remove_from_wishlist, name='remove_from_wishlist'),
     path('add_to_wishlist/<int:id>/', views.add_to_wishlist, name='add_to_wishlist'),
     path('panel/',views.panel,name='panel'),
-    path('techreg/', views.techreg, name='techreg')
+    path('techlist/', views.techlist, name='techlist'),
+    path('techindex/',views.techindex, name='techindex'),
+    path('edit_profile/',views.edit_profile, name='edit_profile'),
+    path('repairing/',views.repairing,name='repairing'),
+    path('techreg/', views.techreg, name='techreg'),
+    path('thank-you/', views.thank_you_page, name='thank_you_page'),
+    path('repair/',views.repair,name='repair'),
+    path('watchrepairrequest/', views.watchrepairrequest_list, name='watchrepairrequest_list'),
+
+    path('email_template/', views.email_template, name='email_template'),
+
+
+
 
 ]
 

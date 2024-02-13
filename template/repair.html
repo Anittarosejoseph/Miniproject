@@ -1,232 +1,460 @@
+{% extends "base.html" %}
+{% block content %}
+
 {% load static %}
 <!DOCTYPE html>
 <html lang="en">
-
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Watch Repair Service</title>
-    <!-- Bootstrap core CSS -->
-    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.0.2/dist/css/bootstrap.min.css" rel="stylesheet"
-        integrity="sha384-EVSTQN3/azprG1Anm3QDgpJLIm9Nao0Yz1ztcQTwFspd3yD65VohhpuuCOmLASjC" crossorigin="anonymous">
-    <!-- Custom styles -->
-    <link rel="stylesheet" type="text/css" href="{% static 'css/stc.css' %}">
-    <link rel="stylesheet" type="text/css" href="{% static '/css/bootstrap.css' %}" />
+    <title>horofix</title>
+
+    <!-- fonts style -->
     <link href="https://fonts.googleapis.com/css2?family=Roboto:wght@400;500;700;900&display=swap" rel="stylesheet">
+
+    <!-- font awesome style -->
     <link href="{% static '/css/font-awesome.min.css' %}" rel="stylesheet" />
+
+    <!-- Custom styles for this template -->
     <link href="{% static '/css/style.css' %}" rel="stylesheet" />
-    <link href="{% static '/css/responsive.css' %}" rel="stylesheet">
-    <script>
-        // JavaScript function to navigate to the index page
-        function goToIndex() {
-            window.location.href = '/'; // Replace '/' with the actual URL of your index page
-        }
-    </script>
+    <!-- responsive style -->
+    <link href="{% static '/css/responsive.css' %}" rel="stylesheet" />
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.0.2/dist/css/bootstrap.min.css" rel="stylesheet" integrity="sha384-EVSTQN3/azprG1Anm3QDgpJLIm9Nao0Yz1ztcQTwFspd3yD65VohhpuuCOmLASjC" crossorigin="anonymous">
+</head>
+<script>
+    
+    // JavaScript function to navigate to the index page
+    function goToIndex() {
+        window.location.href = '/'; // Replace '/' with the actual URL of your index page
+    }
+</script>
+
     <style>
-        body {
-            font-family: Arial, sans-serif;
-            margin: 0;
-            padding: 0;
-            background-color: #f4f4f4;
+     body {
+    font-family: Arial, sans-serif;
+    margin: 0;
+    padding: 0;
+    background-color: #f0f0f0;
+    background-image: url('{% static 'images/rep.jpg' %}');
+    background-size: cover; /* Adjust the size to cover the entire background */
+}
+
+.container {
+    max-width: 800px;
+    margin: 0 auto;
+    padding: 20px;
+    background-color: rgba(255, 255, 255, 0.8); /* Add transparency to the background color */
+    border-radius: 8px;
+    box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
+    margin-top: 50px;
+}
+        /* Style the heading */
+        h1 {
+            text-align: center;
             color: #333;
         }
 
-        header {
-            padding: 1em;
-            text-align: center;
-        }
-
-        main {
-            max-width: 500px; /* Adjust the max-width as needed */
-            margin: 20px auto;
-            padding: 20px;
+        .product-card {
             background-color: #fff;
-            box-shadow: 0 0 10px rgba(0, 0, 0, 0.1);
-            border-radius: 8px;
-        }
-
-        h1, h2, h3 {
-            color: #007bff;
-        }
-
-        p {
-            line-height: 1.6;
-        }
-
-        form {
-            max-width: 600px;
-            margin: 0 auto;
-        }
-
-        label {
-            display: block;
-            margin-bottom: 8px;
-            color: #007bff; 
-        }
-
-        /* Colors for specific labels */
-        label[for="brand"] { color: #e44d26; } /* Watch Brand */
-        label[for="model"] { color: #3b5998; } /* Watch Model */
-        label[for="serialNumber"] { color: #55acee; } /* Serial Number */
-        label[for="issueDescription"] { color: #dd4b39; } /* Issue Description */
-        label[for="customerName"] { color: #007bb5; } /* Your Name */
-        label[for="watchImage"] { color: #4caf50; } /* Watch Image */
-
-        input, textarea {
-            width: 100%;
-            padding: 10px;
-            margin-bottom: 16px;
-            box-sizing: border-box;
             border: 1px solid #ddd;
-            border-radius: 4px;
+            padding: 20px;
+            text-align: center;
+            margin-bottom: 20px;
+            width: 31%; /* Set the width to approximately 31% for three products in one row */
+            display: inline-block; /* Display products side by side */
+            margin-right: 2%; /* Add some space between products */
+            box-sizing: border-box; /* Include padding and border in the width */
         }
 
-        input:focus, textarea:focus {
-            outline: none;
-            border-color: #007bff;
-        }
-
-        button {
-            background-color: #007bff;
-            color: #fff;
-            padding: 12px 20px;
-            border: none;
-            border-radius: 4px;
-            cursor: pointer;
-        }
-
-        button:hover {
-            background-color: #0056b3;
-        }
-
-        .watch-image {
+        /* Style product images */
+        .product-card img {
             max-width: 100%;
             height: auto;
-            border: 1px solid #ddd;
-            border-radius: 4px;
-            margin-bottom: 16px;
+            margin-bottom: 10px;
         }
 
-        .drag-drop-container {
-            border: 2px dashed #007bff;
-            padding: 20px;
-            text-align: center;
+        /* Style product titles */
+        .product-card h3 {
+            font-size: 1.5rem;
+            margin: 10px 0;
+            color: #333;
+        }
+
+        /* Style product details */
+        .product-card p {
+            font-size: 1rem;
+            margin: 5px 0;
+        }
+        .cart-item-price .original-price {
+    text-decoration: line-through;
+    color: #777; /* Change the color to your preference */
+}
+
+
+        /* Style buttons */
+        .btn {
+            padding: 10px 20px;
+            font-size: 1rem;
+            margin: 5px;
             cursor: pointer;
-            margin-bottom: 16px;
         }
 
-        /* Color for Select Watch Issue label */
-        label[for="selectedIssue"] { color: #ff9800; } 
+        .btn-primary {
+            background-color: #007bff;
+            color: #fff;
+            border: none;
+        }
 
-        select {
-            width: 100%;
-            padding: 10px;
-            margin-bottom: 16px;
-            box-sizing: border-box;
-            border: 1px solid #ddd;
-            border-radius: 4px;
+        .btn-success {
+            background-color: #28a745;
+            color: #fff;
+            border: none;
+        }
+
+
+
+
+
+        .container {
+    max-width: 800px;
+    margin: 0 auto;
+    padding: 20px;
+    background-color: #f4f4f4;
+    border-radius: 8px;
+    box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
+}
+
+.cart-header {
+    text-align: center;
+    margin-bottom: 20px;
+}
+
+.cart-item {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    padding: 10px;
+    border-bottom: 1px solid #ddd;
+}
+
+.cart-item-details {
+    display: flex;
+    align-items: center;
+}
+
+.cart-item-name {
+    font-weight: bold;
+    margin-right: 10px;
+    flex: 1;
+    white-space: nowrap;
+    overflow: hidden;
+    text-overflow: ellipsis;
+}
+
+.remove-from-cart-btn,
+.quantity-btn {
+    background-color: #ff6347;
+    color: white;
+    border: none;
+    border-radius: 4px;
+    padding: 5px 10px;
+    cursor: pointer;
+    transition: background-color 0.3s;
+}
+
+.remove-from-cart-btn:hover,
+.quantity-btn:hover {
+    background-color: #e74c3c;
+}
+.remove-from-cart-btn:hover,
+.quantity-btn:hover {
+    background-color: #e74c3c;
+}
+
+.cart-item-quantity {
+    display: flex;
+    align-items: center;
+    margin-right: 10px;
+}
+
+.cart-item-price {
+    font-weight: bold;
+}
+
+.continue-shopping-link {
+    display: inline-block;
+    margin-top: 20px;
+    text-decoration: none;
+    color: #3498db;
+    font-weight: bold;
+}
+
+.continue-shopping-link:hover {
+    text-decoration: underline;
+}
+
+.checkout-button {
+    display: inline-block;
+    background-color: #28a745; 
+    color: white;
+    padding: 10px 20px;
+    border-radius: 4px;
+    margin-top: 20px;
+    margin-left: 400px;
+    text-decoration: none;
+    font-weight: bold;
+    transition: background-color 0.3s;
+}
+
+.checkout-button:hover {
+    background-color: #218838;
+}
+    </style>
+</head>
+<body>
+<div class="hero_area">
+    <header class="header_section">
+        <div class="container-fluid">
+            <nav class="navbar navbar-expand-lg custom_nav-container ">
+                <a class="navbar-brand" href="index.html">
+                    <span>
+                        HandTime
+                    </span>
+                </a>
+
+                <button class="navbar-toggler" type="button" data-toggle="collapse" data-target="#navbarSupportedContent" aria-controls="navbarSupportedContent" aria-expanded="false" aria-label="Toggle navigation">
+                    <span class=""> </span>
+                </button>
+
+                <div class="collapse navbar-collapse" id="navbarSupportedContent">
+                    <ul class="navbar-nav  ">
+                        <li class="nav-item ">
+                            <a class="nav-link" href="{% url 'index' %}">Home </a>
+                        </li>
+                        <li class="nav-item">
+                            <a class="nav-link" href="{% url 'about' %}"> About</a>
+                        </li>
+                        <li class="nav-item">
+                            <a class="nav-link" href="{% url 'customer_products' %}">Products</a>
+                        </li>
+                        <li class="nav-item">
+                            <a class="nav-link" href="testimonial.html">Testimonial</a>
+                        </li>
+                        <li class="nav-item">
+                            <a class="nav-link" href="contact.html">Contact Us</a>
+                        </li>
+
+                        <div class="user_optio_box">
+                            <!-- Inside your user_optio_box div -->
+                            <div class="user_optio_box" >
+                                {% if request.session.is_authenticated %}
+                                    <!-- Display "Logout" button when the user is authenticated -->
+                                    <a href="{% url 'logout' %}">
+                                        <i class="fa fa-sign-out" aria-hidden="true"></i> Logout<span class="sr-only">(current)</span>
+                                    </a>
+                                {% else %}
+                                    <!-- Display "Login" link when the user is not authenticated -->
+                                    <a href="{% url 'login' %}">
+                                        <i class="fa fa-sign-in" aria-hidden="true"></i> Login
+                                    </a>
+                                {% endif %}
+
+                                <li class="nav-item" >
+                                    <a class="nav-link" href="{% url 'Customer_Profile' %}"><i class="fa fa-user" aria-hidden="true"></i></a>
+                                </li>
+                            </li>
+                           
+                            </div>
+                        </div>
+                    </ul>
+                </div>
+            </nav>
+        </div>
+    </header>
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Watch Repair Identification</title>
+    <link rel="stylesheet" href="https://maxcdn.bootstrapcdn.com/bootstrap/4.0.0/css/bootstrap.min.css">
+    <style>
+        body {
+            background-color: #f8f9fa;
+        }
+        .container {
+            margin-top: 50px;
+        }
+        .card {
+            border-radius: 15px;
+            box-shadow: 0 0 10px rgba(0, 0, 0, 0.1);
+        }
+        .card-header {
+            background-color: #007bff;
+            color: #fff;
+            text-align: center;
+            font-weight: bold;
+        }
+        .btn-primary {
+            background-color: #007bff;
+            border-color: #007bff;
+        }
+        .btn-primary:hover {
+            background-color: #0056b3;
+            border-color: #0056b3;
         }
     </style>
 </head>
-
 <body>
-    <div class="hero_area">
-        <!-- header section starts -->
-        <header class="header_section">
-            <div class="container-fluid">
-                <nav class="navbar navbar-expand-lg custom_nav-container ">
-                    <a class="navbar-brand" href="index.html">
-                        <span>
-                            HandTime
-                        </span>
-                    </a>
-
-                    <button class="navbar-toggler" type="button" data-toggle="collapse" data-target="#navbarSupportedContent" aria-controls="navbarSupportedContent" aria-expanded="false" aria-label="Toggle navigation">
-                        <span class=""> </span>
-                    </button>
-
-                    <div class="collapse navbar-collapse" id="navbarSupportedContent">
-                        <ul class="navbar-nav  ">
-                            <li class="nav-item ">
-                                <a class="nav-link" href="{% url 'index' %}">Home</a>
-                            </li>
-                            <li class="nav-item">
-                                <a class="nav-link" href="{% url 'about' %}">About</a>
-                            </li>
-                            <li class="nav-item">
-                                <a class="nav-link" href="{% url 'customer_products' %}">Products</a>
-                            </li>
-                            <li class="nav-item">
-                                <a class="nav-link" href="{% url 'service' %}">Services</a>
-                            </li>
-                            <li class="nav-item">
-                                <a class="nav-link" href="testimonial.html">Testimonial</a>
-                            </li>
-                            <li class="nav-item">
-                                <a class="nav-link" href="contact.html">Contact Us</a>
-                            </li>
-
-                            <div class="user_optio_box">
-                                {% if request.session.is_authenticated %}
-                                <!-- Display "Logout" button when the user is authenticated -->
-                                <a href="{% url 'logout' %}">
-                                    <i class="fa fa-sign-out" aria-hidden="true"></i> Logout<span class="sr-only">(current)</span>
-                                </a>
-                                {% else %}
-                                <!-- Display "Login" link when the user is not authenticated -->
-                                <a href="{% url 'login' %}">
-                                    <i class="fa fa-sign-in" aria-hidden="true"></i> Login
-                                </a>
-                                {% endif %}
-
-                                <li class="nav-item" active>
-                                    <a class="nav-link" href="{% url 'Customer_Profile' %}"><i class="fa fa-user" aria-hidden="true"></i></a>
-                                </li>
-                            </div>
-                        </ul>
-                    </div>
-                </nav>
+    <div class="container">
+        <div class="card">
+            <div class="card-header">
+                <h3>Identify and Describe the Issue</h3>
             </div>
-        </header>
+            <div class="card-body">
+                <form id="repairForm" method="post" enctype="multipart/form-data">
+                    {% csrf_token %}
+                    <div class="form-group">
+                        <label for="id_name">Name</label>
+                        <input type="text" id="id_name" name="name" value="{{ user.name }}"
+                            class="form-control" required>
+                        <span id="nameError" class="error"></span>
+                    </div>
+                        <div class="form-group">
+                            <label for="id_mobile">Email</label>
+                            <input type="tel" id="id_mobile" name="mobile" value="{{ user.email }}"
+                                class="form-control" required>
+                            <span id="mobileError" class="error"></span>
+                        </div>
+                        <!-- Your existing HTML code -->
 
+<div class="form-group">
+    <label for="watchName">Select Watch Name:</label>
+    <select class="form-control" id="watchName" name="watchName" required>
+        <option value="">-- Select Watch Name --</option>
+        <option value="horofix 1">Horofix 1</option>
+        <option value="horofix 2">Horofix 2</option>
+        <option value="horofix 3">Horofix 3</option>
+        <option value="horofix 4">Horofix 4</option>
+        <option value="horofix 5">Horofix 5</option>
+        <option value="horofix 6">Horofix 6</option>
+        <option value="horofix 7">Horofix 7</option>
+        <option value="horofix 8">Horofix 8</option>
+        <option value="horofix 9">Horofix 9</option>
+        <option value="Horofix 10">Horofix 10</option>
+        <option value="Horofix 11">Horofix 11</option>
+        <option value="horofix 12">Horofix 12</option>
+        <option value="horofix 13">Horofix 13</option>
+        <option value="horofix 14">Horofix 14</option>
+        <option value="horofix 15">Horofix 15</option>
+    </select>
+</div>
+<!-- Your existing HTML code -->
 
-    <!-- ... (previous HTML code) ... -->
-
-<label for="customerName">Your Name:</label>
-<input type="text" id="customerName" name="customerName" required>
-
-<label for="model">Watch Model:</label>
-<input type="text" id="model" name="model" required>
-
-<label for="serialNumber">Serial Number:</label>
-<input type="text" id="serialNumber" name="serialNumber" required>
-
-<label for="issueDescription">Issue Description:</label>
-<textarea id="issueDescription" name="issueDescription" rows="4" required></textarea>
-
-<label for="watchImage">Watch Image:</label>
-<input type="file" id="watchImage" name="watchImage" accept="image/*" class="watch-image">
-
-<div class="drag-drop-container" id="dragDropContainer" ondrop="drop(event)" ondragover="allowDrop(event)">
-    Drag and drop your watch issues here
+<div class="form-group">
+    <label for="watchBrand">Select Watch Model Number:</label>
+    <select class="form-control" id="watchBrand" name="watchBrand" required>
+        <option value="">-- Select Watch Model Number --</option>
+        <option value="h-101">H-101</option>
+        <option value="h-102">H-102</option>
+        <option value="h-103">H-103</option>
+        <option value="h-104">H-104</option>
+        <option value="h-105">H-105</option>
+        <option value="h-106">H-106</option>
+        <!-- Add more options as needed -->
+    </select>
 </div>
 
-<label for="watchname">Watch Name:</label>
-<span id="watchname"></span>
+<!-- Your existing HTML code -->
 
-<label for="selectedIssue">Select Watch Issue:</label>
-<select id="selectedIssue" name="selectedIssue">
-    <option value="" disabled selected>Select an issue</option>
-    <option value="Unable to turn on">Unable to turn on</option>
-    <option value="Battery requires service">Battery requires service</option>
-    <option value="Charging tips or troubleshooting">Charging tips or troubleshooting</option>
-    <option value="Unexpected shutdown or restart">Unexpected shutdown or restart</option>
-    <option value="Display has blank screen or no backlight">Display has blank screen or no backlight</option>
-    <!-- Add more options as needed -->
-</select>
 
-<form>
-    <button type="submit">Submit Repair Request</button>
-</form>
 
-<!-- ... (remaining HTML code) ... -->
+                    
+                    <div class="form-group">
+                        <label for="issueType">Select the Issue Type:</label>
+                        <select class="form-control" id="issueType"  name="issueType" required>
+                            <option value="">-- Select Issue Type --</option>
+                            <option value="screen">Screen Issue</option>
+                            <option value="battery">Battery Issue</option>
+                            <option value="software">Software Issue</option>
+                            <option value="strap">Strap/Bracelet Issue</option>
+                            <option value="crown">Crown/Button Issue</option>
+                            <option value="water">Water Resistance Issue</option>
+                            <option value="condensation">Condensation Inside Watch</option>
+                            <option value="timekeeping">Timekeeping Inaccuracy</option>
+                            <option value="brokenStrap">Broken Strap/Bracelet</option>
+                            <option value="movementIssue">Movement Issues</option>
+                            <option value="crackedCrystal">Cracked Crystal</option>
+                            <option value="lostCrown">Lost Crown/Button</option>
+                            <option value="dialIssues">Dial Issues</option>
+                            <option value="looseHands">Loose Hands</option>
+                            <option value="rust">Rust or Corrosion</option>
+                            <option value="missingMarkers">Missing Hour Markers</option>
+                            <!-- Add more options as needed -->
+                        </select>
+                    </div>
+                    <div class="form-group">
+                        <label for="issueDescription">Describe the Issue:</label>
+                        <textarea class="form-control" id="issueDescription" name="issueDescription"  rows="3" required></textarea>
+                    </div>
+                    <div class="form-group">
+                        <label for="imageUpload">Upload an Image of the Watch:</label>
+                        <input type="file" class="form-control-file" name="imageUpload"  id="imageUpload" accept="image/*">
+                    </div>
+                    <div class="form-group">
+                        <label for="additionalInfo">Additional Information:</label>
+                        <textarea class="form-control" id="additionalInfo"  name="additionalInfo" rows="3"></textarea>
+                    </div>
+                    <div class="form-group">
+                        <label for="purchaseDate">Purchase Date:</label>
+                        <input type="date" class="form-control" id="purchaseDate" name="purchaseDate" required>
+                    </div>
+
+                    <div class="form-group">
+                        <label for="warrantyDuration">Warranty Duration (in months):</label>
+                        <input type="number" class="form-control" id="warrantyDuration" name="warrantyDuration" required>
+                    </div>
+                 
+                    <form id="repairForm" method="post" action="{% url 'repair' %}">
+                        <!-- Your form fields -->
+                        <button type="submit" class="btn btn-primary" onclick="submitForm()">Submit</button>
+                    </form>
+                    
+
+                </form>
+            </div>
+        </div>
+    </div>
+
+    <script src="https://code.jquery.com/jquery-3.2.1.slim.min.js"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/popper.js/1.12.9/umd/popper.min.js"></script>
+    <script src="https://maxcdn.bootstrapcdn.com/bootstrap/4.0.0/js/bootstrap.min.js"></script>
+    
+      <script>
+        // JavaScript function to calculate warranty end date and set it on page load
+        function calculateWarrantyEndDate() {
+            // Retrieve values
+            const purchaseDateInput = document.getElementById("purchaseDate");
+            const warrantyDurationInput = document.getElementById("warrantyDuration");
+
+            // Set the purchase date to today's date if it's empty
+            const purchaseDate = purchaseDateInput.value ? new Date(purchaseDateInput.value) : new Date();
+
+            // Set the warranty duration to a default value if it's empty
+            const warrantyDuration = warrantyDurationInput.value ? parseInt(warrantyDurationInput.value) : 12; // Default: 12 months
+
+            // Calculate warranty end date
+            const warrantyEndDate = new Date(purchaseDate);
+            warrantyEndDate.setMonth(warrantyEndDate.getMonth() + warrantyDuration);
+
+            // Set the calculated warranty end date in the input field
+            purchaseDateInput.valueAsDate = purchaseDate;
+            warrantyDurationInput.value = warrantyDuration;
+        }
+
+        // Call the function on page load
+        window.onload = calculateWarrantyEndDate;
+    </script>
+
+   
+</body>
+</html>
+{% endblock %}

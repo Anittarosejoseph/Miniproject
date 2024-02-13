@@ -674,7 +674,6 @@ th.action-header {
         <table class="table table-bordered">
             <thead>
                 <tr>
-                    <th>Order ID</th>
                     <th>Customer</th>
                     <th>Product Name</th>
                     <th>Total Amount</th>
@@ -689,7 +688,6 @@ th.action-header {
             <tbody>
                 {% for order in orders %}
                     <tr>
-                        <td>{{ order.id }}</td>
                         <td>{{ order.user.username }}</td>
                         <td>
                             {% for order_item in order.orderitem_set.all %}

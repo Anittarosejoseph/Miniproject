@@ -269,111 +269,22 @@
         </div>
     </header>
 
-        <link rel="stylesheet" href="{% static 'css/cart.css' %}">
-        <div class="container">
-            <div class="cart-header">
-                <h1>Your Cart</h1>
-            </div>
-            <ul>
-                {% for item in cart_items %}
-                <li class="cart-item">
-                    <div class="cart-item-details">
-                        <div class="cart-item-image">
-                            <img src="{{ item.product.watch_image.url }}" alt="{{ item.product.product_name }}">
-                        </div>
-                        <div class="cart-item-name">{{ item.product.product_name }}</div>
-                        <form action="{% url 'remove-from-cart' item.product.id %}" method="post">
-                            {% csrf_token %}
-                            <button class="remove-from-cart-btn" type="submit">Remove</button>
-                        </form>
-                    </div>
-                    <div class="cart-item-quantity">
-                        <form action="{% url 'increase-cart-item' item.product.id %}" method="post">
-                            {% csrf_token %}
-                            <button class="quantity-btn increase-quantity" type="submit">+</button>
-                        </form>
-                        <span class="item-quantity">{{ item.quantity }}</span>
-                        <form action="{% url 'decrease-cart-item' item.product.id %}" method="post">
-                            {% csrf_token %}
-                            <button class="quantity-btn decrease-quantity" type="submit">-</button>
-                        </form>
-                    </div>
-                    <div class="cart-item-price" data-price="{{ item.product.product_sale_price }}">
-                        <span class="sale-price">${{ item.product.product_sale_price }}</span>
-                    </div>
-                </li>
-                {% endfor %}
-            </ul>
-            <p class="total-price-data"><span id="total-price"></span></p>
 
-            
-    <a class="checkout-button" href="{% url 'Customer_Profile' %}">Checkout</a>
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Thank You</title>
+    <!-- Add any additional styles or scripts if needed -->
+</head>
+<body>
+    <div class="container">
+        <h1 class="text-center mt-5">Thank You!</h1>
+        <p class="text-center">Your watch repair request has been submitted successfully. We will get in touch with you soon.</p>
+        <!-- You can add more content or links to other pages if needed -->
+    </div>
+</body>
+</html>
 
-            </div>
-            <a class="continue-shopping-link" href="{% url 'customer_products' %}">Continue Shopping</a>
-        </div>
-        <script>
-            document.addEventListener("DOMContentLoaded", function () {
-
-   
-updateTotalPrice();
-
-const increaseButtons = document.querySelectorAll(".increase-quantity");
-const decreaseButtons = document.querySelectorAll(".decrease-quantity");
-//const quantityElements = document.querySelectorAll(".item-quantity");
-//const priceElements = document.querySelectorAll(".cart-item-price");
-
-increaseButtons.forEach((button, index) => {
-button.addEventListener("click", (event) => {
-    event.preventDefault();
-    const currentItem = event.target.closest(".cart-item");
-    const quantityElement = currentItem.querySelector(".item-quantity");
-    const priceElement = currentItem.querySelector(".cart-item-price");
-    const pricePerItem = parseFloat(priceElement.getAttribute("data-price"));
-    const currentQuantity = parseInt(quantityElement.textContent);
-
-    quantityElement.textContent = currentQuantity + 1;
-    updateCartItemPrice(priceElement, pricePerItem, currentQuantity + 1);
-    updateTotalPrice();
-});
-});
-
-decreaseButtons.forEach((button, index) => {
-button.addEventListener("click", (event) => {
-    event.preventDefault();
-    const currentItem = event.target.closest(".cart-item");
-    const quantityElement = currentItem.querySelector(".item-quantity");
-    const priceElement = currentItem.querySelector(".cart-item-price");
-    const pricePerItem = parseFloat(priceElement.getAttribute("data-price"));
-    const currentQuantity = parseInt(quantityElement.textContent);
-
-    if (currentQuantity > 1) {
-        quantityElement.textContent = currentQuantity - 1;
-        updateCartItemPrice(priceElement, pricePerItem, currentQuantity - 1);
-        updateTotalPrice();
-    }
-});
-});
-
-function updateCartItemPrice(priceElement, pricePerItem, quantity) {
-const totalPrice = (pricePerItem * quantity).toFixed(2);
-priceElement.textContent = "Rs." + totalPrice;
-}
-function updateTotalPrice() {
-
-const itemElements = document.querySelectorAll(".cart-item");
-
-itemElements.forEach(function (itemElement) {
-    const sale_price = parseFloat(itemElement.querySelector(".cart-item-price").getAttribute("data-price"));
-    const quantity = parseInt(itemElement.querySelector(".cart-item-quantity").textContent);
-    total += sale_price * quantity;
-});
-
-const totalPriceElement = document.getElementById("total-price");
-totalPriceElement.textContent = total.toFixed(2);
-}
-});
-
-        </script>
-    {% endblock %}
-    
+{% endblock %}

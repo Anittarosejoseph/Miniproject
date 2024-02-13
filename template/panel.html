@@ -596,7 +596,7 @@ th.action-header {
                         </div>
                     </a>
                     {% if user.is_superuser %}
-                        <a href="">
+                        <a href="{% url 'watchrepairrequest_list' %}">
                         <div class="nav-option option3">
                             <img src=
     "https://media.geeksforgeeks.org/wp-content/uploads/20221210183320/5.png"
@@ -616,7 +616,7 @@ th.action-header {
                         </div>
                     </a>
                     {% if user.is_superuser %}
-                        <a href="">
+                        <a href="{% url 'techlist' %}">
                         <div class="nav-option option3">
                             <img src=
     "https://media.geeksforgeeks.org/wp-content/uploads/20221210183320/5.png"
@@ -626,12 +626,6 @@ th.action-header {
                         </div>
                         </a>
                         {% endif %}
-    
-
-    
-    
-    
-                      
     
                     </div>
                 </nav>
