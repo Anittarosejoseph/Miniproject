@@ -384,7 +384,7 @@ header {
 }
 
 .container {
-    max-width: 1000px;
+    max-width: 1000%;
     margin: 20px auto;
     padding: 20px;
     background-color: #fff;
@@ -516,14 +516,7 @@ th.action-header {
     transform: translateX(-50%);
     padding: 30px 0;
 }
-.container {
-            max-width: 800px;
-            margin: 50px auto;
-            background-color: #fff;
-            padding: 20px;
-            border-radius: 10px;
-            box-shadow: 0 0 10px rgba(0, 0, 0, 0.1);
-        }
+
 
         form {
             display: flex;
@@ -741,12 +734,17 @@ th.action-header {
                         </td>
                         <td>{{ repair_request.created_at }}</td>
                         <td>
-                            <form method="post" action="">
-                                {% csrf_token %}
-                                <input type="hidden" name="order_id" value="{{ repair_request.id }}">
-                                <button type="submit" name="action" value="approve">Approve</button>
-                                <button type="submit" name="action" value="disapprove">Reject</button>
-                            </form>
+                            {% if repair_request.is_approved %}
+                                <span class="badge badge-success">Approved</span>
+                            {% elif repair_request.is_rejected %}
+                                <span class="badge badge-danger">Rejected</span>
+                            {% else %}
+                                <!-- For Approving -->
+                                <a href="{% url 'approve_repair' repair_request.id %}" class="btn btn-success">Approve</a>
+                                
+                                <!-- For Rejecting -->
+                                <a href="{% url 'reject_repair' repair_request.id %}" class="btn btn-danger">Reject</a>
+                            {% endif %}
                         </td>
                     </tr>
                 {% endfor %}

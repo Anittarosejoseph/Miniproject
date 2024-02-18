@@ -237,7 +237,7 @@ def add_product(request):
     if request.method == 'POST':
         category = request.POST['category']
         product_name = request.POST['productName']
-        watch_model_number = request.POST['watchModelNumber']
+        watch_model_number = request.POST['watch_modelnumber']
         watch_serial_number = request.POST['watchSerialNumber']
         product_price = request.POST['productPrice']
         product_sale_price = request.POST['productSalePrice']
@@ -699,7 +699,6 @@ def all_user_orders(request):
 
     return render(request, 'all_user_orders.html', context)
 
-# Add a function to handle approval and disapproval (in the same view)
 from django.core.mail import send_mail
 from django.shortcuts import redirect
 from django.contrib import messages
@@ -1515,14 +1514,66 @@ def email_template(request):
     # Your logic after sending the thank-you email (e.g., redirect to a thank-you page)
     return render(request, 'thank_you_page.html')  # Replace with the actual template name
 
-# app_name/admin/views.py
-
-from django.shortcuts import render
+from django.core.mail import send_mail
+from django.shortcuts import render, get_object_or_404, redirect
 from .models import WatchRepairRequest
 
 def watchrepairrequest_list(request):
-    # Retrieve all WatchRepairRequest objects from the database
     repair_requests = WatchRepairRequest.objects.all()
-
-    # Render the template with the list of repair requests
     return render(request, 'watchrepairrequest_list.html', {'repair_requests': repair_requests})
+def send_approval_email(repair):
+    subject = 'Watch Repair Request Approved'
+    message = f'Your watch repair request with ID {repair.id} has been approved.'
+    from_email = 'anittarosejoseph2024a@mca.ajce.in'  # Update with your email
+    recipient_list = [repair.user.email]  # Access user's email through the ForeignKey relationship
+    send_mail(subject, message, from_email, recipient_list)
+
+def send_rejection_email(repair):
+    subject = 'Watch Repair Request Rejected'
+    message = f'Your watch repair request with ID {repair.id} has been rejected.'
+    from_email = 'anittarosejoseph2024a@mca.ajce.in'  # Update with your email
+    recipient_list = [repair.user.email]  # Access user's email through the ForeignKey relationship
+    send_mail(subject, message, from_email, recipient_list)
+
+
+
+def approve_repair(request, repair_id):
+    repair = get_object_or_404(WatchRepairRequest, id=repair_id)
+
+    # Perform approval actions
+    repair.is_approved = True
+    repair.is_rejected = False
+    repair.save()
+
+    # Send approval email
+    send_approval_email(repair)
+
+    return redirect('watchrepairrequest_list')
+
+def reject_repair(request, repair_id):
+    repair = get_object_or_404(WatchRepairRequest, id=repair_id)
+
+    # Perform rejection actions
+    repair.is_approved = False
+    repair.is_rejected = True
+    repair.save()
+
+    # Send rejection email
+    send_rejection_email(repair)
+
+    return redirect('watchrepairrequest_list')
+def faq_view(request):
+    # Add any context data if needed
+    return render(request, 'faq.html')
+
+# from .models import Thread
+
+from .models import Thread
+
+@login_required
+def messages_page(request):
+    threads = Thread.objects.by_user(user=request.user).prefetch_related('chatmessage_thread').order_by('timestamp')
+    context = {
+        'Threads': threads
+    }
+    return render(request, 'messages.html', context)

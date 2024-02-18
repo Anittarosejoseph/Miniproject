@@ -1,0 +1,199 @@
+{% extends "base.html" %}
+
+{% block content %}
+    {% load static %}
+    <!DOCTYPE html>
+    <html lang="en">
+
+    <head>
+        <meta charset="UTF-8">
+        <meta name="viewport" content="width=device-width, initial-scale=1.0">
+        <title>horofix</title>
+
+        <!-- Fonts style -->
+        <link href="https://fonts.googleapis.com/css2?family=Roboto:wght@400;500;700;900&display=swap" rel="stylesheet">
+
+        <!-- Font Awesome style -->
+        <link href="{% static '/css/font-awesome.min.css' %}" rel="stylesheet" />
+
+        <!-- Custom styles for this template -->
+        <link href="{% static '/css/style.css' %}" rel="stylesheet" />
+
+        <!-- Responsive style -->
+        <link href="{% static '/css/responsive.css' %}" rel="stylesheet" />
+
+        <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.0.2/dist/css/bootstrap.min.css" rel="stylesheet" integrity="sha384-EVSTQN3/azprG1Anm3QDgpJLIm9Nao0Yz1ztcQTwFspd3yD65VohhpuuCOmLASjC"
+            crossorigin="anonymous">
+
+            <style>
+                body {
+                    font-family: 'Roboto', sans-serif;
+                    background-color: #f8f9fa;
+                }
+        
+                .container {
+                    max-width: 800px;
+                    margin: 20px auto;
+                    padding: 20px;
+                    background-color: #ffffff;
+                    box-shadow: 0 0 10px rgba(0, 0, 0, 0.1);
+                }
+        
+                .faq-heading {
+                    text-align: center;
+                    color: #007bff;
+                }
+        
+                .faq-list {
+                    margin-top: 20px;
+                }
+        
+                .faq-item {
+                    margin-bottom: 20px;
+                    padding: 15px;
+                    border: 1px solid #ddd;
+                    border-radius: 5px;
+                    background-color: #fff;
+                }
+        
+                .faq-item h2 {
+                    color: #333;
+                    border-bottom: 2px solid #007bff;
+                    padding-bottom: 5px;
+                    margin-bottom: 15px;
+                }
+        
+                .faq-item ul {
+                    list-style: none;
+                    padding: 0;
+                    margin-top: 10px;
+                }
+        
+                .faq-item li {
+                    margin-bottom: 5px;
+                }
+            </style>
+    </head>
+
+    <body>
+        <div class="hero_area">
+            <header class="header_section">
+              <div class="container-fluid">
+                <nav class="navbar navbar-expand-lg custom_nav-container ">
+                  <a class="navbar-brand" href="index.html">
+                    <span>
+                      HandTime
+                    </span>
+                  </a>
+        
+                  <button class="navbar-toggler" type="button" data-toggle="collapse" data-target="#navbarSupportedContent" aria-controls="navbarSupportedContent" aria-expanded="false" aria-label="Toggle navigation">
+                    <span class=""> </span>
+                  </button>
+        
+                  <div class="collapse navbar-collapse" id="navbarSupportedContent">
+                    <ul class="navbar-nav  ">
+                      <li class="nav-item ">
+                        <a class="nav-link" href="{% url 'index' %}">Home </a>
+                      </li>
+                      <li class="nav-item">
+                        <a class="nav-link" href="{% url 'about' %}"> About</a>
+                      </li>
+                      <li class="nav-item">
+                        <a class="nav-link" href="{% url 'customer_products' %}">Products</a>
+                      </li>
+                      <li class="nav-item">
+                        <a class="nav-link" href="{% url 'service' %}">Services</a>
+                      </li>
+                      
+        
+                    
+                      
+        
+                      <div class="user_optio_box">
+                
+                        {% if user.is_authenticated %}
+                          <li>Welcome,{{user.username}}</li>
+                            <a href="{% url 'logout' %}">
+                              <i class="fa fa-sign-out" aria-hidden="true"></i> Logout
+                            </a>
+                        {% else %}
+                          <a href="{% url 'login' %}">
+                            <i class="fa fa-sign-in" aria-hidden="true"></i> Login
+                          </a>
+                        {% endif %}
+          
+        
+        <li class="nav-item" >
+                        <a class="nav-link" href="{% url 'Customer_Profile' %}"><i class="fa fa-user" aria-hidden="true"></i></a>
+                        <li class="nav-item" >
+                          <a class="nav-link" href="{% url 'view_cart' %}"> <i class="fa fa-shopping-cart" aria-hidden="true"></i>
+                          </a> 
+                          <li class="nav-item" ></li>
+                          <a href="{% url 'order_history' %}">
+                            <i class="fa fa-sign-in" aria-hidden="true"></i> OrderHistory
+                          </a>
+                                   
+                  </div>            
+                      
+                  </div>
+                </nav>
+              </div>
+            </header>
+
+<body>
+
+    <div class="container">
+        <h1 class="faq-heading">Frequently Asked Questions</h1>
+
+        <div class="faq-list">
+            <!-- FAQ 1 -->
+            <div class="faq-item">
+                <h2>1. How can I submit a watch repair request?</h2>
+                <p>You can fill out our online form in the 'contact us' section on this website. We'll provide you with a tentative estimate based on the information you provide.</p>
+            </div>
+
+            <!-- FAQ 2 -->
+            <div class="faq-item">
+                <h2>2. What warranty do you provide for watch repairs?</h2>
+                <p>We provide a 1-year warranty for all watch repairs, ensuring that any issues post-repair will be promptly resolved at no additional cost (terms and conditions apply).</p>
+            </div>
+            <div class="faq-item">
+    <h2>3. Can I bring my watch in person or should I courier it?</h2>
+    <p>You can either bring your watch in person to one of our stores in Delhi or courier the watch to us.</p>
+</div>
+<div class="faq-item">
+    <h2>4. Are you an authorized service center for specific brands?</h2>
+    <p>We are an authorized service center of Seiko, Citizen, and Victorinox. While we are not authorized for other brands, we do offer repair services for them.</p>
+</div>
+<div class="faq-item">
+    <h2>5. Do you repair clocks?</h2>
+    <p>Yes, we repair clocks! Our clock repair services include battery replacement, movement repair, and cleaning. Contact us to discuss your clock repair needs.</p>
+</div>
+<div class="faq-item">
+    <h2>6. When should I service my watch?</h2>
+    <p>If your watch is losing time, running fast, making unusual noises, or it has been more than three years since your last service, we recommend having it serviced to ensure longevity.</p>
+</div>
+<div class="faq-item">
+    <h2>7. Can you replace broken watch crystals?</h2>
+    <p>Yes, we can replace broken watch crystals. We offer a variety of crystal types and can help you select the best option for your watch.</p>
+</div>
+<div class="faq-item">
+    <h2>8. Do you repair vintage and antique watches?</h2>
+    <p>Yes, we have experience repairing vintage and antique watches. Our watchmakers are skilled in working with a variety of watch styles and can help restore your vintage or antique watch to its former glory.</p>
+</div>
+<div class="faq-item">
+    <h2>9. How can I repair a watch online?</h2>
+    <p>To repair a watch online, you can follow these steps:
+        <ul>
+            <li>Fill out our online watch repair form with details about the issues you're facing.</li>
+            <li>Send your watch to us through a secure courier service.</li>
+            <li>Our expert watchmakers will assess the issues and provide you with a cost estimate.</li>
+            <li>Upon approval, we will proceed with the repair and keep you updated on the progress.</li>
+            <li>Once the repair is complete, we'll securely ship your watch back to you.</li>
+        </ul>
+        Note: Online watch repair services may vary, and it's important to choose a reputable service provider.
+    </p>
+</div>
+</body>
+</html>
+{% endblock %}

@@ -44,6 +44,7 @@ INSTALLED_APPS = [
     'allauth.socialaccount',
     'allauth.socialaccount.providers.google',
     'horofixapp',
+     'channels',
     
 ]
 
@@ -78,7 +79,9 @@ TEMPLATES = [
     },
 ]
 
-WSGI_APPLICATION = 'horofix.wsgi.application'
+# WSGI_APPLICATION = 'horofix.wsgi.application'
+ASGI_APPLICATION = 'horofix.asgi.application'
+
 
 
 # Database
@@ -240,5 +243,13 @@ SOCIALACCOUNT_PROVIDERS = {
             'client_id': '636553351382-srspu6aj8ev6s13qppikrqd6k5pcc4gu.apps.googleusercontent.com',
             'secret': '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',
         }
+    }
+}
+CHANNEL_LAYERS = {
+    'default': {
+        'BACKEND': 'channels.layers.InMemoryChannelLayer',
+        # 'CONFIG': {
+        #     'hosts': [('127.0.0.1', 6379)],
+        # }
     }
 }

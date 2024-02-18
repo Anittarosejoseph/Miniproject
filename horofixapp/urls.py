@@ -78,8 +78,12 @@ urlpatterns = [
     path('thank-you/', views.thank_you_page, name='thank_you_page'),
     path('repair/',views.repair,name='repair'),
     path('watchrepairrequest/', views.watchrepairrequest_list, name='watchrepairrequest_list'),
-
     path('email_template/', views.email_template, name='email_template'),
+    path('faq/', views.faq_view, name='faq'),
+    path('approve_repair/<int:repair_id>/', views.approve_repair, name='approve_repair'),
+    path('reject_repair/<int:repair_id>/', views.reject_repair, name='reject_repair'),
+    path('messages', views.messages_page,name='messages'),
+
 
 
 

@@ -615,6 +615,15 @@ th.action-header {
                             <h3 style="font-size: 17px;"> DeliveryTeam</h3>
                         </div>
                     </a>
+                    <a href="{% url 'messages' %}">
+                        <div class="nav-option option4">
+                            <img src=
+    "https://media.geeksforgeeks.org/wp-content/uploads/20221210183321/6.png"
+                                class="nav-img"
+                                alt="institution">
+                            <h3 style="font-size: 17px;"> Chatroom</h3>
+                        </div>
+                    </a>
                     {% if user.is_superuser %}
                         <a href="{% url 'techlist' %}">
                         <div class="nav-option option3">
