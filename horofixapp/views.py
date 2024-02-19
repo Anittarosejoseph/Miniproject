@@ -1258,30 +1258,20 @@ def delete_order(request, order_id):
         messages.success(request, f"Order {order_id} deleted successfully.")
     return redirect('all_orders')
 from django.shortcuts import render
-from django.contrib.auth.decorators import login_required
-from .models import Order
 
-# views.py
 
-from django.shortcuts import render
-from .models import Order, OrderItem
-
+@login_required
 def order_history(request):
-    orders = Order.objects.filter(user=request.user)
+    user = request.user
+    orders = Order.objects.filter(user=user, payment_status=True)
     
-    # Fetching order_date and order_time from OrderItem
-    order_items = OrderItem.objects.filter(order__user=request.user)
-    
-    for order_item in order_items:
-        order_item.order_date  # Use this in your template
-        order_item.order_time  # Use this in your template
-
     context = {
         'orders': orders,
-        'order_items': order_items,
+        'user': user,
     }
-
     return render(request, 'order_history.html', context)
+
+
 @login_required
 def bill(request):
     # Fetch the latest order for the logged-in user (or implement your logic)
@@ -1568,7 +1558,7 @@ def faq_view(request):
 
 # from .models import Thread
 
-from .models import Thread
+from horofixapp.models import Thread
 
 @login_required
 def messages_page(request):

@@ -120,10 +120,6 @@
                           <a class="nav-link" href="{% url 'customer_products' %}">Products</a>
                         </li>
                        
-          
-                      
-                        
-          
                         <div class="user_optio_box">
                   
                           {% if user.is_authenticated %}
@@ -156,47 +152,32 @@
                 </nav>
             </div>
         </header>
-
-        <div class="order-history-container">
+        <body>
+          <div class="order-history-container">
             <h1>Order History</h1>
-
-            {% if orders %}
-            <ul>
-                {% for order in orders %}
-                <li>
-                    <p><strong>Order ID:</strong> {{ order.id }}</p>
-                    <p><strong>Order Date:</strong> {{ order.created_at.date }}</p>
-                    <p><strong>Order Time:</strong> {{ order.created_at.time }}</p>
-                    <p><strong>Order Status:</strong> {{ order.status }}</p>
-
-                   <div class="order-details">
-    <table>
-        <tr>
-            <th>Product Name</th>
-            <th>Quantity</th>
-        </tr>
-        {% for item in order.orderitem_set.all %}
-        <tr>
-            <td>{{ item.product.product_name }}</td>
-            <td>{{ item.quantity }}</td>
-        </tr>
-        {% endfor %}
-    </table>
-</div>
-
-<p><strong>Total Amount:</strong> {{ order.total_amount }}</p>
-
-
-
-
-                </li>
-                {% endfor %}
-            </ul>
-            {% else %}
-            <p>No order history found.</p>
-            {% endif %}
+            <div class="order-details">
+                <table>
+                    <tr>
+                        <th>Product Name</th>
+                        <th>Quantity</th>
+                        <th>Item Total</th>
+                        <th>Order Date</th>
+                        <th>Order Time</th>
+                        <th>Status</th>
+                    </tr>
+                    {% for order in orders %}
+                        {% for order_item in order.orderitem_set.all %}
+                            <tr>
+                                <td>{{ order_item.product.product_name }}</td>
+                                <td>{{ order_item.quantity }}</td>
+                                <td>{{ order_item.item_total }}</td>
+                                <td>{{ order_item.order_date }}</td>
+                                <td>{{ order_item.order_time }}</td>
+                                <td>{{ order.status }}</td>
+                            </tr>
+                        {% endfor %}
+                    {% endfor %}
+                </table>
+            </div>
         </div>
-    </div>
-</body>
-
-</html>
+        

@@ -44,7 +44,7 @@ INSTALLED_APPS = [
     'allauth.socialaccount',
     'allauth.socialaccount.providers.google',
     'horofixapp',
-     'channels',
+    'channels',
     
 ]
 
@@ -81,6 +81,7 @@ TEMPLATES = [
 
 # WSGI_APPLICATION = 'horofix.wsgi.application'
 ASGI_APPLICATION = 'horofix.asgi.application'
+
 
 
 
@@ -152,6 +153,17 @@ STATICFILES_DIRS = [
 # https://docs.djangoproject.com/en/4.2/ref/settings/#default-auto-field
 
 DEFAULT_AUTO_FIELD = 'django.db.models.BigAutoField'
+
+CHANNEL_LAYERS = {
+    'default': {
+        'BACKEND': 'channels.layers.InMemoryChannelLayer',
+        # 'CONFIG': {
+        #     'hosts': [('127.0.0.1', 6379)],
+        # }
+    }
+}
+
+
 LOGIN_URL = 'login'
 LOGIN_REDIRECT_URL = 'index'
 LOGOUT_URL ='index'
@@ -243,13 +255,5 @@ SOCIALACCOUNT_PROVIDERS = {
             'client_id': '636553351382-srspu6aj8ev6s13qppikrqd6k5pcc4gu.apps.googleusercontent.com',
             'secret': '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',
         }
-    }
-}
-CHANNEL_LAYERS = {
-    'default': {
-        'BACKEND': 'channels.layers.InMemoryChannelLayer',
-        # 'CONFIG': {
-        #     'hosts': [('127.0.0.1', 6379)],
-        # }
     }
 }

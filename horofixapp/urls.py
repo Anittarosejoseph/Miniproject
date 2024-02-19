@@ -82,7 +82,7 @@ urlpatterns = [
     path('faq/', views.faq_view, name='faq'),
     path('approve_repair/<int:repair_id>/', views.approve_repair, name='approve_repair'),
     path('reject_repair/<int:repair_id>/', views.reject_repair, name='reject_repair'),
-    path('messages', views.messages_page,name='messages'),
+    path('messages_page/', views.messages_page,name='messages_page'),
 
 
 
