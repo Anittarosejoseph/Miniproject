@@ -1678,3 +1678,18 @@ def repair_payment_success(request, repair_id):
 
     messages.success(request, 'Payment successfully done.')
     return redirect('user_repair_history')
+# views.py
+
+from django.shortcuts import render, get_object_or_404
+from .models import WatchRepairRequest, RepairPayment
+
+def view_bill(request, repair_id):
+    repair = get_object_or_404(WatchRepairRequest, id=repair_id)
+    payments = RepairPayment.objects.filter(order=repair)
+
+    context = {
+        'repair': repair,
+        'payments': payments,
+    }
+
+    return render(request, 'view_bill.html', context)

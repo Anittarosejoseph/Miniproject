@@ -393,6 +393,7 @@ class WatchRepairRequest(models.Model):
 
 
 class RepairPayment(models.Model):
+    
     order = models.ForeignKey(WatchRepairRequest, on_delete=models.CASCADE)
     razor_pay_order_id = models.CharField(max_length=255)
     amount = models.DecimalField(max_digits=10, decimal_places=2)
