@@ -83,9 +83,12 @@ urlpatterns = [
     path('approve_repair/<int:repair_id>/', views.approve_repair, name='approve_repair'),
     path('reject_repair/<int:repair_id>/', views.reject_repair, name='reject_repair'),
     path('messages_page/', views.messages_page,name='messages_page'),
+    path('user_repair_history/', views.user_repair_history, name='user_repair_history'),
+  path('repair_payment/<int:repair_id>/',views.repair_payment, name='repair_payment'),
+    path('repair_payment_success/<int:repair_id>/',views.repair_payment_success, name='repair_payment_success'),
+  path('add_service/', views.add_service, name='add_service'),
 
-
-
+     path('view_service/', views.view_service, name='view_service'),
 
 
 ]

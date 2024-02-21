@@ -1,0 +1,105 @@
+
+{% block content %}
+
+{% if messages %}
+    {% for message in messages %}
+        <div class="alert" role="alert">
+            {{ message }}
+        </div>
+    {% endfor %}
+{% endif %}
+
+<div class="details-container">
+    <h2>Payment Information</h2>
+    <p>Order ID: {{ repair_request.id }}</p>
+    <p>Total Price: {{ repair_request.issue_type.price }}</p>
+    <!-- Include other relevant repair request details -->
+    <p>Watch Name: {{ repair_request.watch_name }}</p>
+    <p>Model Number: {{ repair_request.watch_model_number }}</p>
+    <p>Issue Description: {{ repair_request.issue_description }}</p>
+    <!-- Display payment details from the payment object -->
+    <p>Payment ID: {{ payment.id }}</p>
+    <p>Amount: ₹{{ rupee_amount }}</p>
+    <p>Currency: {{ payment.currency }}</p>
+    <button id="rzp-button1">Make Payment</button>
+</div>
+
+<script src="https://checkout.razorpay.com/v1/checkout.js"></script>
+<script>
+    var options = {
+        "key": "rzp_test_CWNbERskB9qZzi",
+        "amount": "{{ order_amount }}", 
+        "currency": "INR",
+        "name": "Your Watch Repair Service",
+        "description": "Watch Repair Service Payment",
+        "image": "URL_TO_YOUR_LOGO",
+        "order_id": "{{ payment.id }}", // Use the correct field from the payment object
+        "handler": function (response){
+            alert("Payment Successful");
+            window.location.href = '{% url "repair_payment_success" repair_id=repair_request.id %}';
+        },
+        "theme": {
+            "color": "#3399cc"
+        }
+    };
+    var rzp1 = new Razorpay(options);
+    rzp1.on('payment.failed', function (response){
+            alert(response.error.code);
+            alert(response.error.description);
+            alert(response.error.source);
+            alert(response.error.step);
+            alert(response.error.reason);
+            alert(response.error.metadata.order_id);
+            alert(response.error.metadata.payment_id);
+    });
+    document.getElementById('rzp-button1').onclick = function(e){
+        rzp1.open();
+        e.preventDefault();
+    }
+    </script>
+    
+
+<style>
+  .details-container {
+        background-color: #fff;
+        padding: 20px;
+        border-radius: 8px;
+        box-shadow: 0 0 10px rgba(0, 0, 0, 0.1);
+        margin-bottom: 20px;
+    }
+
+    .details-container h2 {
+        color: #333;
+        margin-bottom: 15px;
+    }
+
+    .details-container p {
+        color: #666;
+        margin-bottom: 8px;
+    }
+
+    /* Style for Razorpay Button */
+    #rzp-button1 {
+        display: inline-block;
+        padding: 10px 20px;
+        font-size: 16px;
+        font-weight: bold;
+        text-align: center;
+        text-decoration: none;
+        border-radius: 6px;
+        color: #fff;
+        background-color: #4CAF50; /* Green color, you can change this */
+        border: 1px solid #4CAF50; /* Same as background initially */
+        box-shadow: 0 2px 4px rgba(0, 0, 0, 0.2);
+        transition: background-color 0.3s ease, border-color 0.3s ease, color 0.3s ease;
+    }
+
+    #rzp-button1:hover {
+        background-color: #45a049; /* Darker green on hover */
+        border-color: #45a049; /* Darker border on hover */
+    }
+
+    #rzp-button1:active {
+        transform: translateY(1px); /* Add a slight press-down effect */</style>
+
+{% endblock content %}

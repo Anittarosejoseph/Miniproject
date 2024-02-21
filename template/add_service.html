@@ -649,76 +649,30 @@ th.action-header {
                     </div>
                 </nav>
             </div>
-            <div class="main">
-                
-                
-                <div class="box-container">
+<body>
+
+    <div class="container mt-4">
+        <h2>Add Watch Repair Service</h2>
+        <form method="post">
+            {% csrf_token %}
+            <div class="form-group">
+                <label for="issueType" style="margin-bottom: 10px;">Issue Type:</label>
+                <input type="text" class="form-control" id="issueType" name="issueType" required>
+            </div>
+            <div class="form-group">
+                <label for="price">Price:</label>
+                <input type="number" class="form-control" id="price" name="price" step="0.01" required>
+            </div>
+            <button type="submit" class="btn btn-primary">Save</button>
+        </form>
+   
     
-                    <div class="box box1">
-                        <div class="text">
-                            <h2 class="topic-heading">{{ total_users }}</h2>
-                            <h2 class="topic">Registered Users</h2>
-                        </div>
 </div>
 
-    
-                    <div class="box box2">
-                        <div class="text">
-                            <h2 class="topic-heading">{{ review_count }}</h2>
-                            <h2 class="topic">Reviews</h2>
-                        </div>
-    
-                       
-                    </div>
-    
-                    <div class="box box3">
-                        <div class="text">
-                            <h2 class="topic-heading">{{ average_rating|default:0|floatformat:1 }}</h2>
-                            <h2 class="topic">Ratings</h2>
-                        </div>
-    
-                    </div>
-    
-                   
-                </div>  
-    
-               
-        <script src="{% static '/assets/js/jquery-3.5.1.min.js'%}"></script>
+<!-- Add any additional scripts or Bootstrap JS links here -->
+<script src="https://code.jquery.com/jquery-3.5.1.slim.min.js"></script>
+<script src="https://cdn.jsdelivr.net/npm/@popperjs/core@2.10.2/dist/umd/popper.min.js"></script>
+<script src="https://maxcdn.bootstrapcdn.com/bootstrap/4.5.2/js/bootstrap.min.js"></script>
 
-        <script src="{% static '/assets/js/bootstrap.bundle.min.js'%}"></script>
-    
-        <script src="{% static '/assets/vendor/owl-carousel/js/owl.carousel.min.js'%}"></script>
-    
-        <script src="{% static '/assets/vendor/wow/wow.min.js'%}"></script>
-    
-        <script src="{% static '/assets/js/theme.js'%}"></script>
-      
-        <script>
-            function searchTable() {
-                var input, filter, table, tr, td, i, txtValue;
-                input = document.getElementById("searchInput");
-                filter = input.value.toUpperCase();
-                table = document.querySelector("table"); // Replace with the actual table ID or class
-                tr = table.getElementsByTagName("tr");
-        
-                for (i = 0; i < tr.length; i++) {
-                    td = tr[i].getElementsByTagName("td")[0]; // Change index to match the column you want to search
-                    if (td) {
-                        txtValue = td.textContent || td.innerText;
-                        if (txtValue.toUpperCase().indexOf(filter) > -1) {
-                            tr[i].style.display = "";
-                        } else {
-                            tr[i].style.display = "none";
-                        }
-                    }
-                }
-            }
-        
-            function performSearch() {
-                searchTable(); // Call the searchTable function when the search icon is clicked
-            }
-        </script>
-        
-        
-    </body>
-    </html>
+</body>
+</html>

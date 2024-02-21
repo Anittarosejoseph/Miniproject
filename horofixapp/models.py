@@ -324,28 +324,17 @@ class Customer(models.Model):
 
     def __str__(self):
         return self.user.email
-
-
 from django.db import models
-from django.utils import timezone
 
-class WatchRepairRequest(models.Model):
-    user = models.ForeignKey(CustomUser, on_delete=models.CASCADE)
-    watch_name = models.CharField(max_length=255, null=True)
-    watch_model_number = models.CharField(max_length=255, null=True)
-    issue_type = models.CharField(max_length=255, null=True)
-    issue_description = models.TextField(null=True)
-    image_upload = models.ImageField(upload_to='watch_images/', null=True, blank=True)
-    additional_info = models.TextField(blank=True, null=True)
-    purchase_date = models.DateField(null=True)
-    warranty_duration = models.IntegerField(null=True)
-    created_at = models.DateTimeField(default=timezone.now) 
-    is_approved = models.BooleanField(default=False)  
-    is_rejected = models.BooleanField(default=False)  
-
+class WatchRepairService(models.Model):
+    issue_type = models.CharField(max_length=255, unique=True)
+    price = models.DecimalField(max_digits=10, decimal_places=2)
 
     def __str__(self):
-        return f"{self.user.name}'s Watch Repair Request"
+        return self.issue_type
+
+
+
 from django.db import models
 from django.contrib.auth import get_user_model
 from django.db.models import Q
@@ -379,3 +368,37 @@ class ChatMessage(models.Model):
     user = models.ForeignKey(CustomUser, on_delete=models.CASCADE)
     message = models.TextField()
     timestamp = models.DateTimeField(auto_now_add=True)
+
+# models.py
+from django.db import models
+from django.utils import timezone
+
+class WatchRepairRequest(models.Model):
+    user = models.ForeignKey(CustomUser, on_delete=models.CASCADE)
+    watch_name = models.CharField(max_length=255, null=True)
+    watch_model_number = models.CharField(max_length=255, null=True)
+    issue_type = models.ForeignKey(WatchRepairService, on_delete=models.CASCADE, null=True)
+    issue_description = models.TextField(null=True)
+    image_upload = models.ImageField(upload_to='watch_images/', null=True, blank=True)
+    additional_info = models.TextField(blank=True, null=True)
+    purchase_date = models.DateField(null=True)
+    warranty_duration = models.IntegerField(null=True)
+    created_at = models.DateTimeField(default=timezone.now) 
+    is_approved = models.BooleanField(default=False)  
+    is_rejected = models.BooleanField(default=False)  
+
+    def __str__(self):
+        return f"{self.user.name}'s Watch Repair Request"
+
+
+
+class RepairPayment(models.Model):
+    order = models.ForeignKey(WatchRepairRequest, on_delete=models.CASCADE)
+    razor_pay_order_id = models.CharField(max_length=255)
+    amount = models.DecimalField(max_digits=10, decimal_places=2)
+    is_paid = models.BooleanField(default=False)
+    customer = models.ForeignKey(CustomUser, on_delete=models.CASCADE)
+    created_at = models.DateTimeField(auto_now_add=True)
+
+    def __str__(self):
+        return f"Payment for Repair Request: {self.order}"

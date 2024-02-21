@@ -370,26 +370,13 @@
                     
                     <div class="form-group">
                         <label for="issueType">Select the Issue Type:</label>
-                        <select class="form-control" id="issueType"  name="issueType" required>
-                            <option value="">-- Select Issue Type --</option>
-                            <option value="screen">Screen Issue</option>
-                            <option value="battery">Battery Issue</option>
-                            <option value="software">Software Issue</option>
-                            <option value="strap">Strap/Bracelet Issue</option>
-                            <option value="crown">Crown/Button Issue</option>
-                            <option value="water">Water Resistance Issue</option>
-                            <option value="condensation">Condensation Inside Watch</option>
-                            <option value="timekeeping">Timekeeping Inaccuracy</option>
-                            <option value="brokenStrap">Broken Strap/Bracelet</option>
-                            <option value="movementIssue">Movement Issues</option>
-                            <option value="crackedCrystal">Cracked Crystal</option>
-                            <option value="lostCrown">Lost Crown/Button</option>
-                            <option value="dialIssues">Dial Issues</option>
-                            <option value="looseHands">Loose Hands</option>
-                            <option value="rust">Rust or Corrosion</option>
-                            <option value="missingMarkers">Missing Hour Markers</option>
-                            <!-- Add more options as needed -->
-                        </select>
+                        <label for="selectedService">Select a Service:</label>
+    <select class="form-control" id="selectedService" name="selectedService">
+        <option value="">-- Select a Service --</option>
+        {% for service in services %}
+            <option value="{{ service.id }}">{{ service.issue_type }} - {{ service.price }}</option>
+        {% endfor %}
+    </select>
                     </div>
                     <div class="form-group">
                         <label for="issueDescription">Describe the Issue:</label>
@@ -405,56 +392,88 @@
                     </div>
                     <div class="form-group">
                         <label for="purchaseDate">Purchase Date:</label>
-                        <input type="date" class="form-control" id="purchaseDate" name="purchaseDate" required>
-                    </div>
+                        <input type="date" class="form-control" id="purchaseDate" name="purchaseDate" required 
+                               min="2001-01-01" max="2024-12-31">
+                               </div>
 
                     <div class="form-group">
-                        <label for="warrantyDuration">Warranty Duration (in months):</label>
-                        <input type="number" class="form-control" id="warrantyDuration" name="warrantyDuration" required>
+                        <label for="warrantyDuration">Warranty Duration:</label>
+                        <select class="form-control" id="warrantyDuration" name="warrantyDuration" required>
+                            <option value="6">6 months</option>
+                            <option value="12">12 months</option>
+                            <option value="12">1 year</option>
+                            <option value="0">Not Applicable</option>
+                        </select>
                     </div>
+                    
                  
                     <form id="repairForm" method="post" action="{% url 'repair' %}">
-                        <!-- Your form fields -->
-                        <button type="submit" class="btn btn-primary" onclick="submitForm()">Submit</button>
-                    </form>
+                        <button type="button" class="btn btn-primary" onclick="submitForm()">Submit</button>
+                   </form>
                     
 
                 </form>
             </div>
         </div>
     </div>
-
+    
+    
     <script src="https://code.jquery.com/jquery-3.2.1.slim.min.js"></script>
     <script src="https://cdnjs.cloudflare.com/ajax/libs/popper.js/1.12.9/umd/popper.min.js"></script>
     <script src="https://maxcdn.bootstrapcdn.com/bootstrap/4.0.0/js/bootstrap.min.js"></script>
     
-      <script>
-        // JavaScript function to calculate warranty end date and set it on page load
-        function calculateWarrantyEndDate() {
-            // Retrieve values
-            const purchaseDateInput = document.getElementById("purchaseDate");
-            const warrantyDurationInput = document.getElementById("warrantyDuration");
-
-            // Set the purchase date to today's date if it's empty
-            const purchaseDate = purchaseDateInput.value ? new Date(purchaseDateInput.value) : new Date();
-
-            // Set the warranty duration to a default value if it's empty
-            const warrantyDuration = warrantyDurationInput.value ? parseInt(warrantyDurationInput.value) : 12; // Default: 12 months
-
-            // Calculate warranty end date
-            const warrantyEndDate = new Date(purchaseDate);
-            warrantyEndDate.setMonth(warrantyEndDate.getMonth() + warrantyDuration);
-
-            // Set the calculated warranty end date in the input field
-            purchaseDateInput.valueAsDate = purchaseDate;
-            warrantyDurationInput.value = warrantyDuration;
+    <script>
+        function submitForm() {
+            // Get the purchase date and warranty duration values
+            var purchaseDate = document.getElementById("purchaseDate").value;
+            var warrantyDuration = document.getElementById("warrantyDuration").value;
+    
+            // Check if warranty is not applicable
+            if (warrantyDuration === "0") {
+                // If "Not Applicable", submit the form
+                document.getElementById("repairForm").submit();
+            } else {
+                // Convert purchaseDate string to a Date object
+                var purchaseDateObj = new Date(purchaseDate);
+    
+                // Calculate the warranty end date by adding warranty duration to purchase date
+                var warrantyEndDate = new Date(purchaseDateObj);
+                warrantyEndDate.setMonth(warrantyEndDate.getMonth() + parseInt(warrantyDuration));
+    
+                // Get the current date
+                var currentDate = new Date();
+    
+                // Compare the warranty end date with the current date
+                if (warrantyEndDate < currentDate) {
+                    // If warranty is not applicable, show an alert
+                    alert("Warranty not applicable. Please check the warranty duration.");
+                } else {
+                    // If everything is valid, submit the form
+                    document.getElementById("repairForm").submit();
+                }
+            }
         }
+         
+        
+    function submitForm() {
+        // Validate all fields before submitting the form
+        var name = document.getElementById("id_name").value;
+        var email = document.getElementById("id_mobile").value;
+        var watchName = document.getElementById("watchName").value;
+        var watchBrand = document.getElementById("watchBrand").value;
+        var selectedService = document.getElementById("selectedService").value;
+        var issueDescription = document.getElementById("issueDescription").value;
 
-        // Call the function on page load
-        window.onload = calculateWarrantyEndDate;
-    </script>
+        // Check if any of the mandatory fields is empty
+        if (!name || !email || !watchName || !watchBrand || !selectedService || !issueDescription) {
+            alert("Please fill in all mandatory fields.");
+        } else {
+            // If all fields are filled, submit the form
+            document.getElementById("repairForm").submit();
+        }
+    }
 
-   
+</script>   
 </body>
 </html>
 {% endblock %}

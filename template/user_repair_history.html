@@ -56,7 +56,7 @@
                 <a class="nav-link" href="{% url 'index' %}">Home <span class="sr-only">(current)</span></a>
               </li>
               <li class="nav-item">
-                <a class="nav-link" href="{% url 'user_repair_history' %}"> About</a>
+                <a class="nav-link" href="{% url 'index' %}"> About</a>
               </li>
               
               <li class="nav-item">
@@ -71,7 +71,9 @@
                 <a class="nav-link" href="{% url 'messages_page' %}">Contact Us</a>
               </li>
              
-
+              <li class="nav-item">
+                <a class="nav-link" href="{% url 'user_repair_history' %}">Repairs</a>
+              </li>
        
               <div class="user_optio_box">
                 
@@ -102,16 +104,70 @@
         </nav>
       </div>
     </header>
+    <h1>Your Watch Repair History</h1>
 
+    {% if repair_history %}
+        <table border="1">
+            <thead>
+                <tr>
+                    <th>Watch Name</th>
+                    <th>Model Number</th>
+                    <th>Issue Type</th>
+                    <th>Issue Description</th>
+                    <th>Additional Info</th>
+                    <th>Purchase Date</th>
+                    <th>Warranty Duration</th>
+                    <th>Image Upload</th>
+                    <th>Created At</th>
+                    <th>Approval Status</th>
+                    
+                </tr>
+            </thead>
+            <tbody>
+                {% for repair in repair_history %}
+                    <tr>
+                        <td>{{ repair.watch_name }}</td>
+                        <td>{{ repair.watch_model_number }}</td>
+                        <td>{{ repair.issue_type }}</td>
+                        <td>{{ repair.issue_description }}</td>
+                        <td>{{ repair.additional_info }}</td>
+                        <td>{{ repair.purchase_date }}</td>
+                        <td>{{ repair.warranty_duration }}</td>
+                        <td>
+                            {% if repair.image_upload %}
+                                <img src="{{ repair.image_upload.url }}" alt="Watch Image" style="max-width: 100px; max-height: 100px;">
+                            {% else %}
+                                No Image
+                            {% endif %}
+                        </td>
+                        <td>{{ repair.created_at }}</td>
+                        <td>
+                            {% if repair.is_approved %}
+                                <span class="badge badge-success">Approved</span>
+                                <p>Status: {% if repair.payments.exists %}{% if repair.payments.first.is_paid %}Paid{% else %}Not Paid{% endif %}{% else %}No Payments{% endif %}</p>
+        {% if not repair.payments.exists or not repair.payments.first.is_paid %}
+            <form action="{% url 'repair_payment' repair.id %}" method="post">
+                {% csrf_token %}
+                <input type="hidden" name="order_id" value="{{ repair.id }}">
+                <button type="submit" class="payment-btn">Pay</button>
+            </form>
+        {% endif %}
 
-
-<body>
-    <div class="container">
-        <h1 class="text-center mt-5">Thank You!</h1>
-        <p class="text-center">Your watch repair request has been submitted successfully. We will get in touch with you soon.</p>
-        <!-- You can add more content or links to other pages if needed -->
-    </div>
-</body>
-</html>
-
+                            {% elif repair.is_rejected %}
+                                <span class="badge badge-danger">Rejected</span>
+                            {% else %}
+                                <span class="badge badge-warning">Not Accepted</span>
+                            {% endif %}
+                        </td>
+                        <td>
+                          {% if repair.payments.exists and repair.payments.first.is_paid %}
+                              <a href="{% url 'view_bill' repair.id %}">View Bill</a>
+                          {% endif %}
+                      </td>                    </tr>
+                {% endfor %}
+            </tbody>
+        </table>
+    {% else %}
+        <p>No repair history found.</p>
+    {% endif %}
 {% endblock %}

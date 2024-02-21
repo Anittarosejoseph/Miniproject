@@ -1401,16 +1401,17 @@ from django.shortcuts import render, redirect
 from django.core.mail import send_mail
 from django.template.loader import render_to_string
 from django.contrib import messages
-from .models import WatchRepairRequest
 from django.conf import settings
 @login_required
 def repair(request):
+    services = WatchRepairService.objects.all()
+
     if request.method == 'POST':
         # Retrieve form data
         user = request.user
         watch_name = request.POST.get('watchName')
         watch_model_number = request.POST.get('watchBrand')
-        issue_type = request.POST.get('issueType')
+        selected_service_id = request.POST.get('selectedService')
         issue_description = request.POST.get('issueDescription')
         image_upload = request.FILES.get('imageUpload')
         additional_info = request.POST.get('additionalInfo')
@@ -1422,13 +1423,18 @@ def repair(request):
             user=user,
             watch_name=watch_name,
             watch_model_number=watch_model_number,
-            issue_type=issue_type,
             issue_description=issue_description,
             image_upload=image_upload,
             additional_info=additional_info,
             purchase_date=purchase_date,
             warranty_duration=warranty_duration,
         )
+
+        if selected_service_id:
+            selected_service = WatchRepairService.objects.get(pk=selected_service_id)
+            # Associate the selected service with the repair request
+            repair_request.issue_type = selected_service
+            repair_request.save()
 
         # Send email
         subject = 'Watch Repair Request Submitted'
@@ -1440,7 +1446,7 @@ def repair(request):
         # Redirect to thank-you page
         messages.success(request, 'Your watch repair request has been submitted successfully!')
         return redirect('thank_you_page')
-    return render(request, 'repair.html')
+    return render(request, 'repair.html',{'services': services})
 
 
 from django.core.mail import EmailMessage
@@ -1506,10 +1512,9 @@ def email_template(request):
 
 from django.core.mail import send_mail
 from django.shortcuts import render, get_object_or_404, redirect
-from .models import WatchRepairRequest
 
 def watchrepairrequest_list(request):
-    repair_requests = WatchRepairRequest.objects.all()
+    repair_requests = WatchRepairRequest.objects.all()    
     return render(request, 'watchrepairrequest_list.html', {'repair_requests': repair_requests})
 def send_approval_email(repair):
     subject = 'Watch Repair Request Approved'
@@ -1567,3 +1572,109 @@ def messages_page(request):
         'Threads': threads
     }
     return render(request, 'messages.html', context)
+# views.py
+
+from django.shortcuts import render
+from django.contrib.auth.decorators import login_required
+
+@login_required
+def user_repair_history(request):
+    # Fetch repair history for the logged-in user with payment details
+    repair_history = WatchRepairRequest.objects.filter(user=request.user)
+    
+    # Fetch payment details for each repair request
+    for repair in repair_history:
+        repair.payments = repair.repairpayment_set.all()
+
+    context = {'repair_history': repair_history}
+    return render(request, 'user_repair_history.html', context)
+
+# views.py
+from .models import WatchRepairRequest
+
+from django.shortcuts import render, redirect
+from .models import WatchRepairService
+
+def add_service(request):
+    if request.method == 'POST':
+        issue_type = request.POST.get('issueType')
+        price = request.POST.get('price')
+
+        # Save the data to the database
+        WatchRepairService.objects.create(issue_type=issue_type, price=price)
+
+        # Redirect to the view_service page
+        return redirect('view_service')
+
+    return render(request, 'add_service.html')
+
+def view_service(request):
+    # Retrieve all services from the database
+    services = WatchRepairService.objects.all()
+    return render(request, 'view_service.html', {'services': services})
+
+
+from django.shortcuts import render, get_object_or_404, redirect
+from django.http import HttpResponse
+from django.contrib import messages
+from .models import WatchRepairRequest, RepairPayment  # Import RepairPayment model
+from django.conf import settings
+import razorpay
+from django.template.defaultfilters import floatformat
+
+def repair_payment(request, repair_id):
+    if request.method == 'POST':
+        repair_request = get_object_or_404(WatchRepairRequest, pk=repair_id)
+        
+        # Load Razorpay API key and secret from settings
+        razorpay_key = settings.RAZOR_KEY_ID
+        razorpay_secret = settings.RAZOR_KEY_SECRET
+
+        client = razorpay.Client(auth=(razorpay_key, razorpay_secret))
+
+        # Example amount calculation, adjust as needed
+        order_amount = int(repair_request.issue_type.price) * 100 if repair_request.issue_type and repair_request.issue_type.price else 0
+
+        data = {
+            "amount": order_amount,
+            "currency": "INR",
+            "receipt": f"repair_rcptid_{repair_id}"
+        }
+        payment = client.order.create(data=data)
+
+        rupee_amount = floatformat(payment['amount'] / 100, 2)
+        return render(request, 'repair_payment.html', {'payment': payment, 'repair_request': repair_request, 'rupee_amount': rupee_amount})
+    
+
+def repair_payment_success(request, repair_id):
+    repair_request = get_object_or_404(WatchRepairRequest, pk=repair_id)
+
+    # Load Razorpay API key and secret from settings
+    razorpay_key = settings.RAZOR_KEY_ID
+    razorpay_secret = settings.RAZOR_KEY_SECRET
+
+    client = razorpay.Client(auth=(razorpay_key, razorpay_secret))
+
+    # Example amount calculation, adjust as needed
+    order_amount = int(repair_request.issue_type.price) * 100 if repair_request.issue_type and repair_request.issue_type.price else 0
+
+    data = {
+        "amount": order_amount,
+        "currency": "INR",
+        "receipt": f"repair_rcptid_{repair_id}"
+    }
+    payment = client.order.create(data=data)
+
+    new_payment = RepairPayment(
+        order=repair_request,
+        razor_pay_order_id=payment['id'],
+        amount=order_amount,
+        is_paid=True,
+        customer=request.user
+    )
+    new_payment.save()
+
+    # Handle other logic here (e.g., updating repair_request status)
+
+    messages.success(request, 'Payment successfully done.')
+    return redirect('user_repair_history')

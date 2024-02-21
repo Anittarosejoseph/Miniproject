@@ -710,10 +710,9 @@ th.action-header {
                     <th>Warranty Duration</th>
                     <th>Image Upload</th>
                     <th>Created At</th>
-                    <th>Action</th> <!-- Add this column for the buttons -->
+                    <th>Action</th> 
                 </tr>
-            </thead>
-            <tbody>
+            </thead><tbody>
                 {% for repair_request in repair_requests %}
                     <tr>
                         <td>{{ repair_request.user }}</td>
@@ -746,8 +745,10 @@ th.action-header {
                                 <a href="{% url 'reject_repair' repair_request.id %}" class="btn btn-danger">Reject</a>
                             {% endif %}
                         </td>
+                     
                     </tr>
                 {% endfor %}
+                        
             </tbody>
         </table>
     </div>
