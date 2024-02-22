@@ -371,7 +371,7 @@
                     <div class="form-group">
                         <label for="issueType">Select the Issue Type:</label>
                         <label for="selectedService">Select a Service:</label>
-    <select class="form-control" id="selectedService" name="selectedService">
+    <select class="form-control" id="selectedService" name="selectedService" required>
         <option value="">-- Select a Service --</option>
         {% for service in services %}
             <option value="{{ service.id }}">{{ service.issue_type }} - {{ service.price }}</option>
@@ -393,7 +393,36 @@
                     <div class="form-group">
                         <label for="purchaseDate">Purchase Date:</label>
                         <input type="date" class="form-control" id="purchaseDate" name="purchaseDate" required 
-                               min="2001-01-01" max="2024-12-31">
+       min="2001-01-01" max="2024-02-22">
+
+                               <script>
+                                document.addEventListener('DOMContentLoaded', function () {
+                                    document.getElementById('yourFormId').addEventListener('submit', function (event) {
+                                        var purchaseDateInput = document.getElementById('purchaseDate');
+                                        var purchaseDateValue = purchaseDateInput.value;
+                            
+                                        // Check if the purchase date is empty
+                                        if (purchaseDateValue.trim() === '') {
+                                            alert('Purchase date cannot be empty. Please enter a valid date.');
+                                            event.preventDefault();  // Prevent the form submission
+                                        } else {
+                                            // Validate the date format
+                                            if (!isValidDateFormat(purchaseDateValue)) {
+                                                alert('Invalid date format. Please enter a date in YYYY-MM-DD format.');
+                                                event.preventDefault();  // Prevent the form submission
+                                            }
+                                        }
+                                    });
+                            
+                                    function isValidDateFormat(dateString) {
+                                        // Regular expression to match YYYY-MM-DD format
+                                        var regex = /^\d{4}-\d{2}-\d{2}$/;
+                                        return regex.test(dateString);
+                                    }
+                                });
+                            </script>
+                            
+                            
                                </div>
 
                     <div class="form-group">
@@ -408,8 +437,8 @@
                     
                  
                     <form id="repairForm" method="post" action="{% url 'repair' %}">
-                        <button type="button" class="btn btn-primary" onclick="submitForm()">Submit</button>
-                   </form>
+                        <button type="submit" class="btn btn-primary">Submit</button>
+                    </form>
                     
 
                 </form>
@@ -423,57 +452,93 @@
     <script src="https://maxcdn.bootstrapcdn.com/bootstrap/4.0.0/js/bootstrap.min.js"></script>
     
     <script>
-        function submitForm() {
-            // Get the purchase date and warranty duration values
-            var purchaseDate = document.getElementById("purchaseDate").value;
-            var warrantyDuration = document.getElementById("warrantyDuration").value;
+        document.addEventListener('DOMContentLoaded', function () {
+            document.getElementById('repairForm').addEventListener('submit', function (event) {
+                var nameInput = document.getElementById('id_name');
+                var mobileInput = document.getElementById('id_mobile');
+                var purchaseDateInput = document.getElementById('purchaseDate');
+                var watchNameInput = document.getElementById('watchName');
+                var watchBrandInput = document.getElementById('watchBrand');
+                var selectedServiceInput = document.getElementById('selectedService');
+                var issueDescriptionInput = document.getElementById('issueDescription');
+                var warrantyDurationInput = document.getElementById('warrantyDuration');
     
-            // Check if warranty is not applicable
-            if (warrantyDuration === "0") {
-                // If "Not Applicable", submit the form
-                document.getElementById("repairForm").submit();
-            } else {
-                // Convert purchaseDate string to a Date object
-                var purchaseDateObj = new Date(purchaseDate);
-    
-                // Calculate the warranty end date by adding warranty duration to purchase date
-                var warrantyEndDate = new Date(purchaseDateObj);
-                warrantyEndDate.setMonth(warrantyEndDate.getMonth() + parseInt(warrantyDuration));
-    
-                // Get the current date
-                var currentDate = new Date();
-    
-                // Compare the warranty end date with the current date
-                if (warrantyEndDate < currentDate) {
-                    // If warranty is not applicable, show an alert
-                    alert("Warranty not applicable. Please check the warranty duration.");
-                } else {
-                    // If everything is valid, submit the form
-                    document.getElementById("repairForm").submit();
+                // Check if the name field is empty
+                if (nameInput.value.trim() === '') {
+                    alert('Name cannot be empty. Please enter a valid name.');
+                    event.preventDefault();
+                    return;
                 }
-            }
-        }
-         
-        
-    function submitForm() {
-        // Validate all fields before submitting the form
-        var name = document.getElementById("id_name").value;
-        var email = document.getElementById("id_mobile").value;
-        var watchName = document.getElementById("watchName").value;
-        var watchBrand = document.getElementById("watchBrand").value;
-        var selectedService = document.getElementById("selectedService").value;
-        var issueDescription = document.getElementById("issueDescription").value;
-
-        // Check if any of the mandatory fields is empty
-        if (!name || !email || !watchName || !watchBrand || !selectedService || !issueDescription) {
-            alert("Please fill in all mandatory fields.");
-        } else {
-            // If all fields are filled, submit the form
-            document.getElementById("repairForm").submit();
-        }
-    }
-
-</script>   
+    
+                // Check if the email field is empty
+                if (mobileInput.value.trim() === '') {
+                    alert('Email cannot be empty. Please enter a valid email.');
+                    event.preventDefault();
+                    return;
+                }
+    
+                // Check other fields similarly...
+                if (watchNameInput.value.trim() === '') {
+                    alert('Watch Name cannot be empty. Please select a watch name.');
+                    event.preventDefault();
+                    return;
+                }
+    
+                if (watchBrandInput.value.trim() === '') {
+                    alert('Watch Model Number cannot be empty. Please select a model number.');
+                    event.preventDefault();
+                    return;
+                }
+    
+                if (selectedServiceInput.value.trim() === '') {
+                    alert('Service cannot be empty. Please select a service.');
+                    event.preventDefault();
+                    return;
+                }
+    
+                if (issueDescriptionInput.value.trim() === '') {
+                    alert('Issue Description cannot be empty. Please describe the issue.');
+                    event.preventDefault();
+                    return;
+                }
+    
+                // Check if purchase date is empty
+                if (purchaseDateInput.value.trim() === '') {
+                    alert('Purchase date cannot be empty. Please enter a valid date.');
+                    event.preventDefault();
+                    return;
+                }
+    
+                // Check if warranty is not applicable
+                var warrantyDuration = warrantyDurationInput.value;
+                if (warrantyDuration === "0") {
+                    // If "Not Applicable", submit the form
+                    document.getElementById("repairForm").submit();
+                } else {
+                    // Convert purchaseDate string to a Date object
+                    var purchaseDateObj = new Date(purchaseDateInput.value);
+    
+                    // Calculate the warranty end date by adding warranty duration to purchase date
+                    var warrantyEndDate = new Date(purchaseDateObj);
+                    warrantyEndDate.setMonth(warrantyEndDate.getMonth() + parseInt(warrantyDuration));
+    
+                    // Get the current date
+                    var currentDate = new Date();
+    
+                    // Compare the warranty end date with the current date
+                    if (warrantyEndDate < currentDate) {
+                        // If warranty is not applicable, show an alert
+                        alert("Warranty not applicable. Please check the warranty duration.");
+                        event.preventDefault();
+                    } else {
+                        // If everything is valid, submit the form
+                        document.getElementById("repairForm").submit();
+                    }
+                }
+            });
+        });
+    </script>
+    
 </body>
 </html>
 {% endblock %}
