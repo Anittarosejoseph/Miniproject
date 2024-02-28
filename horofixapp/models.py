@@ -177,7 +177,7 @@ from django.db import models
 
 class WatchProduct(models.Model):
     product_name = models.CharField(max_length=255, unique=True,null=True) 
-    watch_modelnumber = models.CharField(max_length=255, unique=True, null=True)
+    watch_modelnumber = models.CharField(max_length=255, null=True)
     watch_serial_number = models.CharField(max_length=255, unique=True, null=True)
     watch_description = models.TextField()
     watch_image = models.ImageField(upload_to='watch_images/', null=True, blank=True)
@@ -298,22 +298,6 @@ class ShippingAddress(models.Model):
         return f"{self.street_address}, {self.city}, {self.state} - {self.pincode}"
 
 
-class Repair(models.Model):
-    watch = models.ForeignKey(WatchProduct, on_delete=models.CASCADE)
-    issue_description = models.TextField()
-    requested_by = models.ForeignKey(CustomUser, on_delete=models.CASCADE)
-    date_requested = models.DateTimeField(auto_now_add=True)
-    status_choices = [
-        ('Pending', 'Pending'),
-        ('In Progress', 'In Progress'),
-        ('Completed', 'Completed'),
-    ]
-    status = models.CharField(max_length=20, choices=status_choices, default='Pending')
-
-    def __str__(self):
-        return f"Repair for {self.watch.brand} - {self.watch.model}"
-
-# ... (your existing code continues)
 class Customer(models.Model):
     user = models.OneToOneField(CustomUser, on_delete=models.CASCADE)
     latitude = models.DecimalField(max_digits=9, decimal_places=6, null=True, blank=True)
@@ -326,12 +310,7 @@ class Customer(models.Model):
         return self.user.email
 from django.db import models
 
-class WatchRepairService(models.Model):
-    issue_type = models.CharField(max_length=255, unique=True)
-    price = models.DecimalField(max_digits=10, decimal_places=2)
 
-    def __str__(self):
-        return self.issue_type
 
 
 
@@ -369,15 +348,21 @@ class ChatMessage(models.Model):
     message = models.TextField()
     timestamp = models.DateTimeField(auto_now_add=True)
 
-# models.py
 from django.db import models
 from django.utils import timezone
+
+class WatchRepairService(models.Model):
+    issue_type = models.CharField(max_length=255, unique=True)
+    price = models.DecimalField(max_digits=10, decimal_places=2)
+
+    def __str__(self):
+        return self.issue_type
 
 class WatchRepairRequest(models.Model):
     user = models.ForeignKey(CustomUser, on_delete=models.CASCADE)
     watch_name = models.CharField(max_length=255, null=True)
     watch_model_number = models.CharField(max_length=255, null=True)
-    issue_type = models.ForeignKey(WatchRepairService, on_delete=models.CASCADE, null=True)
+    issue_types = models.ManyToManyField(WatchRepairService)
     issue_description = models.TextField(null=True)
     image_upload = models.ImageField(upload_to='watch_images/', null=True, blank=True)
     additional_info = models.TextField(blank=True, null=True)
@@ -387,19 +372,22 @@ class WatchRepairRequest(models.Model):
     is_approved = models.BooleanField(default=False)  
     is_rejected = models.BooleanField(default=False)  
 
+   
+
     def __str__(self):
         return f"{self.user.name}'s Watch Repair Request"
 
-
-
 class RepairPayment(models.Model):
-    
     order = models.ForeignKey(WatchRepairRequest, on_delete=models.CASCADE)
     razor_pay_order_id = models.CharField(max_length=255)
-    amount = models.DecimalField(max_digits=10, decimal_places=2)
+    amount = models.IntegerField()  # or DecimalField, depending on your requirements
     is_paid = models.BooleanField(default=False)
     customer = models.ForeignKey(CustomUser, on_delete=models.CASCADE)
-    created_at = models.DateTimeField(auto_now_add=True)
+    created_at = models.DateTimeField(default=timezone.now)
+
+    # other fields...
 
     def __str__(self):
-        return f"Payment for Repair Request: {self.order}"
+        return f"Payment for Repair Request: {self.order.user.name}'s Watch Repair Request"
+
+

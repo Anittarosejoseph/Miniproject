@@ -176,8 +176,10 @@ Horofix            </span>
                 <tr>
                     <td>{{ repair.watch_name }}</td>
                     <td>{{ repair.watch_model_number }}</td>
-                    <td>{{ repair.issue_type }}</td>
-                    <td>{{ repair.issue_description }}</td>
+                    <td>
+                      {{ repair.issue_types.all|join:", " }}
+                  </td>
+                                      <td>{{ repair.issue_description }}</td>
                     <td>{{ repair.additional_info }}</td>
                     <td>{{ repair.purchase_date }}</td>
                     <td>{{ repair.warranty_duration }}</td>

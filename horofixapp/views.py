@@ -1352,7 +1352,6 @@ def techlist(request):
 
 from django.shortcuts import render
 from django.contrib.auth.decorators import login_required
-from .models import Repair  # Import the correct model
 
 @login_required(login_url='login')  # Ensure the user is logged in
 def techindex(request):
@@ -1395,23 +1394,29 @@ def repairing(request):
 def thank_you_page(request):
     return render(request, 'thank_you_page.html')
 
-
-
-from django.shortcuts import render, redirect
+from .models import WatchRepairService, WatchRepairRequest
 from django.core.mail import send_mail
 from django.template.loader import render_to_string
-from django.contrib import messages
+from django.utils.html import strip_tags
 from django.conf import settings
+from django.contrib.auth.decorators import login_required
+from django.shortcuts import render, redirect
+from django.contrib import messages
+from .models import WatchRepairService, WatchRepairRequest
+from django.core.mail import send_mail
+from django.template.loader import render_to_string
+from django.utils.html import strip_tags
+from django.conf import settings
+from django.contrib.auth.decorators import login_required
+
 @login_required
 def repair(request):
     services = WatchRepairService.objects.all()
 
     if request.method == 'POST':
-        # Retrieve form data
         user = request.user
         watch_name = request.POST.get('watchName')
         watch_model_number = request.POST.get('watchBrand')
-        selected_service_id = request.POST.get('selectedService')
         issue_description = request.POST.get('issueDescription')
         image_upload = request.FILES.get('imageUpload')
         additional_info = request.POST.get('additionalInfo')
@@ -1430,11 +1435,11 @@ def repair(request):
             warranty_duration=warranty_duration,
         )
 
-        if selected_service_id:
-            selected_service = WatchRepairService.objects.get(pk=selected_service_id)
-            # Associate the selected service with the repair request
-            repair_request.issue_type = selected_service
-            repair_request.save()
+        # Retrieve selected services from the form
+        selected_services = request.POST.getlist('selectedService')
+
+        # Add selected services to the issue_types field of the repair_request
+        repair_request.issue_types.add(*selected_services)
 
         # Send email
         subject = 'Watch Repair Request Submitted'
@@ -1446,7 +1451,8 @@ def repair(request):
         # Redirect to thank-you page
         messages.success(request, 'Your watch repair request has been submitted successfully!')
         return redirect('thank_you_page')
-    return render(request, 'repair.html',{'services': services})
+
+    return render(request, 'repair.html', {'services': services})
 
 
 from django.core.mail import EmailMessage
@@ -1518,14 +1524,14 @@ def watchrepairrequest_list(request):
     return render(request, 'watchrepairrequest_list.html', {'repair_requests': repair_requests})
 def send_approval_email(repair):
     subject = 'Watch Repair Request Approved'
-    message = f'Your watch repair request with ID {repair.id} has been approved.'
+    message = f'Your watch repair request for {repair.watch_name} with ID {repair.id} has been approved. The watch will be sent to Horofix, Kochi, Kerala. Address: Horofix, Kochi, Kerala, 7306139495. Email: anittarosejoseph2024a@mca.ajce.in'
     from_email = 'anittarosejoseph2024a@mca.ajce.in'  # Update with your email
     recipient_list = [repair.user.email]  # Access user's email through the ForeignKey relationship
     send_mail(subject, message, from_email, recipient_list)
 
 def send_rejection_email(repair):
     subject = 'Watch Repair Request Rejected'
-    message = f'Your watch repair request with ID {repair.id} has been rejected.'
+    message = f'Sorry, your watch repair request for {repair.watch_name} with ID {repair.id} has been rejected. If you have any questions, please contact us at anittarosejoseph2024a@mca.ajce.in'
     from_email = 'anittarosejoseph2024a@mca.ajce.in'  # Update with your email
     recipient_list = [repair.user.email]  # Access user's email through the ForeignKey relationship
     send_mail(subject, message, from_email, recipient_list)
@@ -1577,10 +1583,13 @@ def messages_page(request):
 from django.shortcuts import render
 from django.contrib.auth.decorators import login_required
 
+from django.shortcuts import render
+from django.contrib.auth.decorators import login_required
+
 @login_required
 def user_repair_history(request):
-    # Fetch repair history for the logged-in user with payment details
-    repair_history = WatchRepairRequest.objects.filter(user=request.user)
+    # Fetch repair history for the logged-in user with issue_types
+    repair_history = WatchRepairRequest.objects.filter(user=request.user).prefetch_related('issue_types')
     
     # Fetch payment details for each repair request
     for repair in repair_history:
@@ -1622,10 +1631,12 @@ from django.conf import settings
 import razorpay
 from django.template.defaultfilters import floatformat
 
+from decimal import Decimal  # Add this import
+
 def repair_payment(request, repair_id):
     if request.method == 'POST':
         repair_request = get_object_or_404(WatchRepairRequest, pk=repair_id)
-        
+
         # Load Razorpay API key and secret from settings
         razorpay_key = settings.RAZOR_KEY_ID
         razorpay_secret = settings.RAZOR_KEY_SECRET
@@ -1633,10 +1644,10 @@ def repair_payment(request, repair_id):
         client = razorpay.Client(auth=(razorpay_key, razorpay_secret))
 
         # Example amount calculation, adjust as needed
-        order_amount = int(repair_request.issue_type.price) * 100 if repair_request.issue_type and repair_request.issue_type.price else 0
+        order_amount = sum(issue.price for issue in repair_request.issue_types.all()) * 100
 
         data = {
-            "amount": order_amount,
+            "amount": float(order_amount),  # Convert to float here
             "currency": "INR",
             "receipt": f"repair_rcptid_{repair_id}"
         }
@@ -1644,7 +1655,7 @@ def repair_payment(request, repair_id):
 
         rupee_amount = floatformat(payment['amount'] / 100, 2)
         return render(request, 'repair_payment.html', {'payment': payment, 'repair_request': repair_request, 'rupee_amount': rupee_amount})
-    
+
 
 def repair_payment_success(request, repair_id):
     repair_request = get_object_or_404(WatchRepairRequest, pk=repair_id)
@@ -1655,8 +1666,8 @@ def repair_payment_success(request, repair_id):
 
     client = razorpay.Client(auth=(razorpay_key, razorpay_secret))
 
-    # Example amount calculation, adjust as needed
-    order_amount = int(repair_request.issue_type.price) * 100 if repair_request.issue_type and repair_request.issue_type.price else 0
+    # Corrected amount calculation for multiple issue_types
+    order_amount = int(sum(issue.price for issue in repair_request.issue_types.all()) * 100)
 
     data = {
         "amount": order_amount,
@@ -1673,12 +1684,12 @@ def repair_payment_success(request, repair_id):
         customer=request.user
     )
     new_payment.save()
+    send_payment_confirmation_email(request.user.email, repair_request, order_amount)
 
     # Handle other logic here (e.g., updating repair_request status)
 
     messages.success(request, 'Payment successfully done.')
     return redirect('user_repair_history')
-# views.py
 
 from django.shortcuts import render, get_object_or_404
 from .models import WatchRepairRequest, RepairPayment
@@ -1693,3 +1704,14 @@ def view_bill(request, repair_id):
     }
 
     return render(request, 'view_bill.html', context)
+# horofixapp/utils.pyen
+from django.core.mail import send_mail
+from django.conf import settings
+
+def send_payment_confirmation_email(user_email, repair_request, amount):
+    subject = 'Payment Confirmation'
+    message = f'Thank you for your payment of {amount} INR. Your repair request (ID: {repair_request.id}) has been successfully processed.'
+    from_email = settings.DEFAULT_FROM_EMAIL
+    recipient_list = [user_email]
+
+    send_mail(subject, message, from_email, recipient_list)

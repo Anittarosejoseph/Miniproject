@@ -364,20 +364,16 @@
 </div>
 
 <!-- Your existing HTML code -->
-
-
-
-                    
-                    <div class="form-group">
-                        <label for="issueType">Select the Issue Type:</label>
-                        <label for="selectedService">Select a Service:</label>
-    <select class="form-control" id="selectedService" name="selectedService" required>
-        <option value="">-- Select a Service --</option>
-        {% for service in services %}
-            <option value="{{ service.id }}">{{ service.issue_type }} - {{ service.price }}</option>
-        {% endfor %}
-    </select>
-                    </div>
+<div class="form-group">
+    <label for="selectedService">Select the Issue Type:</label>
+    
+    {% for service in services %}
+        <div class="form-check">
+            <input type="checkbox" class="form-check-input" id="service-{{ service.id }}" name="selectedService" value="{{ service.id }}">
+            <label class="form-check-label" for="service-{{ service.id }}">{{ service.issue_type }} - {{ service.price }}</label>
+        </div>
+    {% endfor %}
+</div>
                     <div class="form-group">
                         <label for="issueDescription">Describe the Issue:</label>
                         <textarea class="form-control" id="issueDescription" name="issueDescription"  rows="3" required></textarea>

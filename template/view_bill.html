@@ -38,11 +38,11 @@
             background-color: #dc3545;
             color: #fff;
         }
-        /* Add any additional styles as needed */
+        /* Add any other relevant styles */
     </style>
 </head>
 <body>
-    <h1>Order Bill</h1>
+    <h1><center>Order Bill</center></h1>
 
     <h2>Order ID: {{ repair.id }}</h2>
     <p>Watch Name: {{ repair.watch_name }}</p>
@@ -76,7 +76,7 @@
                 {% for payment in payments %}
                     <tr>
                         <td>{{ payment.razor_pay_order_id }}</td>
-                        <td>${{ payment.amount }}</td>
+                        <td>${{ payment.amount|floatformat:2 }}</td>
                         <td>{% if payment.is_paid %}<span class="badge badge-success">Paid</span>{% else %}<span class="badge badge-danger">Not Paid</span>{% endif %}</td>
                         <td>{{ payment.created_at }}</td>
                     </tr>

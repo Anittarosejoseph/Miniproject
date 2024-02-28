@@ -1,3 +1,4 @@
+
 {% load static %}
 <!DOCTYPE html>
 <html lang="en">
@@ -537,6 +538,15 @@ th.action-header {
             </div>
             
             
+            <div class="button-row">
+                <b><a href="{% url 'add_product' %}" id="addTestLink"class="button-link">Add Product</a></b>
+                <b><a href="{% url 'view_products' %}"id="addStaffLink" class="button-link">View Product</a></b>
+                
+                <b><a href="{% url 'deliveryteamreg' %}"id="addproductLink" class="button-link">Add DeliveryTeam</a></b>
+                <b><a href="{% url 'techreg' %}"id="addtechLink" class="button-link">Add Technician</a></b>
+                <b><a href="{% url 'add_service' %}" id="addServiceLink"class="button-link">Add Service</a></b>
+
+            </div>
             
                    <div class="dropdown">
                         <button class="btn btn-secondary dropdown-toggle" type="button" id="userProfileDropdown" data-toggle="dropdown" aria-haspopup="true" aria-expanded="false">
@@ -587,7 +597,7 @@ th.action-header {
                         </div>
                     </a>
                     {% if user.is_superuser %}
-                        <a href="">
+                        <a href="{% url 'watchrepairrequest_list' %}">
                         <div class="nav-option option3">
                             <img src=
     "https://media.geeksforgeeks.org/wp-content/uploads/20221210183320/5.png"
@@ -606,8 +616,26 @@ th.action-header {
                             <h3 style="font-size: 17px;"> DeliveryTeam</h3>
                         </div>
                     </a>
+                    <a href="{% url 'messages_page' %}">
+                        <div class="nav-option option4">
+                            <img src=
+    "https://media.geeksforgeeks.org/wp-content/uploads/20221210183321/6.png"
+                                class="nav-img"
+                                alt="institution">
+                            <h3 style="font-size: 17px;"> Chatroom</h3>
+                        </div>
+                    </a>
+                    <a href="{% url 'view_service' %}">
+                        <div class="nav-option option4">
+                            <img src=
+    "https://media.geeksforgeeks.org/wp-content/uploads/20221210183321/6.png"
+                                class="nav-img"
+                                alt="institution">
+                            <h3 style="font-size: 17px;"> View Servivces</h3>
+                        </div>
+                    </a>
                     {% if user.is_superuser %}
-                        <a href="">
+                        <a href="{% url 'techlist' %}">
                         <div class="nav-option option3">
                             <img src=
     "https://media.geeksforgeeks.org/wp-content/uploads/20221210183320/5.png"
@@ -618,19 +646,13 @@ th.action-header {
                         </a>
                         {% endif %}
     
-
-    
-    
-    
-                      
-    
                     </div>
                 </nav>
             </div>
-         
-                   
-              
+                
+                
     
+                
                
         <script src="{% static '/assets/js/jquery-3.5.1.min.js'%}"></script>
 

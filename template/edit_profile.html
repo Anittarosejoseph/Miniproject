@@ -1,5 +1,140 @@
+{% load static %}
+       
+   {% block content %}
+   
+<!DOCTYPE html>
+<html lang="en">
 
-{% block content %}
+<head>
+  <style>
+       .hero_area {
+        background-size: cover;
+        background-position: center;
+        background-repeat: no-repeat;
+        height: auto; /* Adjust the height as needed */
+    }
+    .customization-section,
+.repair-section {
+    background-color: rgba(255, 255, 255, 0.8); /* Adjust the alpha value as needed */
+    padding: 100px;
+    border-radius: 1000px;
+    margin-bottom: 20000px;
+    box-shadow: 10px 10px 10px rgba(0, 0, 0, 0.1);
+    text-align: center;
+}
+.customization-section{
+    height: 750px;
+    background-color: rgba(140, 146, 141, 0.8); /* Adjust the alpha value as needed */
+
+
+}
+
+
+.repair-section {
+    background-color: rgba(140, 146, 141, 0.8); /* Adjust the alpha value as needed */
+    padding: 200px;
+    height: 750px;
+}
+.repair-section p {
+            color: #000; /* Black color for paragraph text */
+        }
+
+
+
+        h2 {
+            color: #060a0e;
+            margin-bottom: 20px;
+        }
+
+        h4 {
+            color: #131b24;
+        }
+    
+
+  </style>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title> Editprofile</title>
+    <!-- Bootstrap core CSS -->
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.0.2/dist/css/bootstrap.min.css" rel="stylesheet" integrity="sha384-EVSTQN3/azprG1Anm3QDgpJLIm9Nao0Yz1ztcQTwFspd3yD65VohhpuuCOmLASjC" crossorigin="anonymous">
+
+    <!-- Custom styles -->
+    <link rel="stylesheet" type="text/css" href="{% static 'css/stc.css' %}">
+    <link rel="stylesheet" type="text/css" href="{% static '/css/bootstrap.css' %}" />
+    <link href="https://fonts.googleapis.com/css2?family=Roboto:wght@400;500;700;900&display=swap" rel="stylesheet">
+    <link href="{% static '/css/font-awesome.min.css' %}" rel="stylesheet" />
+    <link href="{% static '/css/style.css' %}" rel="stylesheet" />
+    <link href="{% static '/css/responsive.css' %}" rel="stylesheet" />
+
+    <script>
+        // JavaScript function to navigate to the index page
+        function goToIndex() {
+            window.location.href = '/'; // Replace '/' with the actual URL of your index page
+        }
+    </script>
+</head>
+
+<body>
+    <div class="hero_area">
+        <!-- header section starts -->
+        <header class="header_section">
+            <div class="container-fluid">
+                <nav class="navbar navbar-expand-lg custom_nav-container ">
+                    <a class="navbar-brand" href="index.html">
+                        <span>
+                            HOROFIX
+                        </span>
+                    </a>
+
+                    <button class="navbar-toggler" type="button" data-toggle="collapse" data-target="#navbarSupportedContent" aria-controls="navbarSupportedContent" aria-expanded="false" aria-label="Toggle navigation">
+                        <span class=""> </span>
+                    </button>
+
+                    <div class="collapse navbar-collapse" id="navbarSupportedContent">
+                        <ul class="navbar-nav  ">
+                            <li class="nav-item ">
+                                <a class="nav-link" href="{% url 'index' %}">Home</a>
+                            </li>
+                            <li class="nav-item">
+                                <a class="nav-link" href="{% url 'about' %}">About</a>
+                            </li>
+                            <li class="nav-item">
+                                <a class="nav-link" href="{% url 'customer_products' %}">Products</a>
+                            </li>
+                            <li class="nav-item">
+                                <a class="nav-link" href="{% url 'service' %}">Services</a>
+                            </li>
+                            <li class="nav-item">
+                                <a class="nav-link" href="{% url 'faq' %}">Testimonial</a>
+                            </li>
+                            <li class="nav-item">
+                                <a class="nav-link" href="contact.html">Contact Us</a>
+                            </li>
+
+                            <div class="user_optio_box">
+                                {% if request.session.is_authenticated %}
+                                <!-- Display "Logout" button when the user is authenticated -->
+                                <a href="{% url 'logout' %}">
+                                    <i class="fa fa-sign-out" aria-hidden="true"></i> Logout<span class="sr-only">(current)</span>
+                                </a>
+                                {% else %}
+                                <!-- Display "Login" link when the user is not authenticated -->
+                                <a href="{% url 'login' %}">
+                                    <i class="fa fa-sign-in" aria-hidden="true"></i> Login
+                                </a>
+                                {% endif %}
+
+                                <li class="nav-item" active>
+                                    <a class="nav-link" href="{% url 'Customer_Profile' %}"><i class="fa fa-user" aria-hidden="true"></i></a>
+                                </li>
+                              
+                            </div>
+                        </ul>
+                    </div>
+                </nav>
+            </div>
+        </header>
+
 <script type='text/javascript' src='https://www.bing.com/api/maps/mapcontrol?callback=GetMap' async defer></script>
 <style media="screen">
     body {
@@ -440,13 +575,7 @@ function validateAddress() {
         return false;
     }
 
-    // Check if the address contains a valid postal code format (e.g., 12345 or 12345-6789)
-    //if (!/^\d{5}(?:-\d{4})?$/.test(address)) {
-     //   addressError.textContent = "Invalid postal code format (e.g., 12345 or 12345-6789).";
-      //  return false;
-    //}
-
-    // Check if the address doesn't contain certain restricted words
+   
     var restrictedWords = ["po box", "box", "p.o. box"];
     var containsRestrictedWord = restrictedWords.some(word => address.toLowerCase().includes(word));
     if (containsRestrictedWord) {
@@ -454,7 +583,6 @@ function validateAddress() {
         return false;
     }
 
-    // You can add more validation rules here as needed
     
    
 }
