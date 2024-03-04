@@ -692,7 +692,8 @@ th.action-header {
         
       <div class="container">
         <h1>Watch Repair Requests</h1>
-    
+        <p>Total Repair Requests: {{ repair_request_count }}</p>
+
         <table border="1">
             <thead>
                 <tr>
@@ -706,15 +707,18 @@ th.action-header {
                     <th>Warranty Duration</th>
                     <th>Image Upload</th>
                     <th>Created At</th>
-                    <th>Action</th> 
+                    <th>Action</th>
                 </tr>
-            </thead><tbody>
+            </thead>
+            <tbody>
                 {% for repair_request in repair_requests %}
                     <tr>
                         <td>{{ repair_request.user }}</td>
                         <td>{{ repair_request.watch_name }}</td>
                         <td>{{ repair_request.watch_model_number }}</td>
-                        <td>{{ repair_request.issue_type }}</td>
+                        <td>
+                            {{ repair_request.issue_types.all|join:", " }}
+                        </td>
                         <td>{{ repair_request.issue_description }}</td>
                         <td>{{ repair_request.additional_info }}</td>
                         <td>{{ repair_request.purchase_date }}</td>

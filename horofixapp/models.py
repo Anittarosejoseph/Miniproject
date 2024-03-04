@@ -6,7 +6,10 @@ from django.db.models.signals import post_save
 from django.dispatch import receiver
 from django.contrib.auth.models import AbstractUser, BaseUserManager
 from django.db.models import Q
-
+from django.db import models
+from django.db.models.signals import post_save
+from django.dispatch import receiver
+from django.contrib import messages
 # Create your models here.
 
 class UserManager(BaseUserManager):
@@ -368,14 +371,16 @@ class WatchRepairRequest(models.Model):
     additional_info = models.TextField(blank=True, null=True)
     purchase_date = models.DateField(null=True)
     warranty_duration = models.IntegerField(null=True)
-    created_at = models.DateTimeField(default=timezone.now) 
-    is_approved = models.BooleanField(default=False)  
-    is_rejected = models.BooleanField(default=False)  
-
-   
+    created_at = models.DateTimeField(default=timezone.now)
+    is_approved = models.BooleanField(default=False)
+    is_rejected = models.BooleanField(default=False)
 
     def __str__(self):
         return f"{self.user.name}'s Watch Repair Request"
+
+   
+
+  
 
 class RepairPayment(models.Model):
     order = models.ForeignKey(WatchRepairRequest, on_delete=models.CASCADE)

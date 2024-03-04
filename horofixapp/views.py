@@ -1519,9 +1519,23 @@ def email_template(request):
 from django.core.mail import send_mail
 from django.shortcuts import render, get_object_or_404, redirect
 
+from django.core.mail import send_mail
+from django.shortcuts import render, get_object_or_404, redirect
+from django.db.models import Case, When, Value
+
 def watchrepairrequest_list(request):
-    repair_requests = WatchRepairRequest.objects.all()    
+    repair_requests = WatchRepairRequest.objects.all() \
+        .order_by(
+            '-created_at',
+            Case(
+                When(is_approved=True, then=Value(1)),
+                When(is_rejected=True, then=Value(2)),
+                default=Value(0),
+            ),
+        )
     return render(request, 'watchrepairrequest_list.html', {'repair_requests': repair_requests})
+
+
 def send_approval_email(repair):
     subject = 'Watch Repair Request Approved'
     message = f'Your watch repair request for {repair.watch_name} with ID {repair.id} has been approved. The watch will be sent to Horofix, Kochi, Kerala. Address: Horofix, Kochi, Kerala, 7306139495. Email: anittarosejoseph2024a@mca.ajce.in'
