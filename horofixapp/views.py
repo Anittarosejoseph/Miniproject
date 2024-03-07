@@ -1729,3 +1729,47 @@ def send_payment_confirmation_email(user_email, repair_request, amount):
     recipient_list = [user_email]
 
     send_mail(subject, message, from_email, recipient_list)
+from django.shortcuts import render, redirect
+from django.shortcuts import render, get_object_or_404
+from .models import WatchProduct, WatchCustomization
+from django.contrib import messages
+from django.contrib.auth.decorators import login_required
+
+@login_required
+def customize_watch(request, product_id):
+    product = get_object_or_404(WatchProduct, id=product_id)
+
+    if request.method == 'POST':
+        # Process the form data and save the customization
+        strap_material = request.POST.get('strap_material')
+        strap_color = request.POST.get('strap_color')
+        watch_color = request.POST.get('watch_color')
+        dial_shape = request.POST.get('dial_shape')
+        watch_size = request.POST.get('watch_size')
+        include_date = bool(request.POST.get('include_date', False))
+        watch_hands_color = request.POST.get('watch_hands_color')
+        include_backlight = bool(request.POST.get('include_backlight', False))
+        owner_name = request.POST.get('owner_name')
+
+        customization = WatchCustomization.objects.create(
+            strap_material=strap_material,
+            strap_color=strap_color,
+            watch_color=watch_color,
+            dial_shape=dial_shape,
+            watch_size=watch_size,
+            include_date=include_date,
+            watch_hands_color=watch_hands_color,
+            include_backlight=include_backlight,
+            owner_name=owner_name
+        )
+
+        # You may associate the customization with the product or user as needed
+        # For example: customization.product = product
+        # customization.user = request.user
+        # customization.save()
+
+        messages.success(request, 'Watch customized successfully!')
+        return render(request, 'customize_watch.html', {'product': product, 'customization': customization})
+
+    return render(request, 'customize_watch.html', {'product': product})
+

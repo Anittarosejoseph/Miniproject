@@ -396,3 +396,88 @@ class RepairPayment(models.Model):
         return f"Payment for Repair Request: {self.order.user.name}'s Watch Repair Request"
 
 
+class Appoinment(models.Model):
+   
+    preffered_date = models.DateField()
+    preffered_time = models.TimeField()
+    email = models.EmailField(null=True, blank=True)
+    phone_number = models.CharField(max_length=10, null=True, blank=True)
+    address = models.ForeignKey(
+        Address,
+        on_delete=models.SET_NULL,
+        null=True,
+        blank=True,
+    )
+   
+    appoinment_type = models.CharField(max_length=10)
+    user = models.ForeignKey(
+        CustomUser,
+        on_delete=models.SET_NULL,
+        null=True,
+        blank=True,
+    )
+    created_at = models.DateTimeField(auto_now_add=True)
+    updated_at = models.DateTimeField(auto_now=True)
+    prescription = models.FileField(
+        upload_to="media/prescriptions/",
+        null=True,
+        blank=True,
+    )
+    location = models.ForeignKey(
+        "Location",
+        on_delete=models.SET_NULL,
+        null=True,
+        blank=True,
+    )
+    amount = models.DecimalField(max_digits=10, decimal_places=2, null=True, blank=True)
+    razorpay_order_id = models.CharField(max_length=100, null=True, blank=True)
+    appointment_status = models.CharField(max_length=20,default='pending')
+   
+class Location(models.Model):
+    address = models.TextField(null=True,blank=True)
+    distance = models.DecimalField(max_digits=10, decimal_places=2,null=True,blank=True)
+    latitude = models.CharField(max_length=50,null=True,blank=True)
+    longitude = models.CharField(max_length=50,null=True,blank=True)
+# models.py
+
+from django.db import models
+
+class WatchCustomization(models.Model):
+    SIZE_CHOICES = [
+        ('small', 'Small'),
+        ('medium', 'Medium'),
+        ('large', 'Large'),
+    ]
+
+    STRAP_CHOICES = [
+        ('leather', 'Leather'),
+        ('metal', 'Metal'),
+        ('rubber', 'Rubber'),
+        ('nylon', 'Nylon'),
+    ]
+
+    DIAL_SHAPE_CHOICES = [
+        ('round', 'Round'),
+        ('square', 'Square'),
+        ('digital', 'Digital'),
+    ]
+
+    WATCH_HANDS_CHOICES = [
+        ('silver', 'Silver'),
+        ('gold', 'Gold'),
+        ('black', 'Black'),
+    ]
+
+    strap_material = models.CharField(max_length=50, choices=STRAP_CHOICES)
+    strap_color = models.CharField(max_length=50)
+    watch_color = models.CharField(max_length=50)
+    dial_shape = models.CharField(max_length=50, choices=DIAL_SHAPE_CHOICES)
+    watch_size = models.CharField(max_length=50, choices=SIZE_CHOICES)
+    include_date = models.BooleanField(default=False)
+    watch_hands_color = models.CharField(max_length=50, choices=WATCH_HANDS_CHOICES)
+    include_backlight = models.BooleanField(default=False)
+    owner_name = models.CharField(max_length=100)
+
+    def __str__(self):
+        return f"{self.owner_name}'s Customized Watch"
+

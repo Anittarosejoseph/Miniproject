@@ -90,7 +90,7 @@ urlpatterns = [
     path('view_bill/<int:repair_id>/', views.view_bill, name='view_bill'),
 
     path('view_service/', views.view_service, name='view_service'),
-
+    path('customize/<int:product_id>/', views.customize_watch, name='customize_watch'),
 
 ]
 

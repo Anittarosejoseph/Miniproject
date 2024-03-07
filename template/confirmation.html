@@ -1,0 +1,15 @@
+<!-- templates/confirmation.html -->
+
+{% extends 'base.html' %}
+
+{% block content %}
+    <h2>Customization Confirmation</h2>
+    <p>Thank you for customizing your watch!</p>
+    <p>Your customized watch details:</p>
+    <ul>
+        <li>Name: {{ customized_watch.name }}</li>
+        {% for customized_component in customized_watch.components.all %}
+            <li>{{ customized_component.component.name }} - {{ customized_component.customization_options }}</li>
+        {% endfor %}
+    </ul>
+{% endblock %}

@@ -1,0 +1,643 @@
+<div class="form-container">
+  <!-- Your form content goes here -->
+  <form method="POST" enctype="multipart/form-data">
+    {% csrf_token %}
+    <div class="frminput">
+
+
+      <h3>
+        <center><b><span style="color: rgb(146, 197, 236);">Book Now!</span></b></center>
+      </h3> <br><br>
+      <select name="test" id="testname" required>
+        {% for test in tests %}
+        <option value="{{ test.id }}" {% if request.GET.test == test.name %}selected{% endif %}>
+          {{ test.name }}
+        </option>
+        {% endfor %}
+      </select>
+     
+      <p>Preferred Date: <input type="date" id="preferred-date" name="date"  max="{{ fiveDaysLater }}" min="{{ today }}" pattern="\d{2}/\d{2}/\d{4}" title="Please enter a valid date in mm/dd/yyyy format" required></p>
+
+      <span id="preferred-date-error" class="error-message"></span>
+      <p>Preferred Time:
+        <select id="preferred-time" name="preferred-time">
+        </select>
+      </p>
+
+      
+
+      <div class="person-fields">
+        <div>
+          <input type="text" id="full_name" name="full_name" placeholder="Full name" required>
+          <span id="full_name_error" class="error-message"></span>
+          <select id="gender" name="gender" required>
+            <option value="" selected>Select Gender</option>
+            <option value="Male">Male</option>
+            <option value="Female">Female</option>
+          </select>
+          <input type="number" id="age" name="age" placeholder="Age" required>
+        </div>
+      </div>
+
+      <input type="text" id="email" name="email" placeholder="Email" required readonly value="{{user.email}}">
+      <span id="email_error" class="error-message"></span>
+      <input type="text" id="phone" name="phone" placeholder="Mobile" required readonly value="{{user.phone_number}}">
+      <span id="phone_error" class="error-message"></span>
+
+      <div class="radio-box">
+  <label class="radio-label">
+    <input type="radio" id="current-address-choice" name="address-choice" value="current-address" checked>
+    Use Current Address
+  </label>
+  <label class="radio-label">
+    <input type="radio" id="new-address-choice" name="address-choice" value="new-address">
+    Enter New Address
+  </label>
+</div>
+
+<div id="current-address-fields">
+  <!-- Fields for the current address -->
+  <input type="text" id="current-home-address" name="current-home-address" placeholder="Current Home Address" readonly value="{{user.address.street_address}}">
+  <input type="text" id="current-city" name="current-city" placeholder="Current City" readonly value="{{user.address.city}}">
+  <input type="text" id="current-pincode" name="current-pincode" placeholder="Current Pincode" readonly value="{{user.address.pincode}}">
+</div>
+
+<div id="new-address-fields" class="new-address-fields" style="display: none;">
+  <!-- Fields for the new address -->
+  <input type="text" id="new-home-address" name="new-home-address" placeholder="New Home Address">
+  <div class="error-message" id="new-home-address-error" style="color: red; display: none;"></div>   
+  <input type="text" id="new-city" name="new-city" placeholder="New City">
+  <div class="error-message" id="new-city-error" style="color: red; display: none;"></div>   
+  <input type="text" id="new-pincode" name="new-pincode" placeholder="New Pincode">
+  <div class="error-message" id="pincode-error" style="color: red; display: none;"></div>   
+</div>
+</div>
+      <!-- Additional tests checkboxes -->
+
+      <label class="agreecheck">
+        <input type="checkbox" id="additionalTestsCheckbox" name="additional_tests"
+          onclick="toggleAdditionalTestDropdown();">
+        <span>Add Additional Tests</span>
+      </label>
+
+      <!-- Additional test dropdown container -->
+      <div class="additional-test-container" id="additionalTestContainer">
+
+        <select id="additionalTestsSelect" name="additional_tests_select">
+          <option value="" selected>Select Test</option>
+          {% for test in tests %}
+          <option data-price="{{ test.price }}" value="{{ test.id }}">{{ test.name }}</option>
+          {% endfor %}
+        </select>
+      </div>
+      <br>
+
+      <span>Choose mode of sample collection :</span><br><br>
+      <div>
+        <label style="display: inline;">
+          <input type="radio" id="homeAppointment" name="appointmentType" value="Home" checked> Home
+        </label>
+        <label style="display: inline;">
+          <input type="radio" id="labAppointment" name="appointmentType" value="Lab"> Lab
+        </label>
+      </div>
+
+      <!-- Button trigger modal -->
+      <button type="button" class="btn btn-primary btn-sm mt-3" data-toggle="modal" data-target="#mapModal"
+      id="select-location">
+        Select Location
+      </button>
+
+      <!-- <select name="location" id="location" class="mt-3" required>
+        {% for location in locations %}
+        <option data-price="{{ location.amount }}" value="{{ location.id }}">
+          {{ location.name }}
+        </option>
+        {% endfor %}
+      </select> -->
+
+      <input type="number" hidden name="amount" id="total-amount" value="0.0">
+      <input type="text" hidden name="location-address" id="location-address">
+      <input type="text" hidden name="location-distance" id="location-distance">
+      <input type="text" hidden name="location-lat" id="location-lat">
+      <input type="text" hidden name="location-lng" id="location-lng">
+
+  </form>
+
+
+
+  <br>
+
+  <!-- Total amount calculation -->
+  <div>
+    <label style="padding-bottom: 8px; display:block;">
+      <span id="totalamnt"><strong>Test price: <span id="tprice"> Rs. </span></strong></span>
+    </label>
+    
+    <label id="hccrglbl">
+      <span id="totalamnt"><strong>Home Collection Charge: <span id="hcprice">Rs. 0</span></strong></span>
+    </label>
+
+    <label>
+      <span id="totalamnt"><strong>Total Amount: <span id="totalprice"> Rs.</span></strong></span>
+    </label>
+  </div>
+
+
+  <br>
+  <input type="hidden" id="coupontextbox" name="coupontextbox" value="">
+  <input type="hidden" id="product_id" name="product_id" value="77">
+  <input type="hidden" id="price" name="price" value="300">
+  <input type="hidden" name="currenturl" value="https://www.diagnosticcentres.in/health-checkup-packages/cbc-hemogram">
+  <input id="frmsubbtn" type="submit" class="frmsub" value="Book Now">
+  <input type="hidden" name="sunday" id="sunday" value="">
+</div>
+</form>
+</div>
+</div>
+
+<!-- Modal -->
+<div class="modal fade" id="mapModal" tabindex="-1" role="dialog" aria-labelledby="mapModalTitle" aria-hidden="true">
+  <div class="modal-dialog modal-dialog-centered" role="document">
+    <div class="modal-content">
+      <div class="modal-header">
+        <h5 class="modal-title" id="exampleModalLongTitle">Select Location</h5>
+        <button type="button" class="close" data-dismiss="modal" aria-label="Close">
+          <span aria-hidden="true">&times;</span>
+        </button>
+      </div>
+      <div class="modal-body">
+        <div id="map" style="height: 240px;"></div>
+      </div>
+      <div class="modal-footer">
+        <button type="button" class="btn btn-primary btn-sm" id="confirm-location">Confirm Location</button>
+      </div>
+    </div>
+  </div>
+</div>
+
+{% endblock %}
+{% block extra_js %}
+<script src="https://unpkg.com/leaflet@1.9.4/dist/leaflet.js"
+     integrity="sha256-20nQCchB9co0qIjJZRGuk2/Z9VM+kNiyxNV1lvTlZBo="
+     crossorigin=""></script>
+<script>
+  
+  function toggleAdditionalTestDropdown() {
+    const additionalTestsCheckbox = document.getElementById("additionalTestsCheckbox");
+    const additionalTestContainer = document.getElementById("additionalTestContainer");
+
+    if (additionalTestsCheckbox.checked) {
+      additionalTestContainer.style.display = "block";
+    } else {
+      additionalTestContainer.style.display = "none";
+    }
+  }
+ 
+  // Get the select element by its ID
+  const selectElement = document.getElementById('preferred-time');
+
+  // Function to add time options to the select field
+  function addTimeOptions() {
+    // Start time (09:00 AM) in 24-hour format
+    let startTime = 9;
+
+    // End time (05:30 PM) in 24-hour format
+    const endTime = 17.5; // 05:30 PM is equivalent to 17.5 hours
+
+    // Loop to generate time options
+    while (startTime <= endTime) {
+      // Convert the current time to a formatted string (hh:mm AM/PM)
+      const formattedTime = formatTime(startTime);
+
+      // Create an option element
+      const option = document.createElement('option');
+      option.value = startTime.toFixed(2).replace(".", ":"); // Use toFixed(2) to ensure two decimal places for half hours
+      option.text = formattedTime;
+
+      // Add the option to the select field
+      selectElement.appendChild(option);
+
+      // Increment time by 0.5 (30 minutes)
+      startTime += 0.5;
+    }
+  }
+
+  // Function to format time as hh:mm AM/PM
+  function formatTime(hours) {
+    const hour = Math.floor(hours);
+    const minutes = (hours % 1) * 60;
+    const ampm = hour >= 12 ? 'PM' : 'AM';
+    const formattedHour = hour % 12 === 0 ? 12 : hour % 12; // Convert 0 to 12 for 12:00 AM/PM
+    const formattedMinutes = minutes < 10 ? `0${minutes}` : minutes;
+
+    return `${formattedHour}:${formattedMinutes} ${ampm}`;
+  }
+
+  // Call the function to add time options
+  addTimeOptions();
+function toggleAddressFields() {
+    const currentAddressChoice = document.getElementById("current-address-choice");
+    const newAddressChoice = document.getElementById("new-address-choice");
+    const currentAddressFields = document.getElementById("current-address-fields");
+    const newAddressFields = document.getElementById("new-address-fields");
+
+    if (currentAddressChoice.checked) {
+      currentAddressFields.style.display = "block";
+      newAddressFields.style.display = "none";
+    } else if (newAddressChoice.checked) {
+      currentAddressFields.style.display = "none";
+      newAddressFields.style.display = "block";
+    } else {
+      currentAddressFields.style.display = "none";
+      newAddressFields.style.display = "none";
+    }
+  }
+
+  // Add event listeners to the radio buttons to detect changes
+  const currentAddressChoice = document.getElementById("current-address-choice");
+  const newAddressChoice = document.getElementById("new-address-choice");
+
+  currentAddressChoice.addEventListener("change", toggleAddressFields);
+  newAddressChoice.addEventListener("change", toggleAddressFields);
+
+  // Call the function to set the initial state
+  toggleAddressFields();
+
+  // Add an event listener to the radio buttons to detect changes
+  const fullNameField = document.getElementById("full_name");
+  const fullNameError = document.getElementById("full_name_error");
+  fullNameField.addEventListener("input", () => {
+  const fullName = fullNameField.value.trim();
+  const namePattern = /^[A-Za-z\s]+$/; // Regular expression to allow letters and spaces
+
+  if (!namePattern.test(fullName)) {
+    fullNameError.textContent = "Full name must contain only letters and spaces";
+    fullNameField.classList.add("invalid");
+  } else if (fullName.length < 2) {
+    fullNameError.textContent = "Full name must be at least 2 characters";
+    fullNameField.classList.add("invalid");
+  } else {
+    fullNameError.textContent = "";
+    fullNameField.classList.remove("invalid");
+  }
+});
+const emailField = document.getElementById("email");
+const emailError = document.getElementById("email_error");
+
+emailField.addEventListener("input", () => {
+  const email = emailField.value.trim();
+  const emailPattern = /^[a-zA-Z0-9._-]+@[a-zA-Z0-9.-]+\.[a-zA-Z]{2,4}$/;
+
+  if (!emailPattern.test(email)) {
+    emailError.textContent = "Please enter a valid email address";
+    emailField.classList.add("invalid");
+  } else {
+    emailError.textContent = "";
+    emailField.classList.remove("invalid");
+  }
+});
+
+const phoneField = document.getElementById("phone");
+const phoneError = document.getElementById("phone_error");
+
+phoneField.addEventListener("input", () => {
+  const phone = phoneField.value.trim();
+  const phonePattern = /^[0-9]{10}$/; // Regular expression to allow only 10 digits
+
+  if (!phonePattern.test(phone)) {
+    phoneError.textContent = "Please enter a valid 10-digit phone number";
+    phoneField.classList.add("invalid");
+  } else {
+    phoneError.textContent = "";
+    phoneField.classList.remove("invalid");
+  }
+});
+
+
+const testDropdown = document.getElementById("testname");
+  const testPriceElement = document.getElementById("tprice");
+  const homeCollectionChargeElement = document.getElementById("hcprice");
+  const totalAmountElement = document.getElementById("totalprice");
+  const additionalTestsSelect = document.getElementById("additionalTestsSelect");
+
+  // Function to fetch and update the test price based on the selected test
+  function updateTestPrice() {
+    const selectedOption = testDropdown.options[testDropdown.selectedIndex];
+    const testId = selectedOption.value;
+
+    fetch(`/get_test_price/?test_id=${testId}`) // Replace with your actual URL
+      .then(response => response.json())
+      .then(data => {
+        if (data.price !== null) {
+          testPriceElement.textContent = `Rs. ${parseFloat(data.price) || 0}`;
+          calculateTotalAmount(); // Recalculate total amount
+        } else {
+          testPriceElement.textContent = "Price not available";
+          totalAmountElement.textContent = "Total Amount: N/A";
+        }
+      })
+      .catch(error => {
+        console.error("Error fetching test price:", error);
+        testPriceElement.textContent = "Error fetching price";
+        totalAmountElement.textContent = "Total Amount: N/A";
+      });
+  }
+
+  // Function to calculate and update the total amount
+  function calculateTotalAmount() {
+    const testPrice = parseFloat(testPriceElement.textContent.replace("Rs. ", " ")) || 0;
+    const homeCollectionCharge = parseFloat(homeCollectionChargeElement.textContent.replace("Rs. ", " ")) || 0;
+    const totalAmountInput = document.getElementById("total-amount");
+
+    // Calculate the total amount including the selected additional tests
+    const additionalTestsTotalPrice = Array.from(additionalTestsSelect.selectedOptions)
+      .map(option => parseFloat(option.dataset.price) || 0)
+      .reduce((acc, price) => acc + price, 0);
+
+    const totalAmount = testPrice + homeCollectionCharge + additionalTestsTotalPrice;
+
+    if (!isNaN(totalAmount)) {
+      totalAmountElement.textContent = `Rs. ${totalAmount}`;
+      totalAmountInput.value = totalAmount;
+    } else {
+      totalAmountElement.textContent = "Total Amount: N/A";
+    }
+  }
+
+  // Add an event listener to the test dropdown to update the test price and total amount
+  testDropdown.addEventListener("change", updateTestPrice);
+
+  // Add an event listener to the additional tests dropdown to recalculate total amount on changes
+  additionalTestsSelect.addEventListener("change", calculateTotalAmount);
+
+  // Call the updateTestPrice function initially to set the default price
+  updateTestPrice();
+  const homeAppointment = document.getElementById("homeAppointment");
+  const labAppointment = document.getElementById("labAppointment");
+  const locationSelect = document.getElementById("select-location");
+
+  function updateHomeCollectionCharge() {
+    const FIXED_CHARGE = 20;
+    const PER_KM = 10;
+    let distance = window.kilometer;
+    let amount;
+
+    if (!homeAppointment.checked || !distance){
+      amount = 0;
+    }
+    else if (distance <= 1){
+      amount = FIXED_CHARGE;
+    }
+    else {
+      amount = (FIXED_CHARGE + (distance - 1) * PER_KM).toFixed(2);
+    }
+    
+    if (!isNaN(amount)) {
+      homeCollectionChargeElement.textContent = ` ${amount}`;
+      calculateTotalAmount(); // Recalculate total amount
+    } else {
+      homeCollectionChargeElement.textContent = " N/A";
+      totalAmountElement.textContent = " N/A";
+    }
+  }
+
+  // Add an event listener to the location dropdown to update home collection charge
+  // locationSelect.addEventListener("change", updateHomeCollectionCharge);
+
+  // Call the updateHomeCollectionCharge function initially to set the default home collection charge
+  updateHomeCollectionCharge();
+
+  function toggleLocationSelection() {
+    if (homeAppointment.checked) {
+      locationSelect.style.display = "block";
+    } else {
+      locationSelect.style.display = "none";
+    }
+    updateHomeCollectionCharge();
+  }
+
+  // Add event listeners to the radio buttons
+  homeAppointment.addEventListener("change", toggleLocationSelection);
+  labAppointment.addEventListener("change", toggleLocationSelection);
+
+  // Call the function to set the initial state
+  toggleLocationSelection();
+  const form = document.querySelector('form');
+  const submitButton = document.getElementById('frmsubbtn');
+
+  form.addEventListener('submit', function (event) {
+    // Prevent the default form submission
+    event.preventDefault();
+
+    // You can perform any additional actions here, such as form validation
+
+    // If everything is valid, you can submit the form
+    form.submit();
+  });
+
+  // Alternatively, you can also handle form submission when the "Book Now" button is clicked
+  submitButton.addEventListener('click', function (event) {
+    event.preventDefault();
+    form.submit();
+  });
+  document.addEventListener('DOMContentLoaded', function () {
+  // Function to validate the preferred date
+  function validatePreferredDate() {
+    const preferredDateInput = document.getElementById("preferred-date");
+    const currentDate = new Date();
+    const selectedDate = new Date(preferredDateInput.value);
+
+    // Calculate the allowed date range (today to 5 days later)
+    const allowedStartDate = new Date(currentDate);
+    const allowedEndDate = new Date(currentDate);
+    allowedEndDate.setDate(currentDate.getDate() + 5);
+
+    // Check if the selected date is within the allowed range
+    if (selectedDate < currentDate || selectedDate > allowedEndDate) {
+      document.getElementById("preferred-date-error").textContent = "Please select a valid date within today and the next 5 days";
+      return false; // Prevent form submission
+    } else {
+      document.getElementById("preferred-date-error").textContent = ""; // Clear error message
+      return true; // Allow form submission
+    }
+  }
+
+  // Add an input event listener to the "Preferred Date" input field for real-time validation
+  const preferredDateInput = document.getElementById("preferred-date");
+  preferredDateInput.addEventListener('input', validatePreferredDate);
+
+  // Add an event listener to the form to trigger the date validation on submission
+  const form = document.querySelector('form');
+  const submitButton = document.getElementById('frmsubbtn');
+
+  form.addEventListener('submit', function (event) {
+    // Prevent the default form submission
+    event.preventDefault();
+
+    // Call the date validation function
+    if (validatePreferredDate()) {
+      // If validation passes, submit the form
+      form.submit();
+    }
+  });
+
+  // Alternatively, you can also handle form submission when the "Book Now" button is clicked
+  submitButton.addEventListener('click', function (event) {
+    event.preventDefault();
+    // Call the date validation function
+    if (validatePreferredDate()) {
+      // If validation passes, submit the form
+      form.submit();
+    }
+  });
+});
+
+
+  
+</script>
+<script>
+  var marker, map, kilometer;
+  const SOURCE = [9.0827879, 76.5650678];
+  const RADIUS = 5;
+
+  function haversineDistance(lat1, lon1, lat2, lon2) {
+    // Convert latitude and longitude from degrees to radians
+    const toRadians = (angle) => angle * (Math.PI / 180);
+    lat1 = toRadians(lat1);
+    lon1 = toRadians(lon1);
+    lat2 = toRadians(lat2);
+    lon2 = toRadians(lon2);
+
+    // Haversine formula
+    const dLat = lat2 - lat1;
+    const dLon = lon2 - lon1;
+    const a =
+        Math.sin(dLat / 2) ** 2 +
+        Math.cos(lat1) * Math.cos(lat2) * Math.sin(dLon / 2) ** 2;
+    const c = 2 * Math.asin(Math.sqrt(a));
+
+    // Radius of the Earth in kilometers (mean value)
+    const radiusOfEarth = 6371;
+
+    // Calculate the distance
+    const distance = radiusOfEarth * c;
+
+    return distance;
+  }
+
+  $('#mapModal').on('shown.bs.modal', function (e) {
+    if (!map){
+      map = L.map('map').setView([9.0827879, 76.5650678], 15);
+
+      L.tileLayer('https://tile.openstreetmap.org/{z}/{x}/{y}.png', {
+        maxZoom: 19,
+        attribution: '&copy; Anjali Raj'
+      }).addTo(map);
+
+      L.circle(SOURCE, {
+        color: 'blue',
+        fillColor: '#FFFFFF00',
+        // fillOpacity: 0.5,
+        radius: RADIUS * 1000,
+      }).addTo(map);
+
+      var location = navigator.geolocation.getCurrentPosition(
+        function success(pos){
+          marker = L.marker(
+            [pos.coords.latitude, pos.coords.longitude],
+            // {draggable:true}
+          ).addTo(map);
+        }
+      );
+
+      map.on('click', function onMapClick(e){
+        kilometer = haversineDistance(SOURCE[0], SOURCE[1], e.latlng.lat, e.latlng.lng);
+        if (kilometer > RADIUS){
+          alert(`Select a radius within ${RADIUS} Kilometers.`);
+          return;
+        }
+        if (marker){
+          map.removeLayer(marker);
+        }
+        marker = L.marker(e.latlng).addTo(map);
+      });
+
+      $('#confirm-location').on('click', function onConfirmation(e){
+        destination = marker.getLatLng();
+        kilometer = haversineDistance(SOURCE[0], SOURCE[1], destination.lat, destination.lng);
+        $('#mapModal').modal('hide');
+        updateHomeCollectionCharge();
+        $.get(
+          `https://nominatim.openstreetmap.org/reverse?format=jsonv2&lat=${destination.lat}&lon=${destination.lng}`,
+          function (data){
+            console.log(data)
+            $('#location-address').val(data.display_name);
+            $('#location-distance').val(kilometer);
+            $('#location-lat').val(data.lat);
+            $('#location-lng').val(data.lon);
+          }
+        );
+      })
+    }
+  })
+</script>
+<script type="text/javascript">
+  $(document).ready(function () {
+      // Validation for New Home Address
+      $('#new-home-address').on('input', function () {
+          var newHomeAddress = $(this).val();
+          var validHomeAddress = /^[A-Za-z0-9\s]{3,}$/.test(newHomeAddress); // At least 3 alphanumeric characters
+
+          var errorContainer = $('#new-home-address-error');
+
+          if (!validHomeAddress) {
+              // Display an error message below the input field
+              errorContainer.text('Address must start with letters or numbers and contain at least 3 characters.');
+              errorContainer.show();
+          } else {
+              // Clear the error message and hide the error container if the input is valid
+              errorContainer.text('');
+              errorContainer.hide();
+          }
+      });
+
+      // Validation for New City
+      $('#new-city').on('input', function () {
+          var newCity = $(this).val();
+          var validCity = /^[A-Za-z\s]{3,}$/.test(newCity); // At least 3 letters
+
+          var errorContainer = $('#new-city-error');
+
+          if (!validCity) {
+              // Display an error message below the input field
+              errorContainer.text('City must start with letters and contain at least 3 characters.');
+              errorContainer.show();
+          } else {
+              // Clear the error message and hide the error container if the input is valid
+              errorContainer.text('');
+              errorContainer.hide();
+          }
+      });
+
+      // Validation for New Pincode
+      $('#new-pincode').on('input', function () {
+          var newPincode = $(this).val();
+          var validPincode = /^[1-9]\d{5}$/.test(newPincode); // Starts with a digit (excluding 0) and has 6 digits
+
+          var errorContainer = $('#pincode-error');
+
+          if (!validPincode) {
+              // Display an error message below the input field
+              errorContainer.text('Invalid pincode. It must start with a non-zero digit and contain 6 digits.');
+              errorContainer.show();
+          } else {
+              // Clear the error message and hide the error container if the input is valid
+              errorContainer.text('');
+              errorContainer.hide();
+          }
+      });
+  });
+</script>
+
+{% endblock %}
