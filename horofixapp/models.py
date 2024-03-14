@@ -187,7 +187,7 @@ class WatchProduct(models.Model):
     product_price = models.DecimalField(max_digits=10, decimal_places=2, null=True)
     product_sale_price = models.DecimalField(max_digits=10, decimal_places=2, null=True)
     discount = models.DecimalField(max_digits=5, decimal_places=2, null=True)
-    category = models.CharField(max_length=10, choices=[('Men', 'Men'), ('Women', 'Women'),('Kids', 'Kids'),], default=None)
+    category = models.CharField(max_length=10, choices=[('Men', 'Men'), ('Women', 'Women'),('Kids', 'Kids'),('Unisex', 'Unisex'),], default=None)
     stock = models.PositiveIntegerField(default=1, null=True)  # Add the 'stock' field
     ratings = models.IntegerField(default=0) 
     warranty = models.IntegerField(null=True) 
@@ -231,18 +231,7 @@ class Cart(models.Model):
     def __str__(self):
         return f"Cart for {self.user.username}"
 
-class Address(models.Model):
-    user = models.ForeignKey(CustomUser, on_delete=models.CASCADE, related_name='addresses')
-    street_address = models.CharField(max_length=255)
-    city = models.CharField(max_length=255)  # Add city field
-    country = models.CharField(max_length=255)
-    state = models.CharField(max_length=255)
-    pincode = models.CharField(max_length=10)
-    phone = models.CharField(max_length=15)
-    is_default = models.BooleanField(default=False)
 
-    def __str__(self):
-        return f"{self.user.username}'s Address"
 from django.utils import timezone
 class Order(models.Model):
     user = models.ForeignKey(CustomUser, on_delete=models.CASCADE)
@@ -395,6 +384,18 @@ class RepairPayment(models.Model):
     def __str__(self):
         return f"Payment for Repair Request: {self.order.user.name}'s Watch Repair Request"
 
+from django.contrib.auth.models import User
+
+class Address(models.Model):
+    user = models.ForeignKey(CustomUser, on_delete=models.CASCADE)
+    street_address = models.CharField(max_length=255)
+    city = models.CharField(max_length=100)
+    state = models.CharField(max_length=100)
+    pincode = models.CharField(max_length=10)
+    country = models.CharField(max_length=100, default='', blank=True)  # Add country field
+
+    def __str__(self):
+        return f"{self.street_address}, {self.city}, {self.state}, {self.country} - {self.pincode}"
 
 class Appoinment(models.Model):
    
@@ -438,9 +439,8 @@ class Location(models.Model):
     distance = models.DecimalField(max_digits=10, decimal_places=2,null=True,blank=True)
     latitude = models.CharField(max_length=50,null=True,blank=True)
     longitude = models.CharField(max_length=50,null=True,blank=True)
-# models.py
-
 from django.db import models
+from .models import WatchProduct  # Import WatchProduct model
 
 class WatchCustomization(models.Model):
     SIZE_CHOICES = [
@@ -473,11 +473,26 @@ class WatchCustomization(models.Model):
     watch_color = models.CharField(max_length=50)
     dial_shape = models.CharField(max_length=50, choices=DIAL_SHAPE_CHOICES)
     watch_size = models.CharField(max_length=50, choices=SIZE_CHOICES)
-    include_date = models.BooleanField(default=False)
     watch_hands_color = models.CharField(max_length=50, choices=WATCH_HANDS_CHOICES)
-    include_backlight = models.BooleanField(default=False)
     owner_name = models.CharField(max_length=100)
+    watch_image = models.ImageField(upload_to='watch_images/', null=True, default='watch_images/default_image.jpg')
+    product = models.ForeignKey(WatchProduct, on_delete=models.CASCADE, default=1)  # Add the default value
 
     def __str__(self):
         return f"{self.owner_name}'s Customized Watch"
+        from django.db import models
 
+from django.db import models
+from django.utils import timezone
+from .models import CustomUser, WatchCustomization
+
+class CustomizationPayment(models.Model):
+    customization = models.ForeignKey(WatchCustomization, on_delete=models.CASCADE)
+    razor_pay_order_id = models.CharField(max_length=255)
+    amount = models.IntegerField()  # or DecimalField, depending on your requirements
+    is_paid = models.BooleanField(default=False)
+    customer = models.ForeignKey(CustomUser, on_delete=models.CASCADE)
+    created_at = models.DateTimeField(default=timezone.now)
+
+    def __str__(self):
+        return f"Payment for Customization: {self.customization.owner_name}'s Customization"

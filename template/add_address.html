@@ -3,73 +3,19 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Customer Profile</title>
-    <!-- Bootstrap CSS -->
-    <link rel="stylesheet" href="https://maxcdn.bootstrapcdn.com/bootstrap/4.5.2/css/bootstrap.min.css">
+    <title>Selected Watch Customization</title>
+    <!-- Add any CSS styles if needed -->
 </head>
 <body>
-    <div class="container mt-5">
-        <h2>Customer Profile</h2>
-
-        <!-- Display Customer Profile Details -->
-        <h3>Profile Details</h3>
-        <p><strong>Name:</strong> {{ customer_profile.name }}</p>
-        <p><strong>Email:</strong> {{ customer_profile.user.email }}</p>
-        <p><strong>Street Address:</strong> {{ customer_profile.street_address }}</p>
-        <p><strong>City:</strong> {{ customer_profile.city }}</p>
-        <p><strong>Country:</strong> {{ customer_profile.country }}</p>
-        <p><strong>State:</strong> {{ customer_profile.state }}</p>
-        <p><strong>Pincode:</strong> {{ customer_profile.pincode }}</p>
-        <p><strong>Phone:</strong> {{ customer_profile.phone }}</p>
-
-        <!-- Add a new address -->
-        <hr>
-        <h3>Add New Address</h3>
-        <form method="post" action="{% url 'add_address' %}">
-            {% csrf_token %}
-
-            <div class="form-group">
-                <label for="street_address">Street Address:</label>
-                <input type="text" class="form-control" id="street_address" name="street_address" required>
-            </div>
-
-            <div class="form-group">
-                <label for="city">City:</label>
-                <input type="text" class="form-control" id="city" name="city" required>
-            </div>
-
-            <div class="form-group">
-                <label for="country">Country:</label>
-                <input type="text" class="form-control" id="country" name="country" required>
-            </div>
-
-            <div class="form-group">
-                <label for="state">State:</label>
-                <input type="text" class="form-control" id="state" name="state" required>
-            </div>
-
-            <div class="form-group">
-                <label for="pincode">Pincode:</label>
-                <input type="text" class="form-control" id="pincode" name="pincode" required>
-            </div>
-
-            <div class="form-group">
-                <label for="phone">Phone:</label>
-                <input type="text" class="form-control" id="phone" name="phone" required>
-            </div>
-
-            <div class="form-check">
-                <input type="checkbox" class="form-check-input" id="is_default" name="is_default">
-                <label class="form-check-label" for="is_default">Set as Default Address</label>
-            </div>
-
-            <a type="submit" class="checkout-button" href="{% url 'checkout' %}">Checkout</a>
-        </form>
-    </div>
-
-    <!-- Bootstrap JS and Popper.js (optional) -->
-    <script src="https://code.jquery.com/jquery-3.5.1.slim.min.js"></script>
-    <script src="https://cdn.jsdelivr.net/npm/@popperjs/core@2.9.2/dist/umd/popper.min.js"></script>
-    <script src="https://maxcdn.bootstrapcdn.com/bootstrap/4.5.2/js/bootstrap.min.js"></script>
+    <h2>Selected Watch Customization</h2>
+    <p><strong>Strap Material:</strong> {{ strap_material }}</p>
+    <p><strong>Strap Color:</strong> {{ strap_color }}</p>
+    <p><strong>Watch Color:</strong> {{ watch_color }}</p>
+    <p><strong>Dial Shape:</strong> {{ dial_shape }}</p>
+    <p><strong>Watch Size:</strong> {{ watch_size }}</p>
+    <p><strong>Watch Hands Color:</strong> {{ watch_hands_color }}</p>
+    <p><strong>Owner's Name:</strong> {{ owner_name }}</p>
+    <p><strong>Amount:</strong> {{ product.product_price }}</p> <!-- Assuming product is the associated WatchProduct -->
+    <!-- Add any additional content or styling here -->
 </body>
 </html>

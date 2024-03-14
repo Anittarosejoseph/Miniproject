@@ -432,54 +432,7 @@ def view_details(request, product_id):
     product = get_object_or_404(WatchProduct, pk=product_id)
     return render(request, 'viewdetails.html', {'product': product})
 
-from django.shortcuts import render
-from .models import CustomerProfile
-@login_required
-def add_address(request):
-    # Retrieve the customer profile associated with the currently logged-in user
-    customer_profile = CustomerProfile.objects.get(user=request.user)
 
-    context = {
-        'name': customer_profile.name,
-        'street_address': customer_profile.street_address,
-        'state': customer_profile.state,
-        'country': customer_profile.country,
-        'phone': customer_profile.phone,
-    }
-
-    return render(request, 'add_address.html', context)
-from .models import Address  # Import the Address model from your models.py
-from django.contrib.auth.decorators import login_required
-
-@login_required
-def add_another_address(request):
-    if request.method == 'POST':
-        # Get the form data from the request
-        street_address = request.POST['street_address']
-        country = request.POST['country']
-        state = request.POST['state']
-        pincode = request.POST['pincode']
-        phone = request.POST['phone']
-        is_default = request.POST.get('is_default') == 'on'  # Check if the checkbox is checked
-
-        # Create a new Address instance
-        address = Address(
-            user=request.user,  # Ensure the user is a CustomUser instance
-            street_address=street_address,
-            country=country,
-            state=state,
-            pincode=pincode,
-            phone=phone,
-            is_default=is_default
-        )
-
-        # Save the new address to the database
-        address.save()
-
-        # Redirect to a success page or any other appropriate view
-        return redirect('add_address')
-
-    return render(request, 'add_another_address.html')
 from django.http import JsonResponse
 from django.conf import settings
 import razorpay
@@ -1729,47 +1682,43 @@ def send_payment_confirmation_email(user_email, repair_request, amount):
     recipient_list = [user_email]
 
     send_mail(subject, message, from_email, recipient_list)
-from django.shortcuts import render, redirect
-from django.shortcuts import render, get_object_or_404
-from .models import WatchProduct, WatchCustomization
+from django.shortcuts import render, redirect, get_object_or_404
+from django.shortcuts import render, redirect, get_object_or_404
 from django.contrib import messages
-from django.contrib.auth.decorators import login_required
+from .models import WatchCustomization
+from django.urls import reverse
+from django.utils import timezone
 
-@login_required
+# Other imports...
+
 def customize_watch(request, product_id):
-    product = get_object_or_404(WatchProduct, id=product_id)
-
     if request.method == 'POST':
-        # Process the form data and save the customization
+        # Extracting form data from the request
         strap_material = request.POST.get('strap_material')
         strap_color = request.POST.get('strap_color')
         watch_color = request.POST.get('watch_color')
         dial_shape = request.POST.get('dial_shape')
         watch_size = request.POST.get('watch_size')
-        include_date = bool(request.POST.get('include_date', False))
         watch_hands_color = request.POST.get('watch_hands_color')
-        include_backlight = bool(request.POST.get('include_backlight', False))
         owner_name = request.POST.get('owner_name')
+        watch_image = request.FILES.get('watch_image')
 
-        customization = WatchCustomization.objects.create(
+        # Creating and saving WatchCustomization object
+        customization = WatchCustomization(
             strap_material=strap_material,
             strap_color=strap_color,
             watch_color=watch_color,
             dial_shape=dial_shape,
             watch_size=watch_size,
-            include_date=include_date,
             watch_hands_color=watch_hands_color,
-            include_backlight=include_backlight,
-            owner_name=owner_name
+            owner_name=owner_name,
+            watch_image=watch_image,
+            product_id=product_id  # Associating the customization with the product
         )
+        customization.save()
 
-        # You may associate the customization with the product or user as needed
-        # For example: customization.product = product
-        # customization.user = request.user
-        # customization.save()
-
-        messages.success(request, 'Watch customized successfully!')
-        return render(request, 'customize_watch.html', {'product': product, 'customization': customization})
-
-    return render(request, 'customize_watch.html', {'product': product})
-
+        messages.success(request, 'Watch customized successfully.')
+        return redirect(reverse('product_detail', kwargs={'product_id': product_id}))
+    else:
+        # Render the form template
+        return render(request, 'customize_watch.html', {'product_id': product_id})

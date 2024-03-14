@@ -70,14 +70,16 @@
                         </li>
 
                         <div class="user_optio_box">
-                            {% if request.session.is_authenticated %}
+                
+                            {% if user.is_authenticated %}
+                              <li>Welcome,{{user.username}}</li>
                                 <a href="{% url 'logout' %}">
-                                    <i class="fa fa-sign-out" aria-hidden="true"></i> Logout<span class="sr-only">(current)</span>
+                                  <i class="fa fa-sign-out" aria-hidden="true"></i> Logout
                                 </a>
                             {% else %}
-                                <a href="{% url 'login' %}">
-                                    <i class="fa fa-sign-in" aria-hidden="true"></i> Login
-                                </a>
+                              <a href="{% url 'login' %}">
+                                <i class="fa fa-sign-in" aria-hidden="true"></i> Login
+                              </a>
                             {% endif %}
 
                             <li class="nav-item">
@@ -91,185 +93,91 @@
             </nav>
         </div>
     </header>
-
-<style>
-    html, body {
-        margin: 0;
-        padding: 0;
-    }
-    
-    body {
-        font-family: Arial, sans-serif;
-        background-color: #f4f4f4;
-        text-align: center;
-    }
-    
-    .container {
-        margin: 20px;
-    }
-    
-    h1 {
-        margin-bottom: 20px;
-    }
-    
-    #watch-container {
-        display: flex;
-        justify-content: center;
-        align-items: center;
-        flex-direction: column;
-        margin-bottom: 20px;
-    }
-    
-    #watch {
-        width: 140px;  /* Set the desired width */
-        height:250px; /* Set the desired height */
-        background-color: #fff;
-        border: 5px solid #333;
-        border-radius: 50%;
-        position: relative;
-    }
-
-    #watch img {
-        width: 100%;
-        height: 100%;
-        object-fit: cover;
-        border-radius: 50%;
-    }
-
-  
-    #watch-name {
-        position: absolute;
-        top: 50%;
-        left: 50%;
-        transform: translate(-50%, -50%);
-        font-size: 18px;
-        font-weight: bold;
-        color: #333;
-    }
-    
-    form {
-        display: flex;
-        flex-direction: column;
-        align-items: center;
-    }
-    
-    label {
-        margin: 10px 0;
-    }
-    
-    select, input[type="color"], input[type="checkbox"], input[type="text"] {
-        padding: 8px;
-        font-size: 16px;
-        margin-bottom: 10px;
-    }
-    
-    #color-palette {
-        display: flex;
-        justify-content: space-between;
-        margin-bottom: 20px;
-    }
-    
-    .color-box {
-        width: 30px;
-        height: 30px;
-        border-radius: 50%;
-        cursor: pointer;
-    }
-    
-    button {
-        padding: 10px;
-        font-size: 16px;
-        background-color: #333;
-        color: #fff;
-        border: none;
-        cursor: pointer;
-    }
-    
-    #message {
-        font-size: 16px;
-        font-weight: bold;
-        margin-top: 20px;
-        color: #333;
-    }
-</style>    
+    <title>Customize Watch</title>
+    <link rel="stylesheet" href="https://stackpath.bootstrapcdn.com/bootstrap/4.5.2/css/bootstrap.min.css">
+    <link rel="stylesheet" href="{% static 'css/style.css' %}">
+    <style>
+        body {
+            background-image: url('{% static "images/background.jpg" %}');
+            background-size: cover;
+            background-position: center;
+            height: 100vh;
+            margin: 0;
+            padding: 0;
+        }
+    </style>
 </head>
 <body>
-    <div>
-        <h1>Watch Customization</h1>
-        <div id="watch-container">
-            <div id="watch">
-                <img id="watch-image"  src="{{ product.watch_image.url }}" alt="Watch Image">
-            </div>
-        </div>
-        <form id="customization-form" method="post">
+    <div class="container mt-5">
+        <h2>Customize Watch</h2>
+        <img src="{{ product.watch_image.url }}" alt="Product Image" class="img-fluid mb-3">
+        <form method="post" action="{% url 'customize_watch' product.id %}" enctype="multipart/form-data">
             {% csrf_token %}
-
-            <label for="strap_material">Strap Material:</label>
-            <select id="strap_material" name="strap_material">
-                <option value="leather">Leather</option>
-                <option value="metal">Metal</option>
-                <option value="rubber">Rubber</option>
-                <option value="nylon">Nylon</option>
-            </select>
-
-            <label for="strap_color">Strap Color:</label>
-            <input type="color" id="strap_color" name="strap_color" value="#333">
-
-            <label for="watch_color">Watch Color:</label>
-            <input type="color" id="watch_color" name="watch_color" value="#333">
-
-            <label for="dial_shape">Dial Shape:</label>
-            <select id="dial_shape" name="dial_shape">
-                <option value="round">Round</option>
-                <option value="square">Square</option>
-                <option value="digital">Digital</option>
-            </select>
-
-            <label for="watch_size">Watch Size:</label>
-            <select id="watch_size" name="watch_size">
-                <option value="small">Small</option>
-                <option value="medium">Medium</option>
-                <option value="large">Large</option>
-            </select>
-
-           
-            <label for="watch_hands_color">Watch Hands Color:</label>
-            <select id="watch_hands_color" name="watch_hands_color">
-                <option value="silver">Silver</option>
-                <option value="gold">Gold</option>
-                <option value="black">Black</option>
-            </select>
-
-           
-            <label for="owner_name">Anything written in watch</label>
-            <input type="text" id="owner_name" name="owner_name" placeholder="Enter your name">
-
-          
-            <button type="submit">Customize Watch</button>
+            <div class="form-group">
+                <label for="strap_material">Strap Material:</label>
+                <select id="strap_material" name="strap_material" required>
+                    <option value="leather">Leather</option>
+                    <option value="metal">Metal</option>
+                    <option value="rubber">Rubber</option>
+                    <option value="nylon">Nylon</option>
+                </select>
+            </div>
+            <div class="form-group">
+                <label for="strap_color">Strap Color:</label>
+                <input type="color" id="strap_color" name="strap_color" value="#333" required>
+            </div>
+            <div class="form-group">
+                <label for="watch_color">Watch Color:</label>
+                <input type="color" id="watch_color" name="watch_color" value="#333" required>
+            </div>
+            <div class="form-group">
+                <label for="dial_shape">Dial Shape:</label>
+                <select id="dial_shape" name="dial_shape" required>
+                    <option value="round">Round</option>
+                    <option value="square">Square</option>
+                    <option value="digital">Digital</option>
+                </select>
+            </div>
+            <div class="form-group">
+                <label for="watch_size">Watch Size:</label>
+                <select id="watch_size" name="watch_size" required>
+                    <option value="small">Small</option>
+                    <option value="medium">Medium</option>
+                    <option value="large">Large</option>
+                </select>
+            </div>
+            <div class="form-group">
+                <label for="watch_hands_color">Watch Hands Color:</label>
+                <select id="watch_hands_color" name="watch_hands_color" required>
+                    <option value="silver">Silver</option>
+                    <option value="gold">Gold</option>
+                    <option value="black">Black</option>
+                </select>
+            </div>
+            <div class="form-group">
+                <label for="watch_image">Customize image:</label>
+                <input type="file" class="form-control-file" name="watch_image" id="watch_image" onchange="validateImageFileType()" accept="image/*" required>
+            </div>
+        
+            <div class="form-group">
+                <label for="owner_name">Anything written in dial:</label>
+                <input type="text" id="owner_name" name="owner_name" placeholder="Enter owner's name" required>
+            </div>
+            
+            <button type="submit" class="btn btn-primary">Customize Watch</button>
         </form>
-
-        <div id="message"></div>
     </div>
-
     <script>
-        function customizeWatch() {
-            // ... (unchanged JavaScript code) ...
+        function validateImageFileType() {
+            var fileInput = document.getElementById('watch_image');
+            var filePath = fileInput.value;
+            var allowedExtensions = /(\.jpg|\.jpeg|\.png|\.gif)$/i;
+            if (!allowedExtensions.exec(filePath)) {
+                alert('Please upload only image files (jpg, jpeg, png, gif)');
+                fileInput.value = '';
+                return false;
+            }
         }
-
-        function changeColor(newColor) {
-            // ... (unchanged JavaScript code) ...
-        }
-
-        function updateWatchSizeDisplay() {
-            var watchSize = document.getElementById("watch_size").value;
-            var watchSizeDisplay = document.getElementById("watch-size-display");
-
-            // Update the size display
-            watchSizeDisplay.textContent = "Size: " + watchSize;
-        }
-
-        // Initialize the watch size display on page load
-        updateWatchSizeDisplay();
     </script>
 </body>
 </html>

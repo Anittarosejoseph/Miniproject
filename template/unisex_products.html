@@ -1,0 +1,23 @@
+<!-- Replace this part of your HTML with the code below -->
+<div class="row">
+    {% for product in products %}
+        <div class="col-md-6">
+            <div class="product-card">
+                <a href="{% url 'view_details' product.id %}">
+                    <img src="{{ product.watch_image.url }}" alt="{{ product.product_name }}">
+                </a>
+                <h3>{{ product.product_name }}</h3>
+                <p>
+                    <strong>Product Price:</strong>
+                    {% if product.product_sale_price %}
+                        <del class="product-price">${{ product.product_price }}</del>
+                        <span class="product-sale-price">${{ product.product_sale_price }}</span>
+                    {% else %}
+                        <span class="product-price">${{ product.product_price }}</span>
+                    {% endif %}
+                </p>
+                <p><strong>Discount:</strong> {{ product.discount }}%</p>
+            </div>
+        </div>
+    {% endfor %}
+</div>

@@ -34,11 +34,12 @@ urlpatterns = [
     path('add_address/', views.add_address, name='add_address'),
     path('remove-from-cart/<int:product_id>/', views.remove_from_cart, name='remove-from-cart'),
     path('add_to_cart/<int:product_id>/', views.add_to_cart, name='add_to_cart'),
-    path('add_another_address/', views.add_another_address, name='add_another_address'),
     path('create-order/', views.create_order, name='create-order'),
     path('handle-payment/', views.handle_payment, name='handle-payment'),
     path('checkout/', views.checkout, name='checkout'),
     path('user_list/', views.user_list, name='user_list'),
+    # path('customize_payment/<int:customization_id>/', views.customize_payment, name='customize_payment'),
+    # path('customization_payment_success/<int:customization_id>/', views.customization_payment_success, name='customization_payment_success'),
     path('block_unblock_user/<int:user_id>/', views.block_unblock_user, name='block_unblock_user'),
     path('all_user_orders/', views.all_user_orders, name='all_user_orders'),
     path('approve_disapprove_order/', views.approve_disapprove_order, name='approve_disapprove_order'),
@@ -66,6 +67,7 @@ urlpatterns = [
     path('assign_delivery_team/', views.assign_delivery_team, name='assign_delivery_team'),
     
     path('delivery-team-orders/', views.delivery_team_orders, name='delivery_team_orders'),
+    path('unisex_products/', views.unisex_products, name='unisex_products'),
 
     path('remove_from_wishlist/<int:wishlist_item_id>/', views.remove_from_wishlist, name='remove_from_wishlist'),
     path('add_to_wishlist/<int:id>/', views.add_to_wishlist, name='add_to_wishlist'),
@@ -88,9 +90,10 @@ urlpatterns = [
     path('repair_payment_success/<int:repair_id>/',views.repair_payment_success, name='repair_payment_success'),
   path('add_service/', views.add_service, name='add_service'),
     path('view_bill/<int:repair_id>/', views.view_bill, name='view_bill'),
+    path('add_address/', views.add_address, name='add_address'),
 
     path('view_service/', views.view_service, name='view_service'),
-    path('customize/<int:product_id>/', views.customize_watch, name='customize_watch'),
+    path('customize/<int:product_id>/', views.customize_watch, name='customize_watch'),  # Adjusted URL pattern for customization
 
 ]
 

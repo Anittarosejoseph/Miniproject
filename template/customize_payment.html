@@ -1,0 +1,32 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Customize Watch Payment</title>
+</head>
+<body>
+    <h2>Customize Watch Payment</h2>
+    <p>Please complete the payment to finalize your customization:</p>
+    <p><strong>Amount:</strong> {{ payment.amount / 100 }} INR</p>
+    <p><strong>Order ID:</strong> {{ payment.id }}</p>
+    <p><strong>Receipt:</strong> {{ payment.receipt }}</p>
+    <!-- Add a form to submit the payment -->
+    <form action="{% url 'process_customize_payment' customization.id %}" method="post">
+        {% csrf_token %}
+        <script
+            src="https://checkout.razorpay.com/v1/checkout.js"
+            data-key="{{ payment.key }}"
+            data-amount="{{ payment.amount }}"
+            data-currency="INR"
+            data-name="Your Company Name"
+            data-description="Customize Watch Payment"
+            data-image="{% static 'your_logo.png' %}"
+            data-order_id="{{ payment.id }}"
+            data-buttontext="Pay Now"
+            data-theme.color="#528FF0"
+        ></script>
+        <input type="hidden" custom="Hidden Element" name="hidden">
+    </form>
+</body>
+</html>
