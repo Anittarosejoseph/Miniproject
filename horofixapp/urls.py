@@ -38,16 +38,15 @@ urlpatterns = [
     path('handle-payment/', views.handle_payment, name='handle-payment'),
     path('checkout/', views.checkout, name='checkout'),
     path('user_list/', views.user_list, name='user_list'),
-    # path('customize_payment/<int:customization_id>/', views.customize_payment, name='customize_payment'),
-    # path('customization_payment_success/<int:customization_id>/', views.customization_payment_success, name='customization_payment_success'),
+       path('customize/<int:product_id>/', views.customize_watch, name='customize_watch'),
+    path('view_entered_details/<int:product_id>/<int:amount>/',views.view_entered_details, name='view_entered_details'),
+
     path('block_unblock_user/<int:user_id>/', views.block_unblock_user, name='block_unblock_user'),
     path('all_user_orders/', views.all_user_orders, name='all_user_orders'),
     path('approve_disapprove_order/', views.approve_disapprove_order, name='approve_disapprove_order'),
-    path('add-shipping-address/', views.add_shipping_address, name='add_shipping_address'),
     path('search_products/',views.search_products, name='search_products'),
     path('sort-products/', views.sort_products, name='sort_products'),
     path('filter-products-by-category/', views.filter_products_by_category, name='filter_products_by_category'),
-    path('rate_product/', views.rate_product, name='rate_product'),
     path('remove_order_item/<int:item_id>/', views.remove_order_item, name='remove_order_item'),
     path('ordersummary/', views.ordersummary, name='ordersummary'),
     path('deliveryteamreg/', views.delivery_team_registration, name='deliveryteamreg'),
@@ -62,12 +61,12 @@ urlpatterns = [
     path('update-order-status/<int:order_id>/', views.update_order_status, name='update_order_status'),
     path('delete-order/<int:order_id>/', views.delete_order, name='delete_order'),
     path('order_history/', views.order_history, name='order_history'),
-    path('bill/', views.bill, name='bill'),
+    path('bill/<int:order_id>/', views.bill, name='bill'),
     path('admin_order_list/', views.admin_order_list, name='admin_order_list'),
     path('assign_delivery_team/', views.assign_delivery_team, name='assign_delivery_team'),
     
     path('delivery-team-orders/', views.delivery_team_orders, name='delivery_team_orders'),
-    path('unisex_products/', views.unisex_products, name='unisex_products'),
+    # path('unisex_products/', views.unisex_products, name='unisex_products'),
 
     path('remove_from_wishlist/<int:wishlist_item_id>/', views.remove_from_wishlist, name='remove_from_wishlist'),
     path('add_to_wishlist/<int:id>/', views.add_to_wishlist, name='add_to_wishlist'),
@@ -93,7 +92,6 @@ urlpatterns = [
     path('add_address/', views.add_address, name='add_address'),
 
     path('view_service/', views.view_service, name='view_service'),
-    path('customize/<int:product_id>/', views.customize_watch, name='customize_watch'),  # Adjusted URL pattern for customization
 
 ]
 

@@ -552,14 +552,14 @@ def handle_payment(request):
                 order.payment_status = True
                 order.save()
 
-                # Keep a record of purchased items in the order
+                
                 for cart_item in request.user.cart.cartitem_set.all():
                     OrderItem.objects.create(
                         order=order,
                         product=cart_item.product,
                         quantity=cart_item.quantity,
-                        item_total=cart_item.product.product_price * cart_item.quantity
-                    )
+                        item_total=cart_item.product.product_price * cart_item.quantity)
+    
 
                 # Clear the user's cart after a successful payment
                 request.user.cart.cartitem_set.all().delete()
@@ -726,30 +726,7 @@ def cancel_order(request):
         except Exception as e:
             print(str(e))
             return JsonResponse({'message': 'Server error, please try again later.'}, status=500)
-from django.shortcuts import render, redirect
-from .models import ShippingAddress
 
-def add_shipping_address(request):
-    if request.method == 'POST':
-        # Get data from the request
-        street_address = request.POST.get('street_address')
-        city = request.POST.get('city')
-        state = request.POST.get('state')
-        pincode = request.POST.get('pincode')
-
-        # Validate the data (add your validation logic here)
-
-        # Create a new ShippingAddress instance
-        new_address = ShippingAddress.objects.create(
-            street_address=street_address,
-            city=city,
-            state=state,
-            pincode=pincode
-        )
-
-        return redirect('ordersummary', address_id=new_address.id)
-
-    return render(request, 'add_shipping_address.html')
 # views.py
 
 
@@ -803,33 +780,7 @@ def filter_products_by_category(request):
 
 
     return render(request, 'customer_product.html', {'products': products})
-from django.shortcuts import render, redirect, get_object_or_404
-from django.contrib import messages
-from .models import OrderItem, WatchProduct
 
-def rate_product(request):
-    if request.method == 'POST':
-        item_id = request.POST.get('item_id')
-        rating = request.POST.get('rating')
-
-        # Get the OrderItem and associated product
-        order_item = get_object_or_404(OrderItem, id=item_id)
-        product = order_item.product
-
-        # Update the product's ratings
-        product.ratings += int(rating)
-        product.save()
-
-        # You can also store the rating and review in the OrderItem model if needed
-        order_item.rating = int(rating)
-        order_item.save()
-
-        messages.success(request, 'Product rated successfully.')
-    else:
-        messages.error(request, 'Invalid request.')
-
-    # Redirect back to the order summary page
-    return redirect('ordersummary')
 from django.shortcuts import get_object_or_404, redirect
 
 def remove_order_item(request, item_id):
@@ -1031,32 +982,21 @@ def all_orders(request):
     return render(request, 'myorders.html', context)
 
 
-from django.shortcuts import render
-from django.contrib.auth.decorators import login_required
+from django.shortcuts import render, get_object_or_404
 from .models import Order
 
-from django.shortcuts import render
-from django.contrib.auth.decorators import login_required
-from .models import Order
-
-from django.contrib.auth.decorators import login_required
-from django.shortcuts import render
-from .models import Order, OrderItem
-
-@login_required
 def ordersummary(request):
-    # Retrieve the latest order for the currently logged-in user
-    order = Order.objects.filter(user=request.user).order_by('-id').first()
+    # Retrieve the most recent paid order if it exists, or return a 404 error
+    try:
+        paid_order = Order.objects.filter(payment_status=True).latest('created_at')
+    except Order.DoesNotExist:
+        raise Http404("No paid orders found.")
 
-    # Retrieve order items for the order
-    order_items = OrderItem.objects.filter(order=order)
+    context = {
+        'order': paid_order
+    }
 
-    # Pass the order and order_items to the template
-    context = {'order': order, 'order_items': order_items}
-
-    # Render the template
-    return render(request, 'billinvoice.html', context)
-
+    return render(request, 'ordersummary.html', context)
 
 # views.py
 from django.shortcuts import render
@@ -1224,13 +1164,23 @@ def order_history(request):
     }
     return render(request, 'order_history.html', context)
 
+# views.py
 
-@login_required
-def bill(request):
-    # Fetch the latest order for the logged-in user (or implement your logic)
-    order = Order.objects.filter(user=request.user).latest('created_at')
-    return render(request, 'bill.html', {'order':order})
-from django.shortcuts import render, get_object_or_404, redirect
+from django.shortcuts import render
+from django.http import HttpResponse
+from .models import Order
+
+def bill(request, order_id):
+    # Retrieve the order object based on the order_id
+    try:
+        order = Order.objects.get(pk=order_id)
+    except Order.DoesNotExist:
+        return HttpResponse("Order not found", status=404)
+    
+    # Your view logic here
+    # For example, render a template with the order details
+    return render(request, 'bill.html', {'order': order})
+
 
 @login_required
 def panel(request):
@@ -1682,18 +1632,17 @@ def send_payment_confirmation_email(user_email, repair_request, amount):
     recipient_list = [user_email]
 
     send_mail(subject, message, from_email, recipient_list)
-from django.shortcuts import render, redirect, get_object_or_404
+# views.py
+
 from django.shortcuts import render, redirect, get_object_or_404
 from django.contrib import messages
 from .models import WatchCustomization
-from django.urls import reverse
-from django.utils import timezone
-
-# Other imports...
+from .models import WatchProduct  # Import the WatchProduct model
 
 def customize_watch(request, product_id):
+    product = get_object_or_404(WatchProduct, pk=product_id)
     if request.method == 'POST':
-        # Extracting form data from the request
+        # Process form submission
         strap_material = request.POST.get('strap_material')
         strap_color = request.POST.get('strap_color')
         watch_color = request.POST.get('watch_color')
@@ -1703,7 +1652,7 @@ def customize_watch(request, product_id):
         owner_name = request.POST.get('owner_name')
         watch_image = request.FILES.get('watch_image')
 
-        # Creating and saving WatchCustomization object
+        # Save customization details to the database
         customization = WatchCustomization(
             strap_material=strap_material,
             strap_color=strap_color,
@@ -1713,12 +1662,35 @@ def customize_watch(request, product_id):
             watch_hands_color=watch_hands_color,
             owner_name=owner_name,
             watch_image=watch_image,
-            product_id=product_id  # Associating the customization with the product
+            product_id=product_id
         )
         customization.save()
 
-        messages.success(request, 'Watch customized successfully.')
-        return redirect(reverse('product_detail', kwargs={'product_id': product_id}))
-    else:
-        # Render the form template
-        return render(request, 'customize_watch.html', {'product_id': product_id})
+        # Calculate the amount here based on customization
+        amount = calculate_amount()
+
+        # Redirect to the view_entered_details page with entered details
+        return redirect('view_entered_details', product_id=product_id, amount=amount)
+
+    return render(request, 'customize_watch.html', {'product': product})
+
+def view_entered_details(request, product_id, amount):
+    product = get_object_or_404(WatchProduct, pk=product_id)
+    customization = WatchCustomization.objects.filter(product_id=product_id).last()
+    context = {
+        'product': product,
+        'strap_material': customization.strap_material,
+        'strap_color': customization.strap_color,
+        'watch_color': customization.watch_color,
+        'dial_shape': customization.dial_shape,
+        'watch_size': customization.watch_size,
+        'watch_hands_color': customization.watch_hands_color,
+        'owner_name': customization.owner_name,
+        'amount': amount,
+    }
+    return render(request, 'view_entered_details.html', context)
+
+# You may need to define the calculate_amount function
+def calculate_amount():
+    # Add your calculation logic here
+    return 100  # Example amount, replace with your calculation

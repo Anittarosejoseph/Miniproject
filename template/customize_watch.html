@@ -35,7 +35,8 @@
     width: 50%;
 }
 
-</style>  </head>
+</style>  
+</head>
 <body>
 <div class="hero_area">
     <header class="header_section">
@@ -107,6 +108,102 @@
         }
     </style>
 </head>
+<title>Customize Watch</title>
+    <link rel="stylesheet" href="https://stackpath.bootstrapcdn.com/bootstrap/4.5.2/css/bootstrap.min.css">
+    <link href="{% static 'css/style.css' %}" rel="stylesheet">
+    <style>
+        body {
+            background-image: url('{% static "images/background.jpg" %}');
+            background-size: cover;
+            background-position: center;
+            height: 100vh;
+            margin: 0;
+            padding: 0;
+            font-family: 'Roboto', sans-serif; /* Add your preferred font-family */
+        }
+        
+        .container {
+            max-width: 600px;
+            margin: 0 auto;
+            padding: 20px;
+            background-color: #fff;
+            border-radius: 10px;
+            box-shadow: 0 0 10px rgba(0, 0, 0, 0.1);
+        }
+        
+        h2 {
+            margin-bottom: 20px;
+            text-align: center;
+            color: #333;
+        }
+        
+        img {
+            display: block;
+            margin: 0 auto;
+            max-width: 100%;
+            height: auto;
+        }
+        
+        .form-group {
+            margin-bottom: 20px;
+        }
+        
+        label {
+            font-weight: bold;
+            color: #333;
+        }
+        
+        input[type="color"],
+        select {
+            width: 100%;
+            padding: 8px;
+            border-radius: 5px;
+            border: 1px solid #ccc;
+            background-color: #f9f9f9;
+        }
+        
+        input[type="file"] {
+            width: 100%;
+            padding: 8px;
+            border-radius: 5px;
+            border: 1px solid #ccc;
+            background-color: #f9f9f9;
+        }
+        
+        button {
+            width: 100%;
+            padding: 10px;
+            border: none;
+            border-radius: 5px;
+            background-color: #007bff;
+            color: #fff;
+            cursor: pointer;
+            transition: background-color 0.3s;
+        }
+        
+        button:hover {
+            background-color: #0056b3;
+        }
+        
+        .alert {
+            margin-top: 20px;
+            padding: 15px;
+            border-radius: 5px;
+            background-color: #f8d7da;
+            color: #721c24;
+        }
+        
+        .alert-success {
+            background-color: #d4edda;
+            color: #155724;
+        }
+        
+        .alert-danger {
+            background-color: #f8d7da;
+            color: #721c24;
+        }
+    </style>
+</head>
 <body>
     <div class="container mt-5">
         <h2>Customize Watch</h2>
@@ -164,9 +261,10 @@
                 <input type="text" id="owner_name" name="owner_name" placeholder="Enter owner's name" required>
             </div>
             
-            <button type="submit" class="btn btn-primary">Customize Watch</button>
+            <button type="submit">Customize Watch</button>
         </form>
     </div>
+
     <script>
         function validateImageFileType() {
             var fileInput = document.getElementById('watch_image');
