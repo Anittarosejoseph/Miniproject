@@ -10,7 +10,7 @@ from django.db import models
 from django.db.models.signals import post_save
 from django.dispatch import receiver
 from django.contrib import messages
-# Create your models here.
+# # Create your models here.
 
 class UserManager(BaseUserManager):
     def create_user(self,name, username, phone, email, password=None):
@@ -231,17 +231,67 @@ class Cart(models.Model):
     def __str__(self):
         return f"Cart for {self.user.username}"
 
+from django.db import models
+from django.contrib.auth import get_user_model  # Import get_user_model
 
-from django.utils import timezone
+from .models import WatchProduct
+
+CustomUser = get_user_model()  # Get the CustomUser model
+
+class WatchCustomization(models.Model):
+    SIZE_CHOICES = [
+        ('small', 'Small'),
+        ('medium', 'Medium'),
+        ('large', 'Large'),
+    ]
+
+    STRAP_CHOICES = [
+        ('leather', 'Leather'),
+        ('metal', 'Metal'),
+        ('rubber', 'Rubber'),
+        ('nylon', 'Nylon'),
+    ]
+
+    DIAL_SHAPE_CHOICES = [
+        ('round', 'Round'),
+        ('square', 'Square'),
+        ('digital', 'Digital'),
+    ]
+
+    WATCH_HANDS_CHOICES = [
+        ('silver', 'Silver'),
+        ('gold', 'Gold'),
+        ('black', 'Black'),
+    ]
+    # Add the user_id field
+    user = models.ForeignKey(CustomUser, on_delete=models.CASCADE)
+    strap_material = models.CharField(max_length=50, choices=STRAP_CHOICES)
+    strap_color = models.CharField(max_length=50)
+    watch_color = models.CharField(max_length=50)
+    dial_shape = models.CharField(max_length=50, choices=DIAL_SHAPE_CHOICES)
+    watch_size = models.CharField(max_length=50, choices=SIZE_CHOICES)
+    watch_hands_color = models.CharField(max_length=50, choices=WATCH_HANDS_CHOICES)
+    owner_name = models.CharField(max_length=100)
+    watch_image = models.ImageField(upload_to='watch_images/', null=True, default='watch_images/default_image.jpg')
+    product = models.ForeignKey(WatchProduct, on_delete=models.CASCADE)  # Add the default value
+
+    def __str__(self):
+        return f"{self.owner_name}'s Customized Watch"
+from django.db import models
+from django.contrib.auth import get_user_model
+from .models import WatchProduct, WatchCustomization
+
+CustomUser = get_user_model()
+
 class Order(models.Model):
     user = models.ForeignKey(CustomUser, on_delete=models.CASCADE)
     products = models.ManyToManyField(WatchProduct, through='OrderItem')
+    watch_customization = models.ForeignKey(WatchCustomization, on_delete=models.CASCADE, null=True, blank=True)
 
     total_amount = models.DecimalField(max_digits=10, decimal_places=2)
     payment_id = models.CharField(max_length=100, null=True, blank=True)
     payment_status = models.BooleanField(default=False)
     created_at = models.DateTimeField(auto_now_add=True)
-    delivery_team = models.ForeignKey(DeliveryTeam, on_delete=models.SET_NULL, null=True, blank=True)
     status_choices = [
         ('Placed', 'Placed'),
         ('Processing', 'Processing'),
@@ -249,11 +299,9 @@ class Order(models.Model):
     ]
     status = models.CharField(max_length=20, choices=status_choices, default='Placed')
 
-    
-   
-
     def __str__(self):
         return f"Order {self.id} by {self.user.username}"
+
    
 from django.db import models
 from django.db import models
@@ -439,60 +487,3 @@ class Location(models.Model):
     distance = models.DecimalField(max_digits=10, decimal_places=2,null=True,blank=True)
     latitude = models.CharField(max_length=50,null=True,blank=True)
     longitude = models.CharField(max_length=50,null=True,blank=True)
-from django.db import models
-from .models import WatchProduct  # Import WatchProduct model
-
-class WatchCustomization(models.Model):
-    SIZE_CHOICES = [
-        ('small', 'Small'),
-        ('medium', 'Medium'),
-        ('large', 'Large'),
-    ]
-
-    STRAP_CHOICES = [
-        ('leather', 'Leather'),
-        ('metal', 'Metal'),
-        ('rubber', 'Rubber'),
-        ('nylon', 'Nylon'),
-    ]
-
-    DIAL_SHAPE_CHOICES = [
-        ('round', 'Round'),
-        ('square', 'Square'),
-        ('digital', 'Digital'),
-    ]
-
-    WATCH_HANDS_CHOICES = [
-        ('silver', 'Silver'),
-        ('gold', 'Gold'),
-        ('black', 'Black'),
-    ]
-
-    strap_material = models.CharField(max_length=50, choices=STRAP_CHOICES)
-    strap_color = models.CharField(max_length=50)
-    watch_color = models.CharField(max_length=50)
-    dial_shape = models.CharField(max_length=50, choices=DIAL_SHAPE_CHOICES)
-    watch_size = models.CharField(max_length=50, choices=SIZE_CHOICES)
-    watch_hands_color = models.CharField(max_length=50, choices=WATCH_HANDS_CHOICES)
-    owner_name = models.CharField(max_length=100)
-    watch_image = models.ImageField(upload_to='watch_images/', null=True, default='watch_images/default_image.jpg')
-    product = models.ForeignKey(WatchProduct, on_delete=models.CASCADE, default=1)  # Add the default value
-
-    def __str__(self):
-        return f"{self.owner_name}'s Customized Watch"
-        from django.db import models
-
-from django.db import models
-from django.utils import timezone
-from .models import CustomUser, WatchCustomization
-
-class CustomizationPayment(models.Model):
-    customization = models.ForeignKey(WatchCustomization, on_delete=models.CASCADE)
-    razor_pay_order_id = models.CharField(max_length=255)
-    amount = models.IntegerField()  # or DecimalField, depending on your requirements
-    is_paid = models.BooleanField(default=False)
-    customer = models.ForeignKey(CustomUser, on_delete=models.CASCADE)
-    created_at = models.DateTimeField(default=timezone.now)
-
-    def __str__(self):
-        return f"Payment for Customization: {self.customization.owner_name}'s Customization"

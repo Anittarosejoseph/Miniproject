@@ -432,7 +432,12 @@ def view_details(request, product_id):
     product = get_object_or_404(WatchProduct, pk=product_id)
     return render(request, 'viewdetails.html', {'product': product})
 
-
+from django.http import JsonResponse
+from django.conf import settings
+import razorpay
+import json
+from django.views.decorators.csrf import csrf_exempt
+from .models import Cart, CartItem, Order, OrderItem, WatchCustomization  # Import WatchCustomization
 from django.http import JsonResponse
 from django.conf import settings
 import razorpay
@@ -553,12 +558,12 @@ def handle_payment(request):
                 order.save()
 
                 
-                for cart_item in request.user.cart.cartitem_set.all():
-                    OrderItem.objects.create(
-                        order=order,
-                        product=cart_item.product,
-                        quantity=cart_item.quantity,
-                        item_total=cart_item.product.product_price * cart_item.quantity)
+                # for cart_item in request.user.cart.cartitem_set.all():
+                #     OrderItem.objects.create(
+                #         order=order,
+                #         product=cart_item.product,
+                #         quantity=cart_item.quantity,
+                #         item_total=cart_item.product.product_price * cart_item.quantity)
     
 
                 # Clear the user's cart after a successful payment
@@ -981,22 +986,17 @@ def all_orders(request):
     context = {'order_details': order_details}
     return render(request, 'myorders.html', context)
 
-
-from django.shortcuts import render, get_object_or_404
+from django.shortcuts import render
 from .models import Order
 
-def ordersummary(request):
-    # Retrieve the most recent paid order if it exists, or return a 404 error
-    try:
-        paid_order = Order.objects.filter(payment_status=True).latest('created_at')
-    except Order.DoesNotExist:
-        raise Http404("No paid orders found.")
+def ordersummary(request, order_id):
+    order = Order.objects.prefetch_related('watch_customization').get(id=order_id)
 
     context = {
-        'order': paid_order
+        'order': order,
     }
+    return render(request, 'order_summary.html', context)
 
-    return render(request, 'ordersummary.html', context)
 
 # views.py
 from django.shortcuts import render
@@ -1163,23 +1163,18 @@ def order_history(request):
         'user': user,
     }
     return render(request, 'order_history.html', context)
-
-# views.py
-
-from django.shortcuts import render
-from django.http import HttpResponse
-from .models import Order
+from django.shortcuts import render, get_object_or_404
+from .models import Order, WatchCustomization
 
 def bill(request, order_id):
-    # Retrieve the order object based on the order_id
-    try:
-        order = Order.objects.get(pk=order_id)
-    except Order.DoesNotExist:
-        return HttpResponse("Order not found", status=404)
-    
-    # Your view logic here
-    # For example, render a template with the order details
-    return render(request, 'bill.html', {'order': order})
+    order = get_object_or_404(Order, id=order_id)
+    customization = WatchCustomization.objects.filter(order=order).first()
+    context = {
+        'order': order,
+        'customization': customization,
+    }
+    return render(request, 'bill.html', context)
+
 
 
 @login_required
@@ -1259,7 +1254,7 @@ from django.contrib.auth.decorators import login_required
 @login_required(login_url='login')  # Ensure the user is logged in
 def techindex(request):
     # Assuming you have a foreign key from Repair to Technician
-    repair_requests = Repair.objects.filter(requested_by=request.user)
+    repair_requests = WatchRepairRequest.objects.filter(requested_by=request.user)
 
     return render(request, 'techindex.html', {'repair_requests': repair_requests})
 
@@ -1538,6 +1533,19 @@ def view_service(request):
     # Retrieve all services from the database
     services = WatchRepairService.objects.all()
     return render(request, 'view_service.html', {'services': services})
+from django.shortcuts import get_object_or_404, redirect
+
+def assign_technician(request, repair_request_id, technician_id):
+    # Retrieve the RepairRequest object and Technician object
+    repair_request = get_object_or_404(WatchRepairRequest, pk=repair_request_id)
+    technician = get_object_or_404(Technician, pk=technician_id)
+    
+    # Perform the assignment logic here, e.g., setting the assigned technician for the repair request
+    repair_request.assigned_technician = technician
+    repair_request.save()
+    
+    # Redirect to some appropriate URL after the assignment
+    return redirect('some_redirect_url')
 
 
 from django.shortcuts import render, get_object_or_404, redirect
@@ -1632,28 +1640,27 @@ def send_payment_confirmation_email(user_email, repair_request, amount):
     recipient_list = [user_email]
 
     send_mail(subject, message, from_email, recipient_list)
-# views.py
-
 from django.shortcuts import render, redirect, get_object_or_404
-from django.contrib import messages
-from .models import WatchCustomization
-from .models import WatchProduct  # Import the WatchProduct model
+from django.contrib.auth.decorators import login_required
+from .models import WatchProduct, Order, OrderItem, WatchCustomization
 
+@login_required
 def customize_watch(request, product_id):
-    product = get_object_or_404(WatchProduct, pk=product_id)
     if request.method == 'POST':
-        # Process form submission
-        strap_material = request.POST.get('strap_material')
-        strap_color = request.POST.get('strap_color')
-        watch_color = request.POST.get('watch_color')
-        dial_shape = request.POST.get('dial_shape')
-        watch_size = request.POST.get('watch_size')
-        watch_hands_color = request.POST.get('watch_hands_color')
-        owner_name = request.POST.get('owner_name')
-        watch_image = request.FILES.get('watch_image')
+        # Extract form data from the request
+        strap_material = request.POST['strap_material']
+        strap_color = request.POST['strap_color']
+        watch_color = request.POST['watch_color']
+        dial_shape = request.POST['dial_shape']
+        watch_size = request.POST['watch_size']
+        watch_hands_color = request.POST['watch_hands_color']
+        owner_name = request.POST['owner_name']
+        watch_image = request.FILES.get('watch_image')  # Use get() to avoid KeyError if image is not provided
 
-        # Save customization details to the database
-        customization = WatchCustomization(
+        # Create a new WatchCustomization instance
+        product = WatchProduct.objects.get(pk=product_id)
+        customization = WatchCustomization.objects.create(
+            user=request.user,
             strap_material=strap_material,
             strap_color=strap_color,
             watch_color=watch_color,
@@ -1662,35 +1669,109 @@ def customize_watch(request, product_id):
             watch_hands_color=watch_hands_color,
             owner_name=owner_name,
             watch_image=watch_image,
-            product_id=product_id
+            product=product,
+            # Assuming there's an order associated with the customization
+            order=request.user.order_set.last()
         )
-        customization.save()
 
-        # Calculate the amount here based on customization
-        amount = calculate_amount()
+        # Redirect to view_entered_details page with the created product's ID
+        return redirect('view_entered_details', product_id=product_id)
+    else:
+        # If the request method is GET, render the form template
+        product = get_object_or_404(WatchProduct, pk=product_id)
+        return render(request, 'customize_watch.html', {'product': product})
 
-        # Redirect to the view_entered_details page with entered details
-        return redirect('view_entered_details', product_id=product_id, amount=amount)
-
-    return render(request, 'customize_watch.html', {'product': product})
-
-def view_entered_details(request, product_id, amount):
+def view_entered_details(request, product_id):
     product = get_object_or_404(WatchProduct, pk=product_id)
     customization = WatchCustomization.objects.filter(product_id=product_id).last()
-    context = {
-        'product': product,
-        'strap_material': customization.strap_material,
-        'strap_color': customization.strap_color,
-        'watch_color': customization.watch_color,
-        'dial_shape': customization.dial_shape,
-        'watch_size': customization.watch_size,
-        'watch_hands_color': customization.watch_hands_color,
-        'owner_name': customization.owner_name,
-        'amount': amount,
-    }
+
+    if customization:
+        context = {
+            'product': product,
+            'strap_material': customization.strap_material,
+            'strap_color': customization.strap_color,
+            'watch_color': customization.watch_color,
+            'dial_shape': customization.dial_shape,
+            'watch_size': customization.watch_size,
+            'watch_hands_color': customization.watch_hands_color,
+            'owner_name': customization.owner_name,
+        }
+    else:
+        context = {
+            'product': product,
+            'strap_material': None,
+            'strap_color': None,
+            'watch_color': None,
+            'dial_shape': None,
+            'watch_size': None,
+            'watch_hands_color': None,
+            'owner_name': None,
+        }
+
     return render(request, 'view_entered_details.html', context)
 
-# You may need to define the calculate_amount function
-def calculate_amount():
-    # Add your calculation logic here
-    return 100  # Example amount, replace with your calculation
+
+
+
+from reportlab.pdfgen import canvas
+from io import BytesIO
+from django.utils import timezone
+import matplotlib.pyplot as plt
+from reportlab.lib.utils import ImageReader
+
+def financial_report_pdf(request):
+    # Retrieve orders data or any other financial data you need, ordered by creation date in descending order
+    orders = Order.objects.order_by('-created_at')
+    
+    # Create a BytesIO buffer for the PDF content
+    buffer = BytesIO()
+    
+    # Create a PDF document
+    pdf = canvas.Canvas(buffer, pagesize='A4')
+    
+    # Define PDF filename
+    filename = "financial_report.pdf"
+    
+    # Set PDF metadata
+    pdf.setTitle(filename)
+    
+    # Define PDF title and formatting
+    pdf.setFont("Helvetica-Bold", 16)
+    pdf.drawCentredString(300, 800, "Financial Report")
+
+    pdf.setFont("Helvetica-Bold", 14)
+    pdf.drawString(50, 770, "Summary of Financial Data")
+    
+    
+    # Set up table headers
+    pdf.setFont("Helvetica-Bold", 12)
+    pdf.drawString(50, 750, 'Order ID')
+    # pdf.drawString(150, 750, 'User')
+    pdf.drawString(250, 750, 'Total Amount')
+    pdf.drawString(350, 750, 'Status')
+    pdf.drawString(450, 750, 'Purchased On')
+    
+    # Set up table rows
+    pdf.setFont("Helvetica", 12)
+    y_position = 730  # Initial y-position for the first row
+    
+    for order in orders:
+        pdf.drawString(50, y_position, str(order.id))
+        # pdf.drawString(150, y_position, order.user.fullName)  # Assuming full_name is a field in your User model
+        pdf.drawString(250, y_position, str(order.total_amount))
+        pdf.drawString(350, y_position, order.status)
+        pdf.drawString(450, y_position, order.created_at.strftime("%Y-%m-%d %H:%M:%S"))  # Format the date as needed
+        y_position -= 20  # Move to the next row
+    
+    # Save the PDF document
+    pdf.save()
+    
+    # Get PDF content from the BytesIO buffer
+    pdf_data = buffer.getvalue()
+    buffer.close()
+    
+    # Prepare HTTP response with PDF content
+    response = HttpResponse(pdf_data, content_type='application/pdf')
+    response['Content-Disposition'] = f'attachment; filename="{filename}"'
+    
+    return response

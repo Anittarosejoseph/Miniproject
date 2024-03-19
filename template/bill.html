@@ -2,145 +2,55 @@
 <html lang="en">
 <head>
     <meta charset="UTF-8">
-    <meta http-equiv="X-UA-Compatible" content="IE=edge">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Bill Invoice</title>
-
+    <title>Bill</title>
+    <link rel="stylesheet" type="text/css" href="{% static 'css/bill.css' %}">
     <style>
-        body {
-            font-family: Arial, sans-serif;
-            background-color: #f0f0f0;
-            margin: 0;
-            padding: 0;
-        }
+        .container {
+    max-width: 800px;
+    margin: 0 auto;
+    padding: 20px;
+}
 
-        header {
-            background-color: #112418;
-            color: white;
-            text-align: center;
-            padding: 30px ;
-        }
-        .logout-icon {
-            position: absolute;
-            right: 10px;
-            top: 5px;
-            text-decoration: none;
-            color: #fff;
-        }
+.header {
+    text-align: center;
+}
 
-        h1 {
-            color: #3498db;
-        }
+.order-details,
+.customization-details,
+.user-details {
+    margin-top: 30px;
+}
 
-        table {
-            width: 100%;
-            border-collapse: collapse;
-            margin-top: 20px;
-        }
+.user-details p {
+    margin-bottom: 10px;
+}
 
-        th, td {
-            border: 1px solid #ddd;
-            padding: 10px;
-            text-align: left;
-        }
+/* Add more styles as needed */
 
-        th {
-            background-color: #f2f2f2;
-        }
-        button {
-            background-color: red;
-            color: white;
-            margin-top: 10px;
-            font-size: 18px; /* Adjust the font size */
-            padding: 10px 20px;
-        }
     </style>
 </head>
 <body>
-    <header>
-        <a href="{% url 'order_history' %}" class="logout-icon">Orderhistory</a> 
-        </a>
-    </header>
-    <h1>Bill Invoice</h1>
-
-    {% if order %}
-        <table>
-            <tr>
-                <th>Order Number</th>
-                <td>{{ order.id }}</td>
-            </tr>
-            <tr>
-                <th>Total Amount</th>
-                <td>{{ order.total_amount }}</td>
-            </tr>
-            <tr>
-                <th>Payment Status</th>
-                <td>{% if order.payment_status %}Paid{% else %}Pending{% endif %}</td>
-            </tr>
-            <tr>
-                <th>Order Date</th>
-                <td>{{ order.created_at }}</td>
-            </tr>
-        </table>
-
-        {% if order.payment_status %}
-        <h2>Product Details</h2>
-        <table>
-            <tr>
-                <th>Product Name</th>
-                <th>Quantity</th>
-            </tr>
-            {% for item in order.orderitem_set.all %}
-                <tr>
-                    <td>{{ item.product.product_name }}</td>
-                    <td>{{ item.quantity }}</td>
-                </tr>
-            {% endfor %}
-        </table>
-    {% endif %}
-
-<h2>Customer Details</h2>
-<table>
-    <tr>
-        <th>Name</th>
-        <td>{{ order.user.name }}</td>
-    </tr>
-    <tr>
-        <th>Email</th>
-        <td>{{ order.user.email }}</td>
-    </tr>
-    <tr>
-        <th>Phone Number</th>
-        
-        <td>{{ order.user.customerprofile.phone }}</td>
-    </tr>
-    <tr>
-        <th>Address</th>
-        <td>        {{ order.user.customerprofile.street_address }} 
-        </td>
-    </tr>
-    <tr>
-        <th>City</th>
-        <td>        {{ order.user.customerprofile.city }}
-        </td>
-    </tr>
-    <tr>
-        <th>State</th>
-        <td>        {{ order.user.customerprofile.state }}
-        </td>
-    </tr>
-    <tr>
-        <th>Pincode</th>
-        <td>        {{ order.user.customerprofile.pincode }}
-        </td>
-    </tr>
-</table>
-
-<center><button onclick="window.print()">Print</button></center>
-
-{% else %}
-    <p>No order details found.</p>
-{% endif %}
-
+    <div class="container">
+        <div class="header">
+            <h1>Order Details</h1>
+        </div>
+        <div class="order-details">
+            <p><strong>Order ID:</strong> {{ order.id }}</p>
+            <p><strong>Total Amount:</strong> ${{ order.total_amount }}</p>
+            <!-- Add more order details as needed -->
+        </div>
+        <div class="customization-details">
+            <h2>Watch Customization Details</h2>
+            <p><strong>Owner Name:</strong> {{ customization.owner_name }}</p>
+            <!-- Add more customization details as needed -->
+        </div>
+        <div class="user-details">
+            <h2>User Details</h2>
+            <p><strong>Username:</strong> {{ order.user.username }}</p>
+            <p><strong>Email:</strong> {{ order.user.email }}</p>
+            <!-- Add more user details as needed -->
+        </div>
+    </div>
 </body>
 </html>

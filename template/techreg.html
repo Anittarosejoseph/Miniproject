@@ -786,6 +786,36 @@ th.action-header {
     }
 </script>
 
+<script>
+    // Function to check username availability
+    function checkUsernameAvailability() {
+        var usernameInput = document.getElementById('username');
+        var usernameError = document.getElementById('usernameError');
+
+        // Reset error message
+        usernameError.innerHTML = '';
+
+        // Fetch request to check if the username is available
+        fetch('/check_username_availability/?username=' + usernameInput.value)
+            .then(response => {
+                if (response.ok) {
+                    // Username is available
+                    usernameError.innerHTML = '';
+                } else {
+                    // Username is not available
+                    usernameError.innerHTML = 'Username is already taken. Please choose a different one.';
+                }
+            })
+            .catch(error => {
+                console.error('Error:', error);
+            });
+    }
+
+    // Event listener for username input
+    document.getElementById('username').addEventListener('input', function() {
+        checkUsernameAvailability();
+    });
+</script>
 <!-- Bootstrap JS (if needed) -->
 <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.0.2/dist/js/bootstrap.min.js"
         integrity="sha384-LVEd8s8FfFE2dgB/YckPIjg1w+h73ltzgDXE1gyvT7h5v8qUvMnOAp/g5MFLKjy" crossorigin="anonymous"></script>

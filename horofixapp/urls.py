@@ -38,8 +38,8 @@ urlpatterns = [
     path('handle-payment/', views.handle_payment, name='handle-payment'),
     path('checkout/', views.checkout, name='checkout'),
     path('user_list/', views.user_list, name='user_list'),
-       path('customize/<int:product_id>/', views.customize_watch, name='customize_watch'),
-    path('view_entered_details/<int:product_id>/<int:amount>/',views.view_entered_details, name='view_entered_details'),
+    path('customize/<int:product_id>/', views.customize_watch, name='customize_watch'),
+    path('view_entered_details/<int:product_id>/', views.view_entered_details, name='view_entered_details'),
 
     path('block_unblock_user/<int:user_id>/', views.block_unblock_user, name='block_unblock_user'),
     path('all_user_orders/', views.all_user_orders, name='all_user_orders'),
@@ -48,7 +48,7 @@ urlpatterns = [
     path('sort-products/', views.sort_products, name='sort_products'),
     path('filter-products-by-category/', views.filter_products_by_category, name='filter_products_by_category'),
     path('remove_order_item/<int:item_id>/', views.remove_order_item, name='remove_order_item'),
-    path('ordersummary/', views.ordersummary, name='ordersummary'),
+    path('ordersummary/<int:order_id>/', views.ordersummary, name='order_summary'),
     path('deliveryteamreg/', views.delivery_team_registration, name='deliveryteamreg'),
     path('deliveryindex/',views. deliveryindex, name='deliveryindex'),
     path('delivery_team_list/', views.delivery_team_list, name='delivery_team_list'),
@@ -64,7 +64,9 @@ urlpatterns = [
     path('bill/<int:order_id>/', views.bill, name='bill'),
     path('admin_order_list/', views.admin_order_list, name='admin_order_list'),
     path('assign_delivery_team/', views.assign_delivery_team, name='assign_delivery_team'),
-    
+        path('assign_technician/<int:repair_request_id>/<int:technician_id>/', views.assign_technician, name='assign_technician'),
+    path('financial-report/', views.financial_report_pdf, name='financial-report'),  # Define the URL pattern with the correct name
+
     path('delivery-team-orders/', views.delivery_team_orders, name='delivery_team_orders'),
     # path('unisex_products/', views.unisex_products, name='unisex_products'),
 

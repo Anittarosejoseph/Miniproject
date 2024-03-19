@@ -34,6 +34,100 @@
 .product-specs {
     width: 50%;
 }
+/* Adjustments for body */
+body {
+    font-family: 'Roboto', sans-serif;
+    background-image: url('{% static "images/background.jpg" %}');
+    background-size: cover;
+    background-position: center;
+    height: 100vh;
+    margin: 0;
+    padding: 0;
+}
+
+/* Styles for container */
+.container {
+    max-width: 600px;
+    margin: 0 auto;
+    padding: 20px;
+    background-color: #fff;
+    border-radius: 10px;
+    box-shadow: 0 0 10px rgba(0, 0, 0, 0.1);
+}
+
+/* Styles for headings */
+h2 {
+    margin-bottom: 20px;
+    text-align: center;
+    color: #333;
+}
+
+/* Styles for images */
+img {
+    display: block;
+    margin: 0 auto;
+    max-width: 100%;
+    height: auto;
+}
+
+/* Styles for form groups */
+.form-group {
+    margin-bottom: 20px;
+}
+
+/* Styles for labels */
+label {
+    font-weight: bold;
+    color: #333;
+}
+
+/* Styles for input fields and select dropdowns */
+input[type="color"],
+select,
+input[type="file"],
+input[type="text"] {
+    width: 100%;
+    padding: 8px;
+    border-radius: 5px;
+    border: 1px solid #ccc;
+    background-color: #f9f9f9;
+}
+
+/* Styles for buttons */
+button {
+    width: 100%;
+    padding: 10px;
+    border: none;
+    border-radius: 5px;
+    background-color: #007bff;
+    color: #fff;
+    cursor: pointer;
+    transition: background-color 0.3s;
+}
+
+button:hover {
+    background-color: #0056b3;
+}
+
+/* Styles for alerts */
+.alert {
+    margin-top: 20px;
+    padding: 15px;
+    border-radius: 5px;
+    background-color: #f8d7da;
+    color: #721c24;
+}
+
+.alert-success {
+    background-color: #d4edda;
+    color: #155724;
+}
+
+.alert-danger {
+    background-color: #f8d7da;
+    color: #721c24;
+}
+
 
 </style>  
 </head>
@@ -44,7 +138,7 @@
             <nav class="navbar navbar-expand-lg custom_nav-container">
                 <a class="navbar-brand" href="index.html">
                     <span>
-                        HandTime
+                        HOROFIX
                     </span>
                 </a>
 
@@ -276,6 +370,37 @@
                 return false;
             }
         }
-    </script>
-</body>
-</html>
+    </script><script>
+    function validateForm() {
+        var strapMaterial = document.getElementById('strap_material').value;
+        var strapColor = document.getElementById('strap_color').value;
+        var watchColor = document.getElementById('watch_color').value;
+        var dialShape = document.getElementById('dial_shape').value;
+        var watchSize = document.getElementById('watch_size').value;
+        var watchHandsColor = document.getElementById('watch_hands_color').value;
+        var ownerName = document.getElementById('owner_name').value;
+        var watchImage = document.getElementById('watch_image').value;
+
+        // Check if any field is empty
+        if (!strapMaterial || !strapColor || !watchColor || !dialShape || !watchSize || !watchHandsColor || !ownerName || !watchImage) {
+            alert('Please fill out all fields');
+            return false;
+        }
+
+        // Check if owner name contains spaces
+        if (ownerName.includes(' ')) {
+            alert('Owner name should not contain spaces');
+            return false;
+        }
+
+        // Check if owner name has exactly 200 characters
+        if (ownerName.length !== 200) {
+            alert('Owner name should have exactly 200 characters');
+            return false;
+        }
+
+        // Additional validation checks can be added here
+
+        return true; // Form submission allowed
+    }
+</script>
