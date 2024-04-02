@@ -437,7 +437,7 @@ from django.conf import settings
 import razorpay
 import json
 from django.views.decorators.csrf import csrf_exempt
-from .models import Cart, CartItem, Order, OrderItem, WatchCustomization  # Import WatchCustomization
+from .models import Cart, CartItem, Order, OrderItem
 from django.http import JsonResponse
 from django.conf import settings
 import razorpay
@@ -985,17 +985,10 @@ def all_orders(request):
 
     context = {'order_details': order_details}
     return render(request, 'myorders.html', context)
-
-from django.shortcuts import render
-from .models import Order
-
-def ordersummary(request, order_id):
-    order = Order.objects.prefetch_related('watch_customization').get(id=order_id)
-
-    context = {
-        'order': order,
-    }
-    return render(request, 'order_summary.html', context)
+@login_required
+def ordersummary(request):
+    order = Order.objects.filter(user=request.user).latest('created_at')
+    return render(request, 'ordersummary.html', {'order': order})
 
 
 # views.py
@@ -1164,14 +1157,11 @@ def order_history(request):
     }
     return render(request, 'order_history.html', context)
 from django.shortcuts import render, get_object_or_404
-from .models import Order, WatchCustomization
 
 def bill(request, order_id):
     order = get_object_or_404(Order, id=order_id)
-    customization = WatchCustomization.objects.filter(order=order).first()
     context = {
         'order': order,
-        'customization': customization,
     }
     return render(request, 'bill.html', context)
 
@@ -1609,7 +1599,7 @@ def repair_payment_success(request, repair_id):
         customer=request.user
     )
     new_payment.save()
-    send_payment_confirmation_email(request.user.email, repair_request, order_amount)
+    # send_payment_confirmation_email(request.user.email, repair_request, order_amount)
 
     # Handle other logic here (e.g., updating repair_request status)
 
@@ -1642,73 +1632,72 @@ def send_payment_confirmation_email(user_email, repair_request, amount):
     send_mail(subject, message, from_email, recipient_list)
 from django.shortcuts import render, redirect, get_object_or_404
 from django.contrib.auth.decorators import login_required
-from .models import WatchProduct, Order, OrderItem, WatchCustomization
 
-@login_required
-def customize_watch(request, product_id):
-    if request.method == 'POST':
-        # Extract form data from the request
-        strap_material = request.POST['strap_material']
-        strap_color = request.POST['strap_color']
-        watch_color = request.POST['watch_color']
-        dial_shape = request.POST['dial_shape']
-        watch_size = request.POST['watch_size']
-        watch_hands_color = request.POST['watch_hands_color']
-        owner_name = request.POST['owner_name']
-        watch_image = request.FILES.get('watch_image')  # Use get() to avoid KeyError if image is not provided
+# @login_required
+# def customize_watch(request, product_id):
+#     if request.method == 'POST':
+#         # Extract form data from the request
+#         strap_material = request.POST['strap_material']
+#         strap_color = request.POST['strap_color']
+#         watch_color = request.POST['watch_color']
+#         dial_shape = request.POST['dial_shape']
+#         watch_size = request.POST['watch_size']
+#         watch_hands_color = request.POST['watch_hands_color']
+#         owner_name = request.POST['owner_name']
+#         watch_image = request.FILES.get('watch_image')  # Use get() to avoid KeyError if image is not provided
 
-        # Create a new WatchCustomization instance
-        product = WatchProduct.objects.get(pk=product_id)
-        customization = WatchCustomization.objects.create(
-            user=request.user,
-            strap_material=strap_material,
-            strap_color=strap_color,
-            watch_color=watch_color,
-            dial_shape=dial_shape,
-            watch_size=watch_size,
-            watch_hands_color=watch_hands_color,
-            owner_name=owner_name,
-            watch_image=watch_image,
-            product=product,
-            # Assuming there's an order associated with the customization
-            order=request.user.order_set.last()
-        )
+#         # Create a new WatchCustomization instance
+#         product = WatchProduct.objects.get(pk=product_id)
+#         customization = WatchCustomization.objects.create(
+#             user=request.user,
+#             strap_material=strap_material,
+#             strap_color=strap_color,
+#             watch_color=watch_color,
+#             dial_shape=dial_shape,
+#             watch_size=watch_size,
+#             watch_hands_color=watch_hands_color,
+#             owner_name=owner_name,
+#             watch_image=watch_image,
+#             product=product,
+#             # Assuming there's an order associated with the customization
+#             order=request.user.order_set.last()
+#         )
 
-        # Redirect to view_entered_details page with the created product's ID
-        return redirect('view_entered_details', product_id=product_id)
-    else:
-        # If the request method is GET, render the form template
-        product = get_object_or_404(WatchProduct, pk=product_id)
-        return render(request, 'customize_watch.html', {'product': product})
+#         # Redirect to view_entered_details page with the created product's ID
+#         return redirect('view_entered_details', product_id=product_id)
+#     else:
+#         # If the request method is GET, render the form template
+#         product = get_object_or_404(WatchProduct, pk=product_id)
+#         return render(request, 'customize_watch.html', {'product': product})
 
-def view_entered_details(request, product_id):
-    product = get_object_or_404(WatchProduct, pk=product_id)
-    customization = WatchCustomization.objects.filter(product_id=product_id).last()
+# def view_entered_details(request, product_id):
+#     product = get_object_or_404(WatchProduct, pk=product_id)
+#     customization = WatchCustomization.objects.filter(product_id=product_id).last()
 
-    if customization:
-        context = {
-            'product': product,
-            'strap_material': customization.strap_material,
-            'strap_color': customization.strap_color,
-            'watch_color': customization.watch_color,
-            'dial_shape': customization.dial_shape,
-            'watch_size': customization.watch_size,
-            'watch_hands_color': customization.watch_hands_color,
-            'owner_name': customization.owner_name,
-        }
-    else:
-        context = {
-            'product': product,
-            'strap_material': None,
-            'strap_color': None,
-            'watch_color': None,
-            'dial_shape': None,
-            'watch_size': None,
-            'watch_hands_color': None,
-            'owner_name': None,
-        }
+#     if customization:
+#         context = {
+#             'product': product,
+#             'strap_material': customization.strap_material,
+#             'strap_color': customization.strap_color,
+#             'watch_color': customization.watch_color,
+#             'dial_shape': customization.dial_shape,
+#             'watch_size': customization.watch_size,
+#             'watch_hands_color': customization.watch_hands_color,
+#             'owner_name': customization.owner_name,
+#         }
+#     else:
+#         context = {
+#             'product': product,
+#             'strap_material': None,
+#             'strap_color': None,
+#             'watch_color': None,
+#             'dial_shape': None,
+#             'watch_size': None,
+#             'watch_hands_color': None,
+#             'owner_name': None,
+#         }
 
-    return render(request, 'view_entered_details.html', context)
+#     return render(request, 'view_entered_details.html', context)
 
 
 
@@ -1775,3 +1764,366 @@ def financial_report_pdf(request):
     response['Content-Disposition'] = f'attachment; filename="{filename}"'
     
     return response
+from .forms import VideoForm
+
+def upload_video(request):
+    if request.method == 'POST':
+        form = VideoForm(request.POST, request.FILES)
+        if form.is_valid():
+            form.save()
+            return redirect('panel')  # Update with your template name
+    else:
+        form = VideoForm()
+    
+    return render(request, 'upload_video.html', {'form': form})
+from django.shortcuts import render
+from .models import Video
+
+def display_videos(request):
+    videos = Video.objects.all()
+    return render(request, 'display_videos.html', {'videos': videos})
+from .models import Video
+
+def video_list(request):
+    videos = Video.objects.all()
+    return render(request, 'videos.html', {'videos': videos})
+
+
+def edit_video(request, video_id):
+    # Fetch video details based on video_id and pass it to the template
+    video = Video.objects.get(id=video_id)
+    return render(request, 'edit_video.html', {'video': video})
+
+from django.core.files.base import ContentFile
+import os
+
+def save_edits(request, video_id):
+    if request.method == 'POST':
+        # Fetch the video instance
+        video = Video.objects.get(id=video_id)
+
+        # Update title and description
+        video.title = request.POST.get('title')
+        video.description = request.POST.get('description')
+
+        # Handle video file upload
+        if 'video_file' in request.FILES:
+            # Delete the existing video file if it exists
+            if video.video_file:
+                os.remove(video.video_file.path)
+            # Get the new video file from the request
+            video_file = request.FILES['video_file']
+            # Save the new video file
+            video.video_file.save(video_file.name, video_file)
+
+        # Save the updated video
+        video.save()
+
+        # Redirect back to the videos page
+        return redirect('videos')
+from .models import Video
+
+def video_list(request):
+    videos = Video.objects.all()
+    return render(request, 'videos.html', {'videos': videos})
+
+def delete_video(request, video_id):
+    video = get_object_or_404(Video, id=video_id)
+    if request.method == 'POST':
+        video.delete()
+        return redirect('video_list')
+    return redirect('video_list')  # Redirect to video list page
+from .models import Video
+
+def video_list(request):
+    videos = Video.objects.all()
+    return render(request, 'videos.html', {'videos': videos})
+
+
+def edit_video(request, video_id):
+    # Fetch video details based on video_id and pass it to the template
+    video = Video.objects.get(id=video_id)
+    return render(request, 'edit_video.html', {'video': video})
+
+from django.core.files.base import ContentFile
+import os
+
+def save_edits(request, video_id):
+    if request.method == 'POST':
+        # Fetch the video instance
+        video = Video.objects.get(id=video_id)
+
+        # Update title and description
+        video.title = request.POST.get('title')
+        video.description = request.POST.get('description')
+
+        # Handle video file upload
+        if 'video_file' in request.FILES:
+            # Delete the existing video file if it exists
+            if video.video_file:
+                os.remove(video.video_file.path)
+            # Get the new video file from the request
+            video_file = request.FILES['video_file']
+            # Save the new video file
+            video.video_file.save(video_file.name, video_file)
+
+        # Save the updated video
+        video.save()
+
+        # Redirect back to the videos page
+        return redirect('videos')
+
+@login_required
+def order_status(request):
+    orders = Order.objects.filter(user=request.user)
+    return render(request, 'order_status.html', {'orders': orders})
+from django.shortcuts import render, redirect
+from django.contrib import messages
+from .models import Order
+
+def cancel_order(request, order_id):
+    if request.method == 'POST':
+        order = Order.objects.get(id=order_id)
+        if order.payment_status:
+            order.cancelled = True
+            order.save()
+            messages.success(request, 'Order cancelled successfully.')
+        else:
+            messages.error(request, 'Cannot cancel unpaid orders.')
+    return redirect('order_status')  # Redirect to the order status page
+
+
+
+from django.http import JsonResponse
+from django.shortcuts import get_object_or_404
+from .models import Order
+
+def order_cancellation(request, order_id):
+    order = get_object_or_404(Order, pk=order_id)
+
+    if request.method == 'POST':
+        # Assuming you handle the cancellation logic here
+        order.cancel()  # You may have a method like cancel() in your Order model
+        return JsonResponse({'success': True})
+    else:
+        return JsonResponse({'success': False, 'message': 'Invalid request method'})
+
+
+
+from django.shortcuts import render
+from django.core.exceptions import ObjectDoesNotExist
+from .models import Order
+
+def order_status(request):
+    orders = Order.objects.filter(user=request.user)
+    return render(request, 'order_status.html', {'orders': orders})
+
+
+from django.shortcuts import render, redirect
+from django.contrib import messages
+from .models import CustomWatch
+
+@never_cache
+def add_custom(request):
+    if request.method == 'POST':
+        category = request.POST['category']
+        product_name = request.POST['productName']
+        watch_model_number = request.POST['watch_modelnumber']
+        watch_serial_number = request.POST['watchSerialNumber']
+        product_price = request.POST['productPrice']
+        product_sale_price = request.POST['productSalePrice']
+        discount = request.POST['discount']
+        watch_description = request.POST['watchDescription']
+        warranty = request.POST['warranty']
+        stock = request.POST['stock']
+        watch_image = request.FILES['watchImage']
+
+        if CustomWatch.objects.filter(product_name=product_name, category=category, watch_modelnumber=watch_model_number).exists():
+            messages.error(request, f"A product with the name '{product_name}', category '{category}', and watch model number '{watch_model_number}' already exists.")
+        else:
+            try:
+                product_price = float(product_price)
+                product_sale_price = float(product_sale_price)
+                discount = float(discount)
+                warranty = int(warranty)
+                stock = int(stock)
+
+                CustomWatch.objects.create(
+                    category=category,
+                    product_name=product_name,
+                    watch_modelnumber=watch_model_number,
+                    watch_serial_number=watch_serial_number,
+                    product_price=product_price,
+                    product_sale_price=product_sale_price,
+                    discount=discount,
+                    watch_description=watch_description,
+                    warranty=warranty,
+                    stock=stock,
+                    watch_image=watch_image
+                )
+
+                messages.success(request, "Product added successfully.")
+            except (ValueError, TypeError):
+                messages.error(request, "Invalid numerical input.")
+
+        return redirect('view_custom')
+    
+    return render(request, 'add_custom.html')
+@never_cache
+def view_custom(request):
+    products = CustomWatch.objects.all()  # Retrieve all products from the database
+    return render(request, 'view_custom.html', {'products': products})
+from django.shortcuts import render, redirect, get_object_or_404
+from .models import CustomWatch
+
+@never_cache
+def edit_custom(request, product_id):
+    product = get_object_or_404(CustomWatch, id=product_id)
+    
+    if request.method == 'POST':
+        product_name = request.POST['product_name']
+        product_price = request.POST['product_price']
+        product_sale_price = request.POST['product_sale_price']
+        discount = request.POST['discount']
+        watch_description = request.POST['watch_description']
+        watch_image = request.FILES.get('product_image')
+
+        # Ensure the numerical fields are valid numbers before saving
+        try:
+            product_price = float(product_price)
+            product_sale_price = float(product_sale_price)
+            discount = float(discount)
+
+            # Update the product instance with the new data
+            product.product_name = product_name
+            product.product_price = product_price
+            product.product_sale_price = product_sale_price
+            product.discount = discount
+            product.watch_description = watch_description
+
+            if watch_image:
+                product.watch_image = watch_image
+
+            product.save()
+            messages.success(request, f"Product '{product.product_name}' edited successfully.")
+            return redirect('view_products')
+        except (ValueError, TypeError):
+            messages.error(request, "Invalid numerical input.")
+
+    return render(request, 'edit_custom.html', {'product': product})
+
+@login_required
+def custpro(request):
+    products =CustomWatch.objects.all()
+    return render(request, 'custpro.html', {'products': products})
+def custom_view(request, product_id):
+    product = get_object_or_404(CustomWatch, pk=product_id)
+    return render(request, 'custom_view.html', {'product': product})
+# views.py
+from django.shortcuts import render, redirect, get_object_or_404
+from .models import CustomWatch, CustomizationDetail
+
+def customize_watch(request, product_id):
+    watch = get_object_or_404(CustomWatch, pk=product_id)
+    if request.method == 'POST':
+        strap_material = request.POST.get('strap_material')
+        strap_color = request.POST.get('strap_color')
+        dial_color = request.POST.get('dial_color')
+        case_material = request.POST.get('case_material')
+        case_color = request.POST.get('case_color')
+        engraving_text = request.POST.get('engraving_text')
+        engraving_font = request.POST.get('engraving_font')
+        engraving_location = request.POST.get('engraving_location')
+        special_requests = request.POST.get('special_requests')
+        
+        customization = CustomizationDetail.objects.create(
+            watch=watch,
+            strap_material=strap_material,
+            strap_color=strap_color,
+            dial_color=dial_color,
+            case_material=case_material,
+            case_color=case_color,
+            engraving_text=engraving_text,
+            engraving_font=engraving_font,
+            engraving_location=engraving_location,
+            special_requests=special_requests,
+        )
+        
+        # Redirect to product detail page or any other page
+        return redirect('cust_cart')
+    
+    return render(request, 'customize_watch.html', {'watch': watch})
+from django.shortcuts import render, redirect, get_object_or_404
+from django.http import JsonResponse
+from django.contrib.auth.decorators import login_required
+from .models import Watch, CustomWatch, CustomizationDetail, CustomCartItem, CustomCart, CustomOrder, CustomOrderItem
+from django.http import JsonResponse
+from django.contrib.auth.decorators import login_required
+from django.shortcuts import get_object_or_404, redirect
+
+@login_required(login_url='login')
+def add_to_carts(request, product_id):
+    product = get_object_or_404(Watch, pk=product_id)
+    cart, created = CustomCart.objects.get_or_create(user=request.user)
+    cart_item, item_created = CustomCartItem.objects.get_or_create(cart=cart, product=product)
+    
+    if not item_created:
+        cart_item.quantity += 1
+        cart_item.save()
+    
+    return redirect('cust_cart')
+
+@login_required(login_url='login')
+def remove_from_carts(request, product_id):
+    product = get_object_or_404(Watch, pk=product_id)
+    cart = CustomCart.objects.get(user=request.user)
+    
+    try:
+        cart_item = cart.customcartitem_set.get(product=product)
+        
+        if cart_item.quantity >= 1 and product.status == 'In Stock':
+            cart_item.delete()
+    except CustomCartItem.DoesNotExist:
+        pass
+    
+    return redirect('cust_cart')
+
+def cust_cart(request):
+    cart = request.user.customcart
+    cart_items = CustomCartItem.objects.filter(cart=cart)
+    for item in cart_items:
+        item.total_price = item.product.product_sale_price * item.quantity
+    
+    total_amount = sum(item.total_price for item in cart_items)
+
+    return render(request, 'cust_cart.html', {'cart_items': cart_items,'total_amount': total_amount})
+
+@login_required(login_url='login')
+def increase_cart_items(request, product_id):
+    product = get_object_or_404(Watch, pk=product_id)
+    user = request.user
+    cart, created = CustomCart.objects.get_or_create(user=user)
+    
+    cart_item, created = CustomCartItem.objects.get_or_create(cart=cart, product=product)
+    
+    if not created:
+        
+        cart_item.quantity += 1
+        cart_item.save()
+    
+    return redirect('cust_cart')
+
+@login_required(login_url='login')
+def decrease_cart_items(request, product_id):
+    product = get_object_or_404(Watch, pk=product_id)
+    user = request.user
+    
+    cart_item = CustomCartItem.objects.get(cart__user=user, product=product)
+    
+    if cart_item.quantity > 1:
+        cart_item.quantity -= 1
+        cart_item.save()
+    else:
+        cart_item.delete()
+    
+    return redirect('cust_cart')

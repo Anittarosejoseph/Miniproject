@@ -1,196 +1,177 @@
 {% load static %}
-<!DOCTYPE html>
-<html lang="en">
+
+    <!DOCTYPE html>
+    <html lang="en">
+
+    <head>
+        <meta charset="UTF-8">
+        <meta name="viewport" content="width=device-width, initial-scale=1.0">
+        <title>horofix</title>
+
+        <!-- Fonts style -->
+        <link href="https://fonts.googleapis.com/css2?family=Roboto:wght@400;500;700;900&display=swap" rel="stylesheet">
+
+        <!-- Font Awesome style -->
+        <link href="{% static '/css/font-awesome.min.css' %}" rel="stylesheet" />
+
+        <!-- Custom styles for this template -->
+        <link href="{% static '/css/style.css' %}" rel="stylesheet" />
+
+        <!-- Responsive style -->
+        <link href="{% static '/css/responsive.css' %}" rel="stylesheet" />
+
+        <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.0.2/dist/css/bootstrap.min.css" rel="stylesheet" integrity="sha384-EVSTQN3/azprG1Anm3QDgpJLIm9Nao0Yz1ztcQTwFspd3yD65VohhpuuCOmLASjC"
+            crossorigin="anonymous">
+
+        <style>
+            body {
+                font-family: 'Roboto', sans-serif;
+            }
+
+            .container {
+                max-width: 800px;
+                margin: 20px auto;
+                padding: 20px;
+                background-color: #fff;
+                box-shadow: 0 0 10px rgba(0, 0, 0, 0.1);
+            }
+
+            .order-summary-heading {
+                text-align: center;
+                color: #333;
+            }
+
+            .order-details,
+            .ordered-products,
+            .order-total {
+                margin-bottom: 30px;
+            }
+
+            .order-details h2,
+            .ordered-products h2,
+            .order-total h2 {
+                border-bottom: 2px solid #ddd;
+                padding-bottom: 5px;
+                margin-bottom: 15px;
+                color: #333;
+            }
+
+            .ordered-products ul {
+                list-style: none;
+                padding: 0;
+            }
+
+            .ordered-products li {
+                display: flex;
+                margin-bottom: 20px;
+            }
+
+            .product-image {
+                flex: 0 0 100px;
+                margin-right: 20px;
+            }
+
+            .product-details {
+                flex: 1;
+                padding: 10px; /* Add padding to the product details */
+            }
+
+            .product-details h3 {
+                margin-top: 0;
+                margin-bottom: 5px; /* Adjust margin for the product name */
+                color: #333;
+            }
+
+            .product-image img {
+                width: 100%;
+                height: auto;
+                border: 1px solid #ddd;
+            }
+
+            .order-total p {
+                font-size: 1.2em;
+                color: #333;
+            }
+
+            .btn-cancel-order {
+                margin-top: 10px;
+            }
+        </style>
+    </head>
+
+    <body>
+        <div class="hero_area">
+            <header class="header_section">
+              <div class="container-fluid">
+                <nav class="navbar navbar-expand-lg custom_nav-container ">
+                  <a class="navbar-brand" href="index.html">
+                    <span>
+                      HandTime
+                    </span>
+                  </a>
+        
+                  <button class="navbar-toggler" type="button" data-toggle="collapse" data-target="#navbarSupportedContent" aria-controls="navbarSupportedContent" aria-expanded="false" aria-label="Toggle navigation">
+                    <span class=""> </span>
+                  </button>
+        
+                  <div class="collapse navbar-collapse" id="navbarSupportedContent">
+                    <ul class="navbar-nav  ">
+                      <li class="nav-item ">
+                        <a class="nav-link" href="{% url 'index' %}">Home </a>
+                      </li>
+                      <li class="nav-item">
+                        <a class="nav-link" href="{% url 'about' %}"> About</a>
+                      </li>
+                      <li class="nav-item">
+                        <a class="nav-link" href="{% url 'customer_products' %}">Products</a>
+                      </li>
+                      <li class="nav-item">
+                        <a class="nav-link" href="{% url 'service' %}">Services</a>
+                      </li>
+                      
+        
+                    
+                      
+        
+                      <div class="user_optio_box">
+                
+                        {% if user.is_authenticated %}
+                          <li>Welcome,{{user.username}}</li>
+                            <a href="{% url 'logout' %}">
+                              <i class="fa fa-sign-out" aria-hidden="true"></i> Logout
+                            </a>
+                        {% else %}
+                          <a href="{% url 'login' %}">
+                            <i class="fa fa-sign-in" aria-hidden="true"></i> Login
+                          </a>
+                        {% endif %}
+          
+        
+        <li class="nav-item" >
+                        <a class="nav-link" href="{% url 'Customer_Profile' %}"><i class="fa fa-user" aria-hidden="true"></i></a>
+                        <li class="nav-item" >
+                          <a class="nav-link" href="{% url 'view_cart' %}"> <i class="fa fa-shopping-cart" aria-hidden="true"></i>
+                          </a> 
+                          <li class="nav-item" ></li>
+                          <a href="{% url 'order_history' %}">
+                            <i class="fa fa-sign-in" aria-hidden="true"></i> OrderHistory
+                          </a>
+                                   
+                  </div>            
+                      
+                  </div>
+                </nav>
+              </div>
+            </header>
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>horofix</title>
-
-    <!-- Fonts style -->
+    <title>Customize Watch - {{ watch.product_name }}</title>
     <link href="https://fonts.googleapis.com/css2?family=Roboto:wght@400;500;700;900&display=swap" rel="stylesheet">
-  
-    <!-- Font Awesome style -->
-    <link href="{% static '/css/font-awesome.min.css' %}" rel="stylesheet" />
-
-    <!-- Custom styles for this template -->
-    <link href="{% static '/css/style.css' %}" rel="stylesheet" />
-    
-    <!-- Responsive style -->
-    <link href="{% static '/css/responsive.css' %}" rel="stylesheet" />
-    
-    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.0.2/dist/css/bootstrap.min.css" rel="stylesheet" integrity="sha384-EVSTQN3/azprG1Anm3QDgpJLIm9Nao0Yz1ztcQTwFspd3yD65VohhpuuCOmLASjC" crossorigin="anonymous">
-
-<style>
-  .product-details {
-  display: flex;
-  justify-content: space-between;
-  margin-top: 100px /* Aligns the content to the right */
-}
-
-.product-info-container {
-    width: 50%;
-}
-
-.product-specs {
-    width: 50%;
-}
-/* Adjustments for body */
-body {
-    font-family: 'Roboto', sans-serif;
-    background-image: url('{% static "images/background.jpg" %}');
-    background-size: cover;
-    background-position: center;
-    height: 100vh;
-    margin: 0;
-    padding: 0;
-}
-
-/* Styles for container */
-.container {
-    max-width: 600px;
-    margin: 0 auto;
-    padding: 20px;
-    background-color: #fff;
-    border-radius: 10px;
-    box-shadow: 0 0 10px rgba(0, 0, 0, 0.1);
-}
-
-/* Styles for headings */
-h2 {
-    margin-bottom: 20px;
-    text-align: center;
-    color: #333;
-}
-
-/* Styles for images */
-img {
-    display: block;
-    margin: 0 auto;
-    max-width: 100%;
-    height: auto;
-}
-
-/* Styles for form groups */
-.form-group {
-    margin-bottom: 20px;
-}
-
-/* Styles for labels */
-label {
-    font-weight: bold;
-    color: #333;
-}
-
-/* Styles for input fields and select dropdowns */
-input[type="color"],
-select,
-input[type="file"],
-input[type="text"] {
-    width: 100%;
-    padding: 8px;
-    border-radius: 5px;
-    border: 1px solid #ccc;
-    background-color: #f9f9f9;
-}
-
-/* Styles for buttons */
-button {
-    width: 100%;
-    padding: 10px;
-    border: none;
-    border-radius: 5px;
-    background-color: #007bff;
-    color: #fff;
-    cursor: pointer;
-    transition: background-color 0.3s;
-}
-
-button:hover {
-    background-color: #0056b3;
-}
-
-/* Styles for alerts */
-.alert {
-    margin-top: 20px;
-    padding: 15px;
-    border-radius: 5px;
-    background-color: #f8d7da;
-    color: #721c24;
-}
-
-.alert-success {
-    background-color: #d4edda;
-    color: #155724;
-}
-
-.alert-danger {
-    background-color: #f8d7da;
-    color: #721c24;
-}
-
-
-</style>  
-</head>
-<body>
-<div class="hero_area">
-    <header class="header_section">
-        <div class="container-fluid">
-            <nav class="navbar navbar-expand-lg custom_nav-container">
-                <a class="navbar-brand" href="index.html">
-                    <span>
-                        HOROFIX
-                    </span>
-                </a>
-
-                <button class="navbar-toggler" type="button" data-toggle="collapse" data-target="#navbarSupportedContent" aria-controls="navbarSupportedContent" aria-expanded="false" aria-label="Toggle navigation">
-                    <span class=""> </span>
-                </button>
-
-                <div class="collapse navbar-collapse" id="navbarSupportedContent">
-                    <ul class="navbar-nav  ">
-                        <li class="nav-item ">
-                            <a class="nav-link" href="{% url 'index' %}">Home</a>
-                        </li>
-                        <li class="nav-item">
-                            <a class="nav-link" href="{% url 'about' %}">About</a>
-                        </li>
-                        <li class="nav-item">
-                            <a class="nav-link" href="{% url 'customer_products' %}">Products</a>
-                        </li>
-                        <li class="nav-item">
-                            <a class="nav-link" href="testimonial.html">Testimonial</a>
-                        </li>
-                        <li class="nav-item">
-                            <a class="nav-link" href="contact.html">Contact Us</a>
-                        </li>
-
-                        <div class="user_optio_box">
-                
-                            {% if user.is_authenticated %}
-                              <li>Welcome,{{user.username}}</li>
-                                <a href="{% url 'logout' %}">
-                                  <i class="fa fa-sign-out" aria-hidden="true"></i> Logout
-                                </a>
-                            {% else %}
-                              <a href="{% url 'login' %}">
-                                <i class="fa fa-sign-in" aria-hidden="true"></i> Login
-                              </a>
-                            {% endif %}
-
-                            <li class="nav-item">
-                                <a class="nav-link" href="{% url 'Customer_Profile' %}">
-                                    <i class="fa fa-user" aria-hidden="true"></i>
-                                </a>
-                            </li>
-                        </div>
-                    </ul>
-                </div>
-            </nav>
-        </div>
-    </header>
-    <title>Customize Watch</title>
-    <link rel="stylesheet" href="https://stackpath.bootstrapcdn.com/bootstrap/4.5.2/css/bootstrap.min.css">
-    <link rel="stylesheet" href="{% static 'css/style.css' %}">
+    <link href="{% static 'css/font-awesome.min.css' %}" rel="stylesheet" />
+    <link href="{% static 'css/style.css' %}" rel="stylesheet" />
+    <link href="{% static 'css/responsive.css' %}" rel="stylesheet" />
+    <link href="https://stackpath.bootstrapcdn.com/bootstrap/5.0.2/css/bootstrap.min.css" rel="stylesheet" integrity="sha384-EVSTQN3/azprG1Anm3QDgpJLIm9Nao0Yz1ztcQTwFspd3yD65VohhpuuCOmLASjC" crossorigin="anonymous">
     <style>
         body {
             background-image: url('{% static "images/background.jpg" %}');
@@ -199,23 +180,8 @@ button:hover {
             height: 100vh;
             margin: 0;
             padding: 0;
+            font-family: 'Roboto', sans-serif;
         }
-    </style>
-</head>
-<title>Customize Watch</title>
-    <link rel="stylesheet" href="https://stackpath.bootstrapcdn.com/bootstrap/4.5.2/css/bootstrap.min.css">
-    <link href="{% static 'css/style.css' %}" rel="stylesheet">
-    <style>
-        body {
-            background-image: url('{% static "images/background.jpg" %}');
-            background-size: cover;
-            background-position: center;
-            height: 100vh;
-            margin: 0;
-            padding: 0;
-            font-family: 'Roboto', sans-serif; /* Add your preferred font-family */
-        }
-        
         .container {
             max-width: 600px;
             margin: 0 auto;
@@ -224,29 +190,24 @@ button:hover {
             border-radius: 10px;
             box-shadow: 0 0 10px rgba(0, 0, 0, 0.1);
         }
-        
-        h2 {
-            margin-bottom: 20px;
+        h1 {
             text-align: center;
+            margin-bottom: 20px;
             color: #333;
         }
-        
         img {
             display: block;
             margin: 0 auto;
-            max-width: 100%;
+            max-width: 300px;
             height: auto;
         }
-        
         .form-group {
             margin-bottom: 20px;
         }
-        
         label {
             font-weight: bold;
             color: #333;
         }
-        
         input[type="color"],
         select {
             width: 100%;
@@ -255,15 +216,6 @@ button:hover {
             border: 1px solid #ccc;
             background-color: #f9f9f9;
         }
-        
-        input[type="file"] {
-            width: 100%;
-            padding: 8px;
-            border-radius: 5px;
-            border: 1px solid #ccc;
-            background-color: #f9f9f9;
-        }
-        
         button {
             width: 100%;
             padding: 10px;
@@ -274,35 +226,16 @@ button:hover {
             cursor: pointer;
             transition: background-color 0.3s;
         }
-        
         button:hover {
             background-color: #0056b3;
-        }
-        
-        .alert {
-            margin-top: 20px;
-            padding: 15px;
-            border-radius: 5px;
-            background-color: #f8d7da;
-            color: #721c24;
-        }
-        
-        .alert-success {
-            background-color: #d4edda;
-            color: #155724;
-        }
-        
-        .alert-danger {
-            background-color: #f8d7da;
-            color: #721c24;
         }
     </style>
 </head>
 <body>
-    <div class="container mt-5">
-        <h2>Customize Watch</h2>
-        <img src="{{ product.watch_image.url }}" alt="Product Image" class="img-fluid mb-3">
-        <form method="post" action="{% url 'customize_watch' product.id %}" enctype="multipart/form-data">
+    <div class="container">
+        <h1>Customize Watch - {{ watch.product_name }}</h1>
+        <img src="{{ watch.watch_image.url }}" alt="{{ watch.product_name }}">
+        <form method="post">
             {% csrf_token %}
             <div class="form-group">
                 <label for="strap_material">Strap Material:</label>
@@ -312,95 +245,61 @@ button:hover {
                     <option value="rubber">Rubber</option>
                     <option value="nylon">Nylon</option>
                 </select>
-            </div>
+            </div> 
             <div class="form-group">
                 <label for="strap_color">Strap Color:</label>
                 <input type="color" id="strap_color" name="strap_color" value="#333" required>
             </div>
             <div class="form-group">
-                <label for="watch_color">Watch Color:</label>
-                <input type="color" id="watch_color" name="watch_color" value="#333" required>
+                <label for="dial_color">Dial Color:</label>
+                <input type="color" id="dial_color" name="dial_color" value="#333" required>
             </div>
             <div class="form-group">
-                <label for="dial_shape">Dial Shape:</label>
-                <select id="dial_shape" name="dial_shape" required>
-                    <option value="round">Round</option>
-                    <option value="square">Square</option>
-                    <option value="digital">Digital</option>
+                <label for="case_material">Case Material:</label>
+                <select id="case_material" name="case_material">
+                    <option value="Stainless Steel">Stainless Steel</option>
+                    <option value="Gold">Gold</option>
+                    <option value="Titanium">Titanium</option>
                 </select>
             </div>
             <div class="form-group">
-                <label for="watch_size">Watch Size:</label>
-                <select id="watch_size" name="watch_size" required>
-                    <option value="small">Small</option>
-                    <option value="medium">Medium</option>
-                    <option value="large">Large</option>
+                <label for="case_color">Case Color:</label>
+                <select id="case_color" name="case_color">
+                    <option value="Silver">Silver</option>
+                    <option value="Gold">Gold</option>
+                    <option value="Black">Black</option>
                 </select>
             </div>
             <div class="form-group">
-                <label for="watch_hands_color">Watch Hands Color:</label>
-                <select id="watch_hands_color" name="watch_hands_color" required>
-                    <option value="silver">Silver</option>
-                    <option value="gold">Gold</option>
-                    <option value="black">Black</option>
+                <label for="engraving_text">Engraving Text:</label>
+                <input type="text" id="engraving_text" name="engraving_text">
+            </div>
+            <div class="form-group">
+                <label for="engraving_font">Engraving Font:</label>
+                <select id="engraving_font" name="engraving_font">
+                    <option value="Arial">Arial</option>
+                    <option value="Times New Roman">Times New Roman</option>
+                    <option value="Helvetica">Helvetica</option>
+                    <option value="Courier New">Courier New</option>
+                    <option value="Verdana">Verdana</option>
+                    <option value="Georgia">Georgia</option>
+                    <option value="Comic Sans MS">Comic Sans MS</option>
                 </select>
             </div>
             <div class="form-group">
-                <label for="watch_image">Customize image:</label>
-                <input type="file" class="form-control-file" name="watch_image" id="watch_image" onchange="validateImageFileType()" accept="image/*" required>
+                <label for="engraving_location">Engraving Location:</label>
+                <select id="engraving_location" name="engraving_location">
+                    <option value="Front">Front</option>
+                    <option value="Back">Back</option>
+                    <option value="Side">Side</option>
+                </select>
             </div>
-        
             <div class="form-group">
-                <label for="owner_name">Anything written in dial:</label>
-                <input type="text" id="owner_name" name="owner_name" placeholder="Enter owner's name" required>
+                <label for="special_requests">Special Requests:</label>
+                <textarea id="special_requests" name="special_requests"></textarea>
             </div>
-            
-            <button type="submit">Customize Watch</button>
+            <button type="submit">Submit</button>
         </form>
     </div>
-
-    <script>
-        function validateImageFileType() {
-            var fileInput = document.getElementById('watch_image');
-            var filePath = fileInput.value;
-            var allowedExtensions = /(\.jpg|\.jpeg|\.png|\.gif)$/i;
-            if (!allowedExtensions.exec(filePath)) {
-                alert('Please upload only image files (jpg, jpeg, png, gif)');
-                fileInput.value = '';
-                return false;
-            }
-        }
-    </script><script>
-    function validateForm() {
-        var strapMaterial = document.getElementById('strap_material').value;
-        var strapColor = document.getElementById('strap_color').value;
-        var watchColor = document.getElementById('watch_color').value;
-        var dialShape = document.getElementById('dial_shape').value;
-        var watchSize = document.getElementById('watch_size').value;
-        var watchHandsColor = document.getElementById('watch_hands_color').value;
-        var ownerName = document.getElementById('owner_name').value;
-        var watchImage = document.getElementById('watch_image').value;
-
-        // Check if any field is empty
-        if (!strapMaterial || !strapColor || !watchColor || !dialShape || !watchSize || !watchHandsColor || !ownerName || !watchImage) {
-            alert('Please fill out all fields');
-            return false;
-        }
-
-        // Check if owner name contains spaces
-        if (ownerName.includes(' ')) {
-            alert('Owner name should not contain spaces');
-            return false;
-        }
-
-        // Check if owner name has exactly 200 characters
-        if (ownerName.length !== 200) {
-            alert('Owner name should have exactly 200 characters');
-            return false;
-        }
-
-        // Additional validation checks can be added here
-
-        return true; // Form submission allowed
-    }
-</script>
+</body>
+</html>

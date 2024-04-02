@@ -1,0 +1,200 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Order Status</title>
+    <style>
+        /* Global styles */
+        body {
+            font-family: Arial, sans-serif;
+            background-color: #f4f4f4;
+            margin: 0;
+            padding: 0;
+        }
+
+        /* Header styles */
+        .header {
+            background-color: #c7b9ff; /* Pastel purple color */
+            color: #fff;
+            padding: 10px;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+        }
+
+        .back-button {
+            background-color: #fff;
+            color: #c7b9ff; /* Pastel purple color */
+            border: none;
+            padding: 5px 10px;
+            border-radius: 5px;
+            cursor: pointer;
+            text-decoration: none;
+        }
+
+        /* Order styles */
+        .order {
+            border: 1px solid #ccc;
+            border-radius: 5px;
+            padding: 10px;
+            margin: 20px auto;
+            max-width: 800px;
+            background-color: #fff;
+            box-shadow: 0 0 10px rgba(0, 0, 0, 0.1);
+        }
+
+        .order-details {
+            margin-bottom: 10px;
+        }
+
+        .order-items {
+            margin-bottom: 10px;
+        }
+
+        /* Button styles */
+        .btn {
+            padding: 10px 20px;
+            background-color: #007bff;
+            color: #fff;
+            border: none;
+            border-radius: 5px;
+            cursor: pointer;
+        }
+
+        .btn.cancel-btn {
+            background-color: #dc3545;
+        }
+
+        .btn.order-cancelled-btn {
+            background-color: #28a745; /* Green color for Order Cancelled button */
+        }
+
+        /* Cancelled order styles */
+        .cancelled-order {
+            background-color: #ffc0cb; /* Light pink color for cancelled orders */
+            color: #000;
+        }
+        /* Product image styles */
+        .product-image {
+            max-width: 100px; /* Adjust the max-width as needed */
+            height: auto; /* Maintain aspect ratio */
+            margin-right: 10px; /* Add spacing between image and text */
+        }
+    </style>
+</head>
+<body>
+    <!-- Header -->
+    <div class="header">
+        <span>Order Status</span>
+        <a href="#" class="back-button">Back</a>
+    </div>
+
+    <!-- Content -->
+    {% for order in orders %}
+    <div class="order {% if order.cancelled %}cancelled-order{% endif %}">
+        <div class="order-details">
+            <!-- <p><strong>Order Number:</strong> #{{ order.id }}</p>
+            <p><strong>User:</strong> {{ order.user.username }}</p> -->
+            <p><strong>Total Amount:</strong> ₹{{ order.total_amount }}</p>
+            <p><strong>Payment Status:</strong> {% if order.payment_status %}Paid{% else %}Pending{% endif %}</p>
+            <p><strong>Created At:</strong> {{ order.created_at }}</p>
+            {% if order.cancelled %}
+                <p><strong>Status:</strong> Order Cancelled</p>
+            {% endif %}
+        </div>
+        <div class="order-items">
+            <h4>Ordered Items</h4>
+            <ul>
+                {% for order_item in order.orderitem_set.all %}
+                <img src="{{ order_item.product.image.url }}" alt="{{ order_item.product.name }}" class="product-image">
+                    <li>{{ order_item.quantity }} x {{ order_item.product.name }} - ₹{{ order_item.item_total }}</li>
+                    
+                {% endfor %}
+            </ul>
+        </div>
+        {% if order.payment_status %}
+            {% if not order.cancelled %}
+                <form class="cancelOrderForm">
+                    {% csrf_token %}
+                    <input type="hidden" class="orderId" name="orderId" value="{{ order.id }}">
+                    <button type="submit" class="btn cancel-btn">Cancel Order</button>
+                    <button type="button" class="btn order-cancelled-btn" style="display: none;">Order Cancelled</button>
+                </form>
+            {% endif %}
+        {% endif %}
+    </div>
+    {% endfor %}
+
+    <!-- JavaScript for cancellation -->
+    <script>
+        // Add event listener for each cancel order form
+        const cancelOrderForms = document.querySelectorAll(".cancelOrderForm");
+        cancelOrderForms.forEach(form => {
+            form.addEventListener("submit", function(event) {
+                event.preventDefault();
+                const orderId = this.querySelector(".orderId").value;
+                
+                // Show reason for cancellation dialog
+                const reason = prompt("Please provide a reason for cancelling the order:");
+                if (reason) {
+                    const shouldCancel = confirm("Are you sure you want to cancel this order?");
+                    if (shouldCancel) {
+                        // Proceed with cancellation
+                        const url = /ordercancellation/${orderId}/;
+                        const data = {
+                            'orderId': orderId,
+                            'reason': reason,
+                            'csrfmiddlewaretoken': '{{ csrf_token }}'
+                        };
+                        
+                        fetch(url, {
+                            method: 'POST',
+                            headers: {
+                                'Content-Type': 'application/json',
+                                'X-Requested-With': 'XMLHttpRequest',
+                                'X-CSRFToken': data.csrfmiddlewaretoken
+                            },
+                            body: JSON.stringify(data)
+                        })
+                        .then(response => {
+                            if (!response.ok) {
+                                throw new Error('Network response was not ok');
+                            }
+                            return response.json();
+                        })
+                        .then(data => {
+                            if (data.message) {
+                                alert(data.message);
+                                const cancelBtn = form.querySelector(".cancel-btn");
+                                const cancelledBtn = form.querySelector(".order-cancelled-btn");
+                                cancelBtn.style.display = "none";
+                                cancelledBtn.style.display = "block";
+                                window.location.reload();  // Reload the page after cancellation
+                            } else if (data.error) {
+                                alert(data.error);
+                            }
+                        })
+                        .catch(error => {
+                            console.error('Error:', error);
+                            alert("An error occurred while cancelling the order.");
+                        });
+                    } else {
+                        // User cancelled the cancellation action
+                        console.log("Cancellation cancelled by the user.");
+                    }
+                } else {
+                    // User did not provide a reason
+                    console.log("Cancellation reason not provided.");
+                }
+            });
+        });
+
+        // Back button functionality
+        document.querySelector(".back-button").addEventListener("click", function(event) {
+            event.preventDefault();
+            history.back();
+        });
+    </script>
+</body>
+</html>

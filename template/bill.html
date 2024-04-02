@@ -4,29 +4,102 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Bill</title>
-    <link rel="stylesheet" type="text/css" href="{% static 'css/bill.css' %}">
     <style>
+        /* Global styles */
+        body {
+            font-family: Arial, sans-serif;
+            background-color: #f4f4f4;
+            margin: 0;
+            padding: 0;
+        }
+
         .container {
-    max-width: 800px;
-    margin: 0 auto;
-    padding: 20px;
-}
+            max-width: 800px;
+            margin: 0 auto;
+            padding: 20px;
+            background-color: #fff;
+            border-radius: 10px;
+            box-shadow: 0 0 10px rgba(0, 0, 0, 0.1);
+        }
 
-.header {
-    text-align: center;
-}
+        .header {
+            text-align: center;
+            margin-bottom: 20px;
+        }
 
-.order-details,
-.customization-details,
-.user-details {
-    margin-top: 30px;
-}
+        .order-details,
+        .customization-details,
+        .user-details {
+            margin-top: 30px;
+            border-top: 1px solid #ccc;
+            padding-top: 20px;
+        }
 
-.user-details p {
-    margin-bottom: 10px;
-}
+        .user-details p {
+            margin-bottom: 10px;
+        }
+        <style>
+        /* Global styles */
+        body {
+            font-family: Arial, sans-serif;
+            background-color: #f4f4f4;
+            margin: 0;
+            padding: 0;
+        }
 
-/* Add more styles as needed */
+        .container {
+            max-width: 800px;
+            margin: 0 auto;
+            padding: 20px;
+            background-color: #fff;
+            border-radius: 10px;
+            box-shadow: 0 0 10px rgba(0, 0, 0, 0.1);
+        }
+
+        .header {
+            text-align: center;
+            margin-bottom: 20px;
+        }
+
+        .order-details,
+        .customization-details,
+        .user-details {
+            margin-top: 30px;
+            border-top: 1px solid #ccc;
+            padding-top: 20px;
+        }
+
+        .order-items {
+            margin-top: 30px;
+        }
+
+        .order-items ul {
+            list-style-type: none;
+            padding: 0;
+        }
+
+        .order-items li {
+            margin-bottom: 20px;
+            border-bottom: 1px solid #ccc;
+            padding-bottom: 10px;
+        }
+
+        .order-items li:last-child {
+            border-bottom: none;
+            margin-bottom: 0;
+        }
+
+        .customization-details,
+        .user-details {
+            margin-top: 30px;
+            padding-top: 20px;
+        }
+
+        .user-details p {
+            margin-bottom: 10px;
+        }
+
+    </style>
 
     </style>
 </head>
@@ -36,21 +109,43 @@
             <h1>Order Details</h1>
         </div>
         <div class="order-details">
+            <p><strong>Transaction ID:</strong> {{ order.payment_id }}</p>
             <p><strong>Order ID:</strong> {{ order.id }}</p>
             <p><strong>Total Amount:</strong> ${{ order.total_amount }}</p>
             <!-- Add more order details as needed -->
         </div>
-        <div class="customization-details">
+        <div class="order-items">
+            <h2>Order Items</h2>
+            <ul>
+                {% for item in order.orderitem_set.all %}
+                <li>
+                    <p><strong>Product Name:</strong> {{ item.product.product_name }}</p>
+                    <p><strong>Quantity:</strong> {{ item.quantity }}</p>
+                </li>
+                {% endfor %}
+            </ul>
+        </div>
+        <!-- <div class="customization-details">
             <h2>Watch Customization Details</h2>
             <p><strong>Owner Name:</strong> {{ customization.owner_name }}</p>
+            <p><strong>Strap Material:</strong> {{ customization.strap_material }}</p>
+            <p><strong>Strap Color:</strong> {{ customization.strap_color }}</p>
+            <p><strong>Watch Color:</strong> {{ customization.watch_color }}</p>
+            <p><strong>Dial Shape:</strong> {{ customization.dial_shape }}</p>
+            <p><strong>Watch Size:</strong> {{ customization.watch_size }}</p>
+            <p><strong>Watch Hands Color:</strong> {{ customization.watch_hands_color }}</p>
             <!-- Add more customization details as needed -->
-        </div>
+        <!-- </div>  -->
         <div class="user-details">
             <h2>User Details</h2>
             <p><strong>Username:</strong> {{ order.user.username }}</p>
             <p><strong>Email:</strong> {{ order.user.email }}</p>
+            <p><strong>Address:</strong> {{ order.user.customerprofile.street_address }}, {{ order.user.customerprofile.city }}, {{ order.user.customerprofile.state }}, {{ order.user.customerprofile.country }} - {{ order.user.customerprofile.pincode }}</p>
+            <p><strong>Mobile:</strong> {{ order.user.customerprofile.phone }}</p>
             <!-- Add more user details as needed -->
         </div>
     </div>
+    <center><button onclick="window.print()">Print</button></center>
+
 </body>
 </html>

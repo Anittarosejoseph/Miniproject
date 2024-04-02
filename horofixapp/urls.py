@@ -1,4 +1,6 @@
 from django.urls import path
+from .views import upload_video
+from .views import display_videos
 
 from django.contrib.auth import views as auth_views
 from django.conf import settings
@@ -38,9 +40,23 @@ urlpatterns = [
     path('handle-payment/', views.handle_payment, name='handle-payment'),
     path('checkout/', views.checkout, name='checkout'),
     path('user_list/', views.user_list, name='user_list'),
-    path('customize/<int:product_id>/', views.customize_watch, name='customize_watch'),
-    path('view_entered_details/<int:product_id>/', views.view_entered_details, name='view_entered_details'),
+    # path('customize/<int:product_id>/', views.customize_watch, name='customize_watch'),
+    # path('view_entered_details/<int:product_id>/', views.view_entered_details, name='view_entered_details'),
+    path('upload_video/', upload_video, name='upload_video'),
+  path('add_custom/', views.add_custom, name='add_custom'),
+      path('edit_custom/', views.edit_custom, name='edit_custom'),
+        path('custpro/', views.custpro, name='custpro'),
+# urls.py
+    path('view_custom/<int:product_id>/', views.custom_view, name='view_custom'),
+    path('cust_cart/', views.cust_cart, name='cust_cart'),
 
+    path('customize_watch/<int:product_id>/', views.customize_watch, name='customize_watch'),
+   path('add_to_cart/<int:product_id>/', views.add_to_carts, name='add_to_cart'),
+    path('remove_from_cart/<int:product_id>/', views.remove_from_carts, name='remove_from_cart'),
+    path('cust_cart/', views.cust_cart, name='cust_cart'),
+    path('increase_cart_item/<int:product_id>/', views.increase_cart_items, name='increase_cart_item'),
+    path('decrease_cart_item/<int:product_id>/', views.decrease_cart_items, name='decrease_cart_item'),
+    path('view_custom/', views.view_custom, name='view_custom'),
     path('block_unblock_user/<int:user_id>/', views.block_unblock_user, name='block_unblock_user'),
     path('all_user_orders/', views.all_user_orders, name='all_user_orders'),
     path('approve_disapprove_order/', views.approve_disapprove_order, name='approve_disapprove_order'),
@@ -48,7 +64,7 @@ urlpatterns = [
     path('sort-products/', views.sort_products, name='sort_products'),
     path('filter-products-by-category/', views.filter_products_by_category, name='filter_products_by_category'),
     path('remove_order_item/<int:item_id>/', views.remove_order_item, name='remove_order_item'),
-    path('ordersummary/<int:order_id>/', views.ordersummary, name='order_summary'),
+    path('ordersummary/', views.ordersummary, name='ordersummary'),
     path('deliveryteamreg/', views.delivery_team_registration, name='deliveryteamreg'),
     path('deliveryindex/',views. deliveryindex, name='deliveryindex'),
     path('delivery_team_list/', views.delivery_team_list, name='delivery_team_list'),
@@ -66,10 +82,14 @@ urlpatterns = [
     path('assign_delivery_team/', views.assign_delivery_team, name='assign_delivery_team'),
         path('assign_technician/<int:repair_request_id>/<int:technician_id>/', views.assign_technician, name='assign_technician'),
     path('financial-report/', views.financial_report_pdf, name='financial-report'),  # Define the URL pattern with the correct name
-
+   path('display_videos/', display_videos, name='display_videos'),
     path('delivery-team-orders/', views.delivery_team_orders, name='delivery_team_orders'),
     # path('unisex_products/', views.unisex_products, name='unisex_products'),
-
+  path('videos/delete/<int:video_id>/',views.delete_video, name='delete_video'),
+  path('order_status/', views.order_status, name='order_status'),
+    path('videos/', views.video_list, name='videos'),
+    path('edit/<int:video_id>/', views.edit_video, name='edit_video'),
+    path('save_edits/<int:video_id>/', views.save_edits, name='save_edits'),
     path('remove_from_wishlist/<int:wishlist_item_id>/', views.remove_from_wishlist, name='remove_from_wishlist'),
     path('add_to_wishlist/<int:id>/', views.add_to_wishlist, name='add_to_wishlist'),
     path('panel/',views.panel,name='panel'),
@@ -94,7 +114,8 @@ urlpatterns = [
     path('add_address/', views.add_address, name='add_address'),
 
     path('view_service/', views.view_service, name='view_service'),
-
+    path('order_status/', views.order_status, name='order_status'),
+    path('ordercancellation/<int:order_id>/', views.order_cancellation, name='order_cancellation'),
 ]
 
 

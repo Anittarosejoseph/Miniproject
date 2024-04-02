@@ -1,0 +1,53 @@
+{%load static %}
+
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Edit Video</title>
+    <!-- Bootstrap CSS -->
+    <link rel="stylesheet" href="https://stackpath.bootstrapcdn.com/bootstrap/4.5.2/css/bootstrap.min.css">
+</head>
+<body>
+    <!-- Header -->
+    <header class="navbar navbar-dark bg-dark justify-content-between">
+        <a href="{% url 'videos' %}" class="btn btn-secondary">Back</a> 
+        <h1 class="text-light">Edit Video</h1>
+    </header>
+
+    <div class="container mt-5">
+        <div class="row justify-content-center">
+            <div class="col-md-6">
+                <div class="card">
+                    <div class="card-header">
+                       
+                    </div>
+                    <div class="card-body">
+                        <form method="post" action="{% url 'save_edits' video.id %}" enctype="multipart/form-data">
+                            {% csrf_token %}
+                            <div class="form-group">
+                                <label for="title">Title:</label>
+                                <input type="text" id="title" name="title" class="form-control" value="{{ video.title }}">
+                            </div>
+                            <div class="form-group">
+                                <label for="description">Description:</label>
+                                <input type="text" id="description" name="description" class="form-control" value="{{ video.description }}">
+                            </div>
+                            <div class="form-group">
+                                <label for="video_file">New Video File:</label>
+                                <input type="file" id="video_file" name="video_file" class="form-control-file">
+                            </div>
+                            <!-- Add more fields for editing -->
+                            <button type="submit" class="btn btn-primary">Save</button>
+                        </form>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Bootstrap JavaScript -->
+    <script src="https://stackpath.bootstrapcdn.com/bootstrap/4.5.2/js/bootstrap.min.js"></script>
+</body>
+</html>

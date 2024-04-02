@@ -634,6 +634,24 @@ th.action-header {
                             <h3 style="font-size: 17px;"> View Servivces</h3>
                         </div>
                     </a>
+                    <a href="{% url 'add_custom' %}">
+                        <div class="nav-option option4">
+                            <img src=
+    "https://media.geeksforgeeks.org/wp-content/uploads/20221210183321/6.png"
+                                class="nav-img"
+                                alt="institution">
+                            <h3 style="font-size: 17px;"> Add Custom</h3>
+                        </div>
+                    </a>
+                    <a href="{% url 'upload_video' %}">
+                        <div class="nav-option option4">
+                            <img src=
+    "https://media.geeksforgeeks.org/wp-content/uploads/20221210183321/6.png"
+                                class="nav-img"
+                                alt="institution">
+                            <h3 style="font-size: 17px;">Tutorial</h3>
+                        </div>
+                    </a>
                     {% if user.is_superuser %}
                         <a href="{% url 'financial-report' %}">
                         <div class="nav-option option3">

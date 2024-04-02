@@ -4,33 +4,69 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Order Summary</title>
+    <!-- Bootstrap CSS -->
+    <link href="https://stackpath.bootstrapcdn.com/bootstrap/4.5.2/css/bootstrap.min.css" rel="stylesheet">
     <style>
-        /* Add your CSS styles here */
+        /* Custom CSS styles */
+        /* Add your custom CSS styles here */
     </style>
 </head>
 <body>
-    <h1>Order Summary</h1>
-    <h2>Order Details</h2>
-    <p><strong>Order ID:</strong> {{ order.id }}</p>
-    <p><strong>Total Amount:</strong> {{ order.total_amount }}</p>
-    <p><strong>Payment Status:</strong> {% if order.payment_status %}Paid{% else %}Unpaid{% endif %}</p>
-    
-    <h2>Watch Customization Details</h2>
-    {% if order.watch_customization %}
-    <h2>Watch Customization Details</h2>
-    <p>Strap Material: {{ order.watch_customization.strap_material }}</p>
-    <p>Strap Color: {{ order.watch_customization.strap_color }}</p>
-    <p>Watch Color: {{ order.watch_customization.watch_color }}</p>
-    <!-- Include other customization details as needed -->
-{% else %}
-    <p>No watch customization details found for this order.</p>
-{% endif %}
+    <div class="container">
+        <h1 class="mt-4">Order Summary</h1>
 
-    
-    
-    <h2>User Details</h2>
-    <p><strong>User ID:</strong> {{ order.user.id }}</p>
-    <p><strong>User Name:</strong> {{ order.user.username }}</p>
-    <p><strong>User Email:</strong> {{ order.user.email }}</p>
+        <!-- Order Details -->
+        <div class="card mt-4">
+            <div class="card-body">
+                <h2 class="card-title">Order Details</h2>
+                <p><strong>Order ID:</strong> {{ order.id }}</p>
+                <p><strong>Total Amount:</strong> {{ order.total_amount }}</p>
+                <p><strong>Payment Status:</strong> {% if order.payment_status %}Paid{% else %}Unpaid{% endif %}</p>
+            </div>
+        </div>
+
+        <!-- Watch Customization Details -->
+        <!-- <div class="card mt-4">
+            <div class="card-body">
+                <h2 class="card-title">Watch Customization Details</h2>
+                {% if order.watch_customization %}
+                    <p><strong>Strap Material:</strong> {{ order.watch_customization.strap_material }}</p>
+                    <p><strong>Strap Color:</strong> {{ order.watch_customization.strap_color }}</p>
+                    <p><strong>Watch Color:</strong> {{ order.watch_customization.watch_color }}</p>
+                    Include other customization details as needed -->
+                <!-- {% else %}
+                    <p>No watch customization details found for this order.</p>
+                {% endif %}
+            </div>
+        </div> -->
+
+        <!-- User Details -->
+        <div class="card mt-4">
+            <div class="card-body">
+                <h2 class="card-title">User Details</h2>
+                <p><strong>User ID:</strong> {{ order.user.id }}</p>
+                <p><strong>User Name:</strong> {{ order.user.username }}</p>
+                <p><strong>User Email:</strong> {{ order.user.email }}</p>
+            </div>
+        </div>
+
+        <!-- Product Order Details -->
+        <div class="card mt-4">
+            <div class="card-body">
+                <h2 class="card-title">Product Order Details</h2>
+                {% for item in order.orderitem_set.all %}
+                    <p><strong>Product:</strong> {{ item.product.product_name }}</p>
+                    <p><strong>Quantity:</strong> {{ item.quantity }}</p>
+                    <p><strong>Item Total:</strong> {{ item.item_total }}</p>
+                    <!-- Include other product order details as needed -->
+                {% endfor %}
+            </div>
+        </div>
+    </div>
+
+    <!-- Bootstrap JS and jQuery (optional, if required) -->
+    <script src="https://code.jquery.com/jquery-3.5.1.slim.min.js"></script>
+    <script src="https://cdn.jsdelivr.net/npm/@popperjs/core@2.5.4/dist/umd/popper.min.js"></script>
+    <script src="https://stackpath.bootstrapcdn.com/bootstrap/4.5.2/js/bootstrap.min.js"></script>
 </body>
 </html>

@@ -1,0 +1,136 @@
+[7:16 AM, 3/19/2024] nandana: {% load static %} 
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Videos</title>
+    <!-- Bootstrap CSS -->
+    <link rel="stylesheet" href="https://stackpath.bootstrapcdn.com/bootstrap/4.5.2/css/bootstrap.min.css">
+    <style>
+        /* Delete Button Styles */
+        .delete-button {
+            background-color: red;
+            color: white;
+            border: none;
+            border-radius: 5px;
+            padding: 5px 10px;
+            cursor: pointer;
+        }
+        /* Edit Button Styles */
+        .edit-button {
+            background-color: blue;
+            color: white;
+            border: none;
+            border-radius: 5px;
+            padding: 5px 10px;
+            cursor: pointer;
+            margin-right: 5px;
+        }
+    </style>
+</head>
+<body>
+    <header class="navbar navbar-dark bg-dark justify-content-between">
+        <!-- Back Button -->
+        <a href="{% url 'upload_video'%}" class="btn btn-light" onclick="window.history.back()">Back</a>
+        <h1 class="text-light"><center>Videos</center></h1>
+    </header>
+
+    <div class="container mt-5">
+        <table class="table">
+            <thead class="thead-dark">
+                <tr>
+                    <th>Title</th>
+                    <th>Description</th>
+                    <th>Video</th>
+                    <th>Action</th>
+                </tr>
+            </thead>
+            <tbody>
+                {% for video in videos %}
+                <tr>
+                    <td>{{ video.title }}</td>
+                    <td>{{ video.description }}</td>
+                    <td>
+                        <video width="320" height="240" controls>
+                            <source src="{{ video.video_file.url }}" type="video/mp4">
+                            Your browser does not support the video tag.
+                        </video>
+                    </td>
+                    <td>
+                        <div class="d-flex">
+                            <button class="btn btn-primary edit-button mr-2" onclick="location.href='{% url 'edit_video' video.id %}'">Edit</button>
+                            <form action="{% url 'delete_video' video.id %}" method="POST">
+                                {% csrf_token %}
+                                <button type="submit" class="delete-button">Delete</button>
+                            </form>
+                        </div>
+                    </td>
+                </tr>
+                {% endfor %}
+            </tbody>
+        </table>
+    </div>
+
+    <!-- Bootstrap JavaScript -->
+    <script src="https://stackpath.bootstrapcdn.com/bootstrap/4.5.2/js/bootstrap.min.js"></script>
+</body>
+</html>
+[7:18 AM, 3/19/2024] nandana: path('MakeupArtistTemplate/upload_video.html', views.video_list, name='video_list'),
+    path('videos/delete/<int:video_id>/',views.delete_video, name='delete_video'),
+    path('videos/', views.video_list, name='videos'),
+    path('edit/<int:video_id>/', views.edit_video, name='edit_video'),
+    path('save_edits/<int:video_id>/', views.save_edits, name='save_edits'),
+[7:18 AM, 3/19/2024] nandana: {%load static %}
+
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Edit Video</title>
+    <!-- Bootstrap CSS -->
+    <link rel="stylesheet" href="https://stackpath.bootstrapcdn.com/bootstrap/4.5.2/css/bootstrap.min.css">
+</head>
+<body>
+    <!-- Header -->
+    <header class="navbar navbar-dark bg-dark justify-content-between">
+        <a href="{% url 'videos' %}" class="btn btn-secondary">Back</a> 
+        <h1 class="text-light">Edit Video</h1>
+    </header>
+
+    <div class="container mt-5">
+        <div class="row justify-content-center">
+            <div class="col-md-6">
+                <div class="card">
+                    <div class="card-header">
+                       
+                    </div>
+                    <div class="card-body">
+                        <form method="post" action="#" enctype="multipart/form-data">
+                            {% csrf_token %}
+                            <div class="form-group">
+                                <label for="title">Title:</label>
+                                <input type="text" id="title" name="title" class="form-control" value="{{ video.title }}">
+                            </div>
+                            <div class="form-group">
+                                <label for="description">Description:</label>
+                                <input type="text" id="description" name="description" class="form-control" value="{{ video.description }}">
+                            </div>
+                            <div class="form-group">
+                                <label for="video_file">New Video File:</label>
+                                <input type="file" id="video_file" name="video_file" class="form-control-file">
+                            </div>
+                            <!-- Add more fields for editing -->
+                            <a href="{% url 'add_to_cart' watch.id %}" class="btn btn-primary" id="add_to_cart_button">Add to Cart</a>
+                        </form>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Bootstrap JavaScript -->
+    <script src="https://stackpath.bootstrapcdn.com/bootstrap/4.5.2/js/bootstrap.min.js"></script>
+</body>
+</html>
