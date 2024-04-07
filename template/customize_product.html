@@ -1,0 +1,26 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Customize Product</title>
+</head>
+<body>
+    <h1>Customize Product</h1>
+    <form method="post" action="{% url 'add_to_cart_view' product.id %}">
+        {% csrf_token %}
+        <h2>Customization Options:</h2>
+        <ul>
+            {% for customization_detail in product.customizationdetail_set.all %}
+                <li>
+                    <label>
+                        <input type="radio" name="customization_detail_id" value="{{ customization_detail.id }}">
+                        {{ customization_detail }}
+                    </label>
+                </li>
+            {% endfor %}
+        </ul>
+        <button type="submit">Add to Cart</button>
+    </form>
+</body>
+</html>

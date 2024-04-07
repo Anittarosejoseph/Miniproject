@@ -48,14 +48,9 @@ urlpatterns = [
         path('custpro/', views.custpro, name='custpro'),
 # urls.py
     path('view_custom/<int:product_id>/', views.custom_view, name='view_custom'),
-    path('cust_cart/', views.cust_cart, name='cust_cart'),
-
     path('customize_watch/<int:product_id>/', views.customize_watch, name='customize_watch'),
-   path('add_to_cart/<int:product_id>/', views.add_to_carts, name='add_to_cart'),
-    path('remove_from_cart/<int:product_id>/', views.remove_from_carts, name='remove_from_cart'),
-    path('cust_cart/', views.cust_cart, name='cust_cart'),
-    path('increase_cart_item/<int:product_id>/', views.increase_cart_items, name='increase_cart_item'),
-    path('decrease_cart_item/<int:product_id>/', views.decrease_cart_items, name='decrease_cart_item'),
+
+    
     path('view_custom/', views.view_custom, name='view_custom'),
     path('block_unblock_user/<int:user_id>/', views.block_unblock_user, name='block_unblock_user'),
     path('all_user_orders/', views.all_user_orders, name='all_user_orders'),
@@ -112,11 +107,16 @@ urlpatterns = [
   path('add_service/', views.add_service, name='add_service'),
     path('view_bill/<int:repair_id>/', views.view_bill, name='view_bill'),
     path('add_address/', views.add_address, name='add_address'),
+    
+    path('add_to_shopping_cart/<int:watch_id>/', views.add_to_shopping_cart, name='add_to_shopping_cart'),
+    path('remove_from_/<int:watch_id>/', views.remove_from_shopping_cart, name='remove_from_cart'),
 
+    path('view_shopping_cart/', views.view_shopping_cart, name='view_shopping_cart'),  # Changed from view_cart
     path('view_service/', views.view_service, name='view_service'),
     path('order_status/', views.order_status, name='order_status'),
     path('ordercancellation/<int:order_id>/', views.order_cancellation, name='order_cancellation'),
 ]
+
 
 
 if settings.DEBUG:

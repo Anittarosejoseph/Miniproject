@@ -9,7 +9,7 @@ from django.contrib import messages
 from .models import CustomUser
 from .models import WatchProduct
 from .models import Cart  # Import the Cart model
-from django.http import HttpResponse
+from django.http import HttpResponse, HttpResponseNotFound
 from .models import UserProfile
 from .models import WishlistItem
 from django.http import HttpResponseRedirect
@@ -453,7 +453,7 @@ def create_order(request):
 
         cart_items = CartItem.objects.filter(cart=cart)
         total_amount = sum(item.product.product_sale_price * item.quantity for item in cart_items)
-
+        
         try:
             # Create a new order object
             order = Order.objects.create(user=user, total_amount=total_amount)
@@ -461,6 +461,7 @@ def create_order(request):
             # Create order items for each cart item
             for cart_item in cart_items:
                 OrderItem.objects.create(
+                    customization=cart_item.customization,
                     order=order,
                     product=cart_item.product,
                     quantity=cart_item.quantity,
@@ -2024,7 +2025,7 @@ from django.shortcuts import render, redirect, get_object_or_404
 from .models import CustomWatch, CustomizationDetail
 
 def customize_watch(request, product_id):
-    watch = get_object_or_404(CustomWatch, pk=product_id)
+    watch = get_object_or_404(WatchProduct, pk=product_id)
     if request.method == 'POST':
         strap_material = request.POST.get('strap_material')
         strap_color = request.POST.get('strap_color')
@@ -2048,82 +2049,69 @@ def customize_watch(request, product_id):
             engraving_location=engraving_location,
             special_requests=special_requests,
         )
+        cart, created = Cart.objects.get_or_create(user=request.user)
         
-        # Redirect to product detail page or any other page
-        return redirect('cust_cart')
+        # Create a new CartItem with the created customization and product
+        cart_item, item_created = CartItem.objects.get_or_create(
+            cart=cart,
+            product=watch,
+            customization=customization,
+        )
+        return redirect('view_cart')
     
     return render(request, 'customize_watch.html', {'watch': watch})
-from django.shortcuts import render, redirect, get_object_or_404
-from django.http import JsonResponse
+
+from django.shortcuts import redirect, get_object_or_404, render
 from django.contrib.auth.decorators import login_required
-from .models import Watch, CustomWatch, CustomizationDetail, CustomCartItem, CustomCart, CustomOrder, CustomOrderItem
-from django.http import JsonResponse
-from django.contrib.auth.decorators import login_required
-from django.shortcuts import get_object_or_404, redirect
+from .models import CustomWatch, ShoppingCart, ShoppingCartItem, CustomizationDetail
 
 @login_required(login_url='login')
-def add_to_carts(request, product_id):
-    product = get_object_or_404(Watch, pk=product_id)
-    cart, created = CustomCart.objects.get_or_create(user=request.user)
-    cart_item, item_created = CustomCartItem.objects.get_or_create(cart=cart, product=product)
+def add_to_shopping_cart(request, watch_id):
+    watch = get_object_or_404(CustomWatch, pk=watch_id)
+    
+    
+    customization_detail = CustomizationDetail.objects.filter(watch=watch).latest('id')
+    
+    shopping_cart, created = ShoppingCart.objects.get_or_create(user=request.user)
+    shopping_cart.cartid = request.user.id # Set the cartid
+    shopping_cart.save() # Save the shopping cart with the new cartid
+    
+    shopping_cart_item, item_created = ShoppingCartItem.objects.get_or_create(
+        shopping_cart=shopping_cart, product=watch, customization=customization_detail
+    )
     
     if not item_created:
-        cart_item.quantity += 1
-        cart_item.save()
+        shopping_cart_item.quantity += 1
+        shopping_cart_item.save()
     
-    return redirect('cust_cart')
+    return redirect('view_custom')
 
 @login_required(login_url='login')
-def remove_from_carts(request, product_id):
-    product = get_object_or_404(Watch, pk=product_id)
-    cart = CustomCart.objects.get(user=request.user)
-    
+def remove_from_shopping_cart(request, watch_id):
+    watch = get_object_or_404(CustomWatch, pk=watch_id)
+    shopping_cart = ShoppingCart.objects.get(user=request.user)
     try:
-        cart_item = cart.customcartitem_set.get(product=product)
-        
-        if cart_item.quantity >= 1 and product.status == 'In Stock':
+        cart_item = shopping_cart.shoppingcartitem_set.get(product=watch)
+        if cart_item.quantity > 1:
+             cart_item.quantity -= 1
+             cart_item.save()
+        else:
             cart_item.delete()
-    except CustomCartItem.DoesNotExist:
+    except ShoppingCartItem.DoesNotExist:
         pass
     
-    return redirect('cust_cart')
+    return redirect('view_shopping_cart.html')
 
-def cust_cart(request):
-    cart = request.user.customcart
-    cart_items = CustomCartItem.objects.filter(cart=cart)
-    for item in cart_items:
-        item.total_price = item.product.product_sale_price * item.quantity
-    
-    total_amount = sum(item.total_price for item in cart_items)
 
-    return render(request, 'cust_cart.html', {'cart_items': cart_items,'total_amount': total_amount})
+
 
 @login_required(login_url='login')
-def increase_cart_items(request, product_id):
-    product = get_object_or_404(Watch, pk=product_id)
-    user = request.user
-    cart, created = CustomCart.objects.get_or_create(user=user)
-    
-    cart_item, created = CustomCartItem.objects.get_or_create(cart=cart, product=product)
-    
-    if not created:
-        
-        cart_item.quantity += 1
-        cart_item.save()
-    
-    return redirect('cust_cart')
+def view_shopping_cart(request):
+    try:
+        cart = request.user.shoppingcart
+        cart_items = cart.shoppingcartitem_set.all()
+        return render(request, 'view_shopping_cart.html', {'cart_items': cart_items})
+    except ShoppingCart.DoesNotExist:
+        # Handle the case where the user doesn't have a shopping cart
+        return render(request, 'view_shopping_cart.html', {'cart_items': []})
 
-@login_required(login_url='login')
-def decrease_cart_items(request, product_id):
-    product = get_object_or_404(Watch, pk=product_id)
-    user = request.user
-    
-    cart_item = CustomCartItem.objects.get(cart__user=user, product=product)
-    
-    if cart_item.quantity > 1:
-        cart_item.quantity -= 1
-        cart_item.save()
-    else:
-        cart_item.delete()
-    
-    return redirect('cust_cart')

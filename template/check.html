@@ -1,0 +1,15 @@
+<h1>Checkout</h1>
+{% for item in cart_items %}
+    <div>
+        <p>{{ item.product.product_name }}</p>
+        <p>Quantity: {{ item.quantity }}</p>
+        {% if item.customization_detail %}
+            <p>Customization: {{ item.customization_detail }}</p>
+        {% endif %}
+    </div>
+{% endfor %}
+<p>Total Amount: {{ total_amount }}</p>
+<form method="post" action="{% url 'checkout_view' %}">
+    {% csrf_token %}
+    <button type="submit">Place Order</button>
+</form>

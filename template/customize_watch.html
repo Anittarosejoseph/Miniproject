@@ -235,7 +235,7 @@
     <div class="container">
         <h1>Customize Watch - {{ watch.product_name }}</h1>
         <img src="{{ watch.watch_image.url }}" alt="{{ watch.product_name }}">
-        <form method="post">
+        <form method="post" >
             {% csrf_token %}
             <div class="form-group">
                 <label for="strap_material">Strap Material:</label>
