@@ -269,53 +269,85 @@
         </div>
     </header>
 
-        <link rel="stylesheet" href="{% static 'css/cart.css' %}">
-        <div class="container">
-            <div class="cart-header">
-                <h1>Your Cart</h1>
-            </div>
-            <ul>
-                {% for item in cart_items %}
-                <li class="cart-item">
-                    <div class="cart-item-details">
-                        <div class="cart-item-image">
-                            <img src="{{ item.product.watch_image.url }}" alt="{{ item.product.product_name }}">
-                        </div>
-                        <div class="cart-item-name">{{ item.product.product_name }}</div>
-                        <form action="{% url 'remove-from-cart' item.product.id %}" method="post">
-                            {% csrf_token %}
-                            <button class="remove-from-cart-btn" type="submit">Remove</button>
-                        </form>
-                    </div>
-                    <div class="cart-item-quantity">
-                        <form action="{% url 'increase-cart-item' item.product.id %}" method="post">
-                            {% csrf_token %}
-                            <button class="quantity-btn increase-quantity" type="submit">+</button>
-                        </form>
-                        <span class="item-quantity">{{ item.quantity }}</span>
-                        <form action="{% url 'decrease-cart-item' item.product.id %}" method="post">
-                            {% csrf_token %}
-                            <button class="quantity-btn decrease-quantity" type="submit">-</button>
-                        </form>
-                    </div>
-                    <div class="cart-item-price" data-price="{{ item.product.product_sale_price }}">
-                        <span class="sale-price">${{ item.product.product_sale_price }}</span>
-                    </div>
-                </li>
-                {% endfor %}
-            </ul>
-            <p class="total-price-data"><span id="total-price"></span></p>
-
-            
-    <a class="checkout-button" href="{% url 'Customer_Profile' %}">Checkout</a>
-
-            </div>
-            <a class="continue-shopping-link" href="{% url 'customer_products' %}">Continue Shopping</a>
+    <link rel="stylesheet" href="{% static 'css/cart.css' %}">
+    <div class="container">
+        <div class="cart-header">
+            <h1>Your Cart</h1>
         </div>
-        <script>
-            document.addEventListener("DOMContentLoaded", function () {
+        <ul>
+            {% for item in cart_items %}
+            <li class="cart-item">
+                <div class="cart-item-details">
+                    <div class="cart-item-image">
+                        {% if item.product %}
+                            <img src="{{ item.product.watch_image.url }}" alt="{{ item.product.product_name }}">
+                        {% else %}
+                            <img src="{{ item.customization.watch.watch_image.url }}" alt="{{ item.customization.watch.product_name }}">
+                        {% endif %}
+                    </div>
+                    <div class="cart-item-name">
+                        {% if item.product %}
+                            {{ item.product.product_name }}
+                        {% else %}
+                            {{ item.customization.watch.product_name }}
+                        {% endif %}
+                    </div>
+                    {% if item.product %}
+                    <form action="{% url 'remove-from-cart' item.product.id %}" method="post">
+                        {% csrf_token %}
+                    <button class="remove-from-cart-btn" type="submit">Remove</button>
+                </form>
+                {% else %}
+                <form action="{% url 'remove_customization_from_cart' item.customization.id %}" method="post">
+                    {% csrf_token %}
+                    <button class="remove-from-cart-btn" type="submit">Remove</button>
+                </form>
 
-   
+                <div class="cart-item-quantity">                
+                {% endif %}
+                {% if item.product %}
+                <form action="{% url 'increase-cart-item' item.product.id %}" method="post">
+                    {% csrf_token %}
+                    <button class="quantity-btn increase-quantity" type="submit">+</button>
+                </form>
+                {% else %}
+                <form action="{% url 'increase_customization_from_cart' item.customization.id %}" method="post">
+                    {% csrf_token %}
+                    <button class="quantity-btn increase-quantity" type="submit">+</button>
+                </form>
+                {% endif %}
+                <span class="item-quantity">{{ item.quantity }}</span>
+                {% if item.product %}
+                <form action="{% url 'decrease-cart-item' item.product.id %}" method="post">
+                    {% csrf_token %}
+                    <button class="quantity-btn decrease-quantity" type="submit">-</button>
+                </form>
+                {% else %}
+                <form action="{% url 'decrease_customization_from_cart' item.customization.id %}" method="post">
+                    {% csrf_token %}
+                    <button class="quantity-btn decrease-quantity" type="submit">-</button>
+
+                </form>
+                {% endif %}
+                
+
+                        
+                
+                <div class="cart-item-price" data-price="{% if item.product %}{{ item.product.product_sale_price }}{% else %}{{ item.customization.price }}{% endif %}">
+                    <span class="sale-price">${% if item.product %}{{ item.product.product_sale_price }}{% else %}{{ item.customization.watch.product_sale_price }}{% endif %}</span>
+                </div>
+            </li>
+            {% endfor %}
+        </ul>
+        <p class="total-price-data"><span id="total-price"></span></p>
+        <a class="checkout-button" href="{% url 'order_details' %}">Checkout</a>
+    </div>
+    <a class="continue-shopping-link" href="{% url 'customer_products' %}">Continue Shopping</a>
+    
+    <script>
+        document.addEventListener("DOMContentLoaded", function () {
+
+
 updateTotalPrice();
 
 const increaseButtons = document.querySelectorAll(".increase-quantity");
@@ -325,33 +357,33 @@ const decreaseButtons = document.querySelectorAll(".decrease-quantity");
 
 increaseButtons.forEach((button, index) => {
 button.addEventListener("click", (event) => {
-    event.preventDefault();
-    const currentItem = event.target.closest(".cart-item");
-    const quantityElement = currentItem.querySelector(".item-quantity");
-    const priceElement = currentItem.querySelector(".cart-item-price");
-    const pricePerItem = parseFloat(priceElement.getAttribute("data-price"));
-    const currentQuantity = parseInt(quantityElement.textContent);
+event.preventDefault();
+const currentItem = event.target.closest(".cart-item");
+const quantityElement = currentItem.querySelector(".item-quantity");
+const priceElement = currentItem.querySelector(".cart-item-price");
+const pricePerItem = parseFloat(priceElement.getAttribute("data-price"));
+const currentQuantity = parseInt(quantityElement.textContent);
 
-    quantityElement.textContent = currentQuantity + 1;
-    updateCartItemPrice(priceElement, pricePerItem, currentQuantity + 1);
-    updateTotalPrice();
+quantityElement.textContent = currentQuantity + 1;
+updateCartItemPrice(priceElement, pricePerItem, currentQuantity + 1);
+updateTotalPrice();
 });
 });
 
 decreaseButtons.forEach((button, index) => {
 button.addEventListener("click", (event) => {
-    event.preventDefault();
-    const currentItem = event.target.closest(".cart-item");
-    const quantityElement = currentItem.querySelector(".item-quantity");
-    const priceElement = currentItem.querySelector(".cart-item-price");
-    const pricePerItem = parseFloat(priceElement.getAttribute("data-price"));
-    const currentQuantity = parseInt(quantityElement.textContent);
+event.preventDefault();
+const currentItem = event.target.closest(".cart-item");
+const quantityElement = currentItem.querySelector(".item-quantity");
+const priceElement = currentItem.querySelector(".cart-item-price");
+const pricePerItem = parseFloat(priceElement.getAttribute("data-price"));
+const currentQuantity = parseInt(quantityElement.textContent);
 
-    if (currentQuantity > 1) {
-        quantityElement.textContent = currentQuantity - 1;
-        updateCartItemPrice(priceElement, pricePerItem, currentQuantity - 1);
-        updateTotalPrice();
-    }
+if (currentQuantity > 1) {
+    quantityElement.textContent = currentQuantity - 1;
+    updateCartItemPrice(priceElement, pricePerItem, currentQuantity - 1);
+    updateTotalPrice();
+}
 });
 });
 
@@ -364,9 +396,9 @@ function updateTotalPrice() {
 const itemElements = document.querySelectorAll(".cart-item");
 
 itemElements.forEach(function (itemElement) {
-    const sale_price = parseFloat(itemElement.querySelector(".cart-item-price").getAttribute("data-price"));
-    const quantity = parseInt(itemElement.querySelector(".cart-item-quantity").textContent);
-    total += sale_price * quantity;
+const sale_price = parseFloat(itemElement.querySelector(".cart-item-price").getAttribute("data-price"));
+const quantity = parseInt(itemElement.querySelector(".cart-item-quantity").textContent);
+total += sale_price * quantity;
 });
 
 const totalPriceElement = document.getElementById("total-price");
@@ -374,6 +406,5 @@ totalPriceElement.textContent = total.toFixed(2);
 }
 });
 
-        </script>
-    {% endblock %}
-    
+    </script>
+{% endblock %}

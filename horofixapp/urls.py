@@ -35,6 +35,10 @@ urlpatterns = [
     path('fetch-cart-count/', views.fetch_cart_count, name='fetch-cart-count'),
     path('add_address/', views.add_address, name='add_address'),
     path('remove-from-cart/<int:product_id>/', views.remove_from_cart, name='remove-from-cart'),
+    path('remove-customization-from-cart/<int:customization_id>/', views.remove_customization_from_cart, name='remove_customization_from_cart'),
+path('increase-customization-from-cart/<int:customization_id>/', views.increase_customization_from_cart, name='increase_customization_from_cart'),
+path('decrease-cart-item/<int:product_id>/', views.decrease_cart_item, name='decrease-cart-item'),
+    path('decrease-customization-from-cart/<int:customization_id>/', views.decrease_customization_from_cart, name='decrease_customization_from_cart'),
     path('add_to_cart/<int:product_id>/', views.add_to_cart, name='add_to_cart'),
     path('create-order/', views.create_order, name='create-order'),
     path('handle-payment/', views.handle_payment, name='handle-payment'),
@@ -44,7 +48,7 @@ urlpatterns = [
     # path('view_entered_details/<int:product_id>/', views.view_entered_details, name='view_entered_details'),
     path('upload_video/', upload_video, name='upload_video'),
   path('add_custom/', views.add_custom, name='add_custom'),
-      path('edit_custom/', views.edit_custom, name='edit_custom'),
+      path('edit_custom/<int:product_id>/', views.edit_custom, name='edit_custom'),
         path('custpro/', views.custpro, name='custpro'),
 # urls.py
     path('view_custom/<int:product_id>/', views.custom_view, name='view_custom'),
@@ -107,11 +111,12 @@ urlpatterns = [
   path('add_service/', views.add_service, name='add_service'),
     path('view_bill/<int:repair_id>/', views.view_bill, name='view_bill'),
     path('add_address/', views.add_address, name='add_address'),
-    
-    path('add_to_shopping_cart/<int:watch_id>/', views.add_to_shopping_cart, name='add_to_shopping_cart'),
-    path('remove_from_/<int:watch_id>/', views.remove_from_shopping_cart, name='remove_from_cart'),
+    path('assign_delivery/<int:order_id>/', views.assign_delivery, name='assign_delivery'),
+     #path('deliveryorders_details/<int:delivery_boy_id>', views.deliveryorder_details, name='deliveryorder_details'),
+    path('assigned_orders/', views.assigned_orders, name='assigned_orders'),
+    path('deliverydashboard/', views.delivery_dashboard, name='deliverydashboard'),
 
-    path('view_shopping_cart/', views.view_shopping_cart, name='view_shopping_cart'),  # Changed from view_cart
+    path('order_details/', views.display_order_details, name='order_details'),
     path('view_service/', views.view_service, name='view_service'),
     path('order_status/', views.order_status, name='order_status'),
     path('ordercancellation/<int:order_id>/', views.order_cancellation, name='order_cancellation'),

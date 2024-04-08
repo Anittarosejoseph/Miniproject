@@ -136,6 +136,24 @@
             <p><strong>Watch Hands Color:</strong> {{ customization.watch_hands_color }}</p>
             <!-- Add more customization details as needed -->
         <!-- </div>  -->
+        <div class="customization-details">
+            <h2>Customization Details</h2>
+            <ul>
+                {% for customization_detail in customization_details %}
+                    {% if customization_detail.customization__strap_material %}
+                    <li>
+                        <p><strong>Strap Material:</strong> {{ customization_detail.customization__strap_material }}</p>
+                        <p><strong>Strap Color:</strong> {{ customization_detail.customization__strap_color }}</p>
+                        <p><strong>Dial Color:</strong> {{ customization_detail.customization__dial_color }}</p>
+                        <p><strong>Case Material:</strong> {{ customization_detail.customization__case_material }}</p>
+                        <p><strong>Case Color:</strong> {{ customization_detail.customization__case_color }}</p>
+                        <p><strong>Engraving Text:</strong> {{ customization_detail.customization__engraving_text }}</p>
+                        <!-- Include other customization details as needed -->
+                    </li>
+                    {% endif %}
+                {% endfor %}
+            </ul>
+        </div>
         <div class="user-details">
             <h2>User Details</h2>
             <p><strong>Username:</strong> {{ order.user.username }}</p>

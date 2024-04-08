@@ -39,6 +39,22 @@
                 {% endif %}
             </div>
         </div> -->
+<!-- Watch Customization Details -->
+<!-- Watch Customization Details -->
+<div class="card mt-4">
+    <div class="card-body">
+        <h2 class="card-title">Watch Customization Details</h2>
+        {% for customization_detail in customization_details %}
+            <p><strong>Strap Material:</strong> {{ customization_detail.strap_material }}</p>
+            <p><strong>Strap Color:</strong> {{ customization_detail.strap_color }}</p>
+            <p><strong>Dial Color:</strong> {{ customization_detail.dial_color }}</p>
+            <p><strong>Case Material:</strong> {{ customization_detail.case_material }}</p>
+            <p><strong>Case Color:</strong> {{ customization_detail.case_color }}</p>
+            <p><strong>Engraving Text:</strong> {{ customization_detail.engraving_text }}</p>
+            <!-- Add other customization details here -->
+        {% endfor %}
+    </div>
+</div>
 
         <!-- User Details -->
         <div class="card mt-4">

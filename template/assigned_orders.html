@@ -1,0 +1,132 @@
+{% load static %}
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Assigned Orders</title>
+    <style>
+        body {
+            font-family: Arial, sans-serif;
+            margin: 0;
+            padding: 0;
+        }
+        .container {
+            max-width: 800px;
+            margin: 0 auto;
+            padding: 20px;
+        }
+        .header {
+            text-align: center;
+            margin-bottom: 20px;
+            background-color: #f0f0f0; /* Background color for the header */
+            padding: 10px; /* Padding for the header */
+        }
+        .order-container {
+            border: 1px solid #ccc;
+            padding: 10px;
+            margin-bottom: 10px;
+        }
+        .sidebar {
+            width: 250px;
+            background-color: #333;
+            color: #fff;
+            height: 100vh;
+            position: fixed;
+            left: 0;
+            top: 0;
+            overflow-y: auto;
+          }
+          
+          .sidebar-header {
+            padding: 20px;
+            display: flex;
+            align-items: center;
+          }
+          
+          .sidebar-header img {
+            width: 40px;
+            height: 40px;
+            border-radius: 50%;
+            margin-right: 10px;
+          }
+          
+          .sidebar-menu {
+            list-style-type: none;
+            padding: 0;
+          }
+          
+          .sidebar-menu li {
+            padding: 10px 20px;
+            border-bottom: 1px solid #555;
+          }
+          
+          .sidebar-menu li a {
+            color: #fff;
+            text-decoration: none;
+            display: flex;
+            align-items: center;
+          }
+          
+          .sidebar-menu li a i {
+            margin-right: 10px;
+          }
+          
+          .content {
+            margin-left: 250px; /* Adjust based on sidebar width */
+            padding: 20px;
+          }
+          
+          /* Styles for fontawesome icons */
+          .fa {
+            font-size: 18px;
+          }
+    </style>
+</head>
+<body>
+    <div class="sidebar">
+        <div class="sidebar-header">
+          <img src="{% static 'images/deliverboy.jpeg' %}" >
+          <span><strong> Welcome, {{ user.fullName }}!</strong></span>
+        </div>
+        <ul class="sidebar-menu">
+          <li><a href="{% url 'deliverydashboard' %}"><i class="fas fa-home"></i> Home</a></li>
+          <li><a href="#"><i class="fas fa-bell"></i> Notifications</a></li>
+          <li><a href="{% url 'assigned_orders' %}"><i class="fas fa-bell"></i> Orders</a></li>
+          <!-- Add more menu items as needed -->
+        </ul>
+      </div>
+    <div class="container">
+        <div class="header">
+            <h1>Assigned Orders</h1>
+        </div>
+        <div class="order-list">
+            {% for assignment in assigned_orders %}
+            <div class="order-container">
+                <p><strong>Order ID:</strong> {{ assignment.order.id }}</p>
+                <p><strong>Product Name:</strong> 
+                    {% for product in assignment.order.products.all %}
+                        {{ product.product_name }}{% if not forloop.last %}, {% endif %}
+                    {% endfor %}
+                </p>
+                <p><strong>Total Amount:</strong> Rs.{{ assignment.order.total_amount }}</p>
+                {% comment %} <p><strong>Payment ID:</strong> {{ assignment.order.payment_id }}</p> {% endcomment %}
+                <p><strong>Payment Status:</strong> {% if assignment.order.payment_status %}Paid{% else %}Pending{% endif %}</p>
+                <p><strong>Customer Name:</strong> {{ assignment.order.user.fullName }}</p>
+                <p><strong>Customer Address:</strong>  {{ user_address.address }}, {{ user_address.pincode }}</p>
+                <p><strong>Customer Phone:</strong>  {{ user_address.phone_number }}</p>
+                <p><strong>Assigned At:</strong> {{ assignment.assigned_at }}</p>
+                <p><strong>Status:</strong> 
+                    <select name="status">
+                        <option value="Pending Pickup" {% if assignment.status == 'Pending Pickup' %}selected{% endif %}>Pending Pickup</option>
+                        <option value="Pickedup" {% if assignment.status == 'Picked up' %}selected{% endif %}>Picked up</option>
+                        <option value="outofdelivery" {% if assignment.status == 'Out of delivery' %}selected{% endif %}>Out of Delivery</option>
+                        <option value="delivered" {% if assignment.status == 'delivered' %}selected{% endif %}>Delivered</option>
+                    </select>
+                </p>
+            </div>
+            {% endfor %}
+        </div>
+    </div>
+</body>
+</html>

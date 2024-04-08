@@ -719,7 +719,7 @@ th.action-header,
                 <td>{{ product.watch_description }}</td>
                 <td>{{ product.status }}</td>
                 <td class="action-buttons">
-                    <a href="{% url 'edit_custom' product.id %}" class="btn btn-primary">Edit</a>
+                    <a href="{% url 'edit_custom' product_id=product.id %}" class="btn btn-primary">Edit</a>
                     <!-- You can add more action buttons if needed -->
                     <button class="btn btn-danger" onclick="confirmDelete('{{ product.id }}')">Delete</button>
                 </td>

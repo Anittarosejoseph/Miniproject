@@ -210,10 +210,41 @@ class WatchProduct(models.Model):
     def __str__(self):
         return self.product_name
 
+class CustomWatch(models.Model):
+    product_name = models.CharField(max_length=255, unique=True,null=True) 
+    watch_modelnumber = models.CharField(max_length=255, null=True)
+    watch_serial_number = models.CharField(max_length=255, unique=True, null=True)
+    watch_description = models.TextField()
+    watch_image = models.ImageField(upload_to='watch_images/', null=True, blank=True)
+    product_price = models.DecimalField(max_digits=10, decimal_places=2, null=True)
+    product_sale_price = models.DecimalField(max_digits=10, decimal_places=2, null=True)
+    discount = models.DecimalField(max_digits=5, decimal_places=2, null=True)
+    category = models.CharField(max_length=10, choices=[('Men', 'Men'), ('Women', 'Women'),('Kids', 'Kids'),('Unisex', 'Unisex'),], default=None)
+    stock = models.PositiveIntegerField(default=1, null=True)  # Add the 'stock' field
+    ratings = models.IntegerField(default=0) 
+    warranty = models.IntegerField(null=True) 
+    # Modify the STATUS_CHOICES
+    STATUS_CHOICES = [
+        ('In Stock', 'In Stock'),
+        ('Out of Stock', 'Out of Stock'),
+    ]
+
+    status = models.CharField(max_length=12, choices=STATUS_CHOICES, default='In Stock')
+
+    def save(self, *args, **kwargs):
+        # Update the status based on the stock value
+        if self.stock == 0:
+            self.status = 'Out of Stock'
+        else:
+            self.status = 'In Stock'
+        super(CustomWatch, self).save(*args, **kwargs)
+
+    def __str__(self):
+        return self.product_name
 
 
 class CustomizationDetail(models.Model):
-    watch = models.ForeignKey(WatchProduct, on_delete=models.CASCADE)
+    watch = models.ForeignKey(CustomWatch, on_delete=models.CASCADE)
     strap_material = models.CharField(max_length=100, null=True, blank=True)
     strap_color = models.CharField(max_length=50, null=True, blank=True)
     dial_color = models.CharField(max_length=50, null=True, blank=True)
@@ -229,18 +260,24 @@ class CustomizationDetail(models.Model):
 
 class CartItem(models.Model):
     cart = models.ForeignKey('Cart', on_delete=models.CASCADE)
-    product = models.ForeignKey(WatchProduct, on_delete=models.CASCADE)
+    product = models.ForeignKey(WatchProduct, on_delete=models.CASCADE,null=True)
     customization=models.ForeignKey(CustomizationDetail, on_delete=models.CASCADE,null=True)
     quantity = models.PositiveIntegerField(default=1)
     is_active = models.BooleanField(default=True)
 
 
     def __str__(self):
-        return f"{self.quantity} x {self.product.product_name}"
+        if self.product:
+            return f"{self.quantity} x {self.product.product_name}"
+        elif self.customization:
+            return f"{self.quantity} x Customized {self.customization.watch.product_name}"
+        else:
+            return "Invalid Cart Item"
 
 class Cart(models.Model):
     user = models.OneToOneField(CustomUser, on_delete=models.CASCADE)
     products = models.ManyToManyField(WatchProduct, through='CartItem')
+    customization=models.ManyToManyField(CustomizationDetail, through='CartItem')
 
     def __str__(self):
         return f"Cart for {self.user.username}"
@@ -276,6 +313,7 @@ from django.db import models
 class OrderItem(models.Model):
     order = models.ForeignKey(Order, on_delete=models.CASCADE)
     customization=models.ForeignKey(CustomizationDetail, on_delete=models.CASCADE,null=True)
+    
 
     product = models.ForeignKey(WatchProduct, on_delete=models.CASCADE)
     quantity = models.PositiveIntegerField(default=1)
@@ -476,38 +514,14 @@ from django.contrib.auth import get_user_model
 
 CustomUser = get_user_model()
 
-class CustomWatch(models.Model):
-    product_name = models.CharField(max_length=255, unique=True,null=True) 
-    watch_modelnumber = models.CharField(max_length=255, null=True)
-    watch_serial_number = models.CharField(max_length=255, unique=True, null=True)
-    watch_description = models.TextField()
-    watch_image = models.ImageField(upload_to='watch_images/', null=True, blank=True)
-    product_price = models.DecimalField(max_digits=10, decimal_places=2, null=True)
-    product_sale_price = models.DecimalField(max_digits=10, decimal_places=2, null=True)
-    discount = models.DecimalField(max_digits=5, decimal_places=2, null=True)
-    category = models.CharField(max_length=10, choices=[('Men', 'Men'), ('Women', 'Women'),('Kids', 'Kids'),('Unisex', 'Unisex'),], default=None)
-    stock = models.PositiveIntegerField(default=1, null=True)  # Add the 'stock' field
-    ratings = models.IntegerField(default=0) 
-    warranty = models.IntegerField(null=True) 
-    # Modify the STATUS_CHOICES
-    STATUS_CHOICES = [
-        ('In Stock', 'In Stock'),
-        ('Out of Stock', 'Out of Stock'),
-    ]
 
-    status = models.CharField(max_length=12, choices=STATUS_CHOICES, default='In Stock')
-
-    def save(self, *args, **kwargs):
-        # Update the status based on the stock value
-        if self.stock == 0:
-            self.status = 'Out of Stock'
-        else:
-            self.status = 'In Stock'
-        super(CustomWatch, self).save(*args, **kwargs)
-
-    def __str__(self):
-        return self.product_name
-
+class DeliveryAssignment(models.Model):
+    order = models.ForeignKey(Order, on_delete=models.CASCADE)
+    delivery_boy = models.ForeignKey(CustomUser, on_delete=models.CASCADE, limit_choices_to={'is_deliveryteam': True}
+)
+    assigned_at = models.DateTimeField(auto_now_add=True)
+    is_completed = models.BooleanField(default=False)
+    
 
 
 
@@ -520,7 +534,7 @@ CustomUser = get_user_model()
 class ShoppingCartItem(models.Model):
     shopping_cart = models.ForeignKey('ShoppingCart', on_delete=models.CASCADE)
     product = models.ForeignKey(CustomWatch, on_delete=models.CASCADE)
-    customization = models.ForeignKey(CustomizationDetail, on_delete=models.CASCADE)
+    customization = models.ForeignKey(CustomizationDetail, on_delete=models.CASCADE,default=0)
     quantity = models.PositiveIntegerField(default=1)
 
     def __str__(self):

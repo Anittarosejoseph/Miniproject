@@ -721,14 +721,17 @@ th.action-header {
                         <td>{{ order.total_amount }}</td>
                         <td>{{ order.payment_status }}</td>
                         <td>{{ order.status }}</td>
-                        <td>{{ order.delivery_team }}</td>
-                        <td>{{ order.get_delivery_team_city }}</td>
+                        
                         <td>{{ order.created_at }}</td>
                         <td>
                             {% if order.payment_status %}
-                                <button class="btn btn-assign">Assign Delivery Team</button>
+                            <form id="assignDeliveryForm{{ order.id }}" method="post" action="{% url 'assign_delivery' order.id %}">
+                                {% csrf_token %}
+                                <button type="button" class="btn btn-primary mt-3 assignDeliveryBtn" data-order-id="{{ order.id }}">Assign Delivery</button>
+                            </form>
                             {% endif %}
                         </td>
+                        
                     </tr>
                 {% endfor %}
             </tbody>
@@ -739,5 +742,37 @@ th.action-header {
     <script src="https://code.jquery.com/jquery-3.5.1.slim.min.js" integrity="sha384-DfXdz2htPH0lsSSs5nCTpuj/zy4C+OGpamoFVy38MVBnE+IbbVYUew+OrCXaRkfj" crossorigin="anonymous"></script>
     <script src="https://cdn.jsdelivr.net/npm/@popperjs/core@2.9.1/dist/umd/popper.min.js" integrity="sha384-pzjw8+uJpKl0U02BFn7fZfiIQbwmZNRKF6ZLIb5U5fag11pjFqAeg8kpYxs17NPw" crossorigin="anonymous"></script>
     <script src="https://stackpath.bootstrapcdn.com/bootstrap/4.5.2/js/bootstrap.min.js" integrity="sha384-B4gt1jrGC7Jh4AgTPSdUtOBvfO8sh+Wy8RAHmMSfD" crossorigin="anonymous"></script>
-</body>
+    <script src="https://code.jquery.com/jquery-3.6.0.min.js"></script>
+    <script>
+        $(document).ready(function() {
+            $('.assignDeliveryBtn').on('click', function() {
+                var button = $(this); // Store the button element
+                var orderId = button.data('order-id'); // Get the order ID from the button data attribute
+                var form = $('#assignDeliveryForm' + orderId); // Get the form corresponding to the order ID
+    
+                $.ajax({
+                    url: form.attr('action'), // Get the form action URL
+                    type: form.attr('method'), // Get the form method (POST)
+                    data: form.serialize(), // Serialize form data
+                    dataType: 'json',
+                    success: function(response) {
+                        if (response.success) {
+                            alert('Delivery assigned successfully.');
+                            // Disable the button after successful assignment
+                            button.prop('disabled', true);
+                            // You can optionally update the UI here
+                        } else {
+                            alert('Error assigning delivery: ' + response.message);
+                        }
+                    },
+                    error: function(xhr, status, error) {
+                        console.error('Error:', error);
+                        alert('An error occurred while assigning delivery. Please try again later.');
+                    }
+                });
+            });
+        });
+    </script>
+    
+    </body>
 </html>

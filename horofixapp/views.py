@@ -93,7 +93,7 @@ def login_user(request):
                     return redirect('/')
                 elif user.is_deliveryteam :
                     request.session["username"] = user.username
-                    return redirect('deliveryindex')
+                    return redirect('deliverydashboard')
                 elif user.is_technician :
                     request.session["username"] = user.username
                     return redirect('techindex')
@@ -149,6 +149,18 @@ def Customer_Profile(request):
         'form_submitted': True,
     }
     return render(request, 'Customer_Profile.html', context)
+# views.py
+
+from django.shortcuts import render
+from django.contrib.auth.decorators import login_required
+from .models import DeliveryAssignment
+
+@login_required
+def delivery_dashboard(request):
+    
+
+    # Render the template with the provided context
+    return render(request, 'deliverydashboard.html')
 
 
 @login_required(login_url='login')
@@ -315,6 +327,14 @@ def assign_delivery_team(request, order_id):
     return render(request, 'assign_delivery_team.html', {'delivery_teams': delivery_teams, 'order_id': order_id})
 
 from django.shortcuts import render, get_object_or_404, redirect
+def assigned_orders(request):
+    # Fetch all DeliveryAssignments
+    assigned_orders = DeliveryAssignment.objects.all()
+    user_profile = CustomerProfile.objects.filter(user=request.user).first()
+
+    # Pass the assigned orders to the template
+    context = {'assigned_orders': assigned_orders, 'user_profile': user_profile}
+    return render(request, 'assigned_orders.html', context)
 
 
 
@@ -338,34 +358,61 @@ def add_to_cart(request, product_id):
 
 
 
-@login_required(login_url='login')
+from django.shortcuts import get_object_or_404, redirect
+from .models import Cart, CartItem
+from .models import WatchProduct
 def remove_from_cart(request, product_id):
-    # Get the WatchProduct object based on the product_id
+    cart = get_object_or_404(Cart, user=request.user)
     product = get_object_or_404(WatchProduct, pk=product_id)
-    
-    # Get the user's cart
-    cart = Cart.objects.get(user=request.user)
-    
-    try:
-        # Get the cart item for the product
-        cart_item = cart.cartitem_set.get(product=product)
-        
-        if cart_item.quantity >= 1 and product.status == 'In Stock':
-            cart_item.delete()
-    except CartItem.DoesNotExist:
-        pass
-    
+
+    # Use filter() instead of get() to handle multiple CartItems
+    cart_items = cart.cartitem_set.filter(product=product)
+
+    # Remove all matching CartItems
+    for cart_item in cart_items:
+        cart_item.delete()
+
     return redirect('view_cart')
+from django.shortcuts import redirect
+from django.shortcuts import redirect, get_object_or_404
+from .models import Cart, CustomizationDetail
+
+def remove_customization_from_cart(request, customization_id):
+    # Retrieve the cart for the current user
+    cart = get_object_or_404(Cart, user=request.user)
+    
+    # Retrieve the customization detail to be removed
+    customization = get_object_or_404(CustomizationDetail, pk=customization_id)
+    
+    # Filter cart items related to the customization to be removed
+    cart_items = cart.cartitem_set.filter(customization=customization)
+    
+    # Delete the filtered cart items
+    cart_items.delete()
+    
+    # Redirect to the cart view
+    return redirect('view_cart')
+
+
+
 def view_cart(request):
     cart = request.user.cart
     cart_items = CartItem.objects.filter(cart=cart)
-    for item in cart_items:
-        item.total_price = item.product.product_sale_price * item.quantity
     
+    # Iterate over cart items
+    for item in cart_items:
+        # Check if the product is None but customization is present
+        if item.product is None and item.customization is not None:
+            # Calculate total price based on customization price
+            item.total_price = item.customization.watch.product_sale_price * item.quantity
+        else:
+            # Calculate total price based on product sale price
+            item.total_price = item.product.product_sale_price * item.quantity
+    
+    # Calculate total amount
     total_amount = sum(item.total_price for item in cart_items)
 
-    return render(request, 'view_cart.html', {'cart_items': cart_items,'total_amount': total_amount})
-
+    return render(request, 'view_cart.html', {'cart_items': cart_items, 'total_amount': total_amount})
 from django.shortcuts import get_object_or_404, redirect
 from django.contrib.auth.decorators import login_required
 
@@ -386,6 +433,28 @@ def increase_cart_item(request, product_id):
         cart_item.save()
     
     return redirect('view_cart')
+from django.shortcuts import redirect, get_object_or_404
+from .models import CustomizationDetail, Cart, CartItem
+from django.contrib.auth.decorators import login_required
+
+@login_required(login_url='login')
+def increase_customization_from_cart(request, customization_id):
+    customization = get_object_or_404(CustomizationDetail, pk=customization_id)
+    user = request.user
+    cart, created = Cart.objects.get_or_create(user=user)
+    
+    # Get or create the cart item
+    cart_item, created = CartItem.objects.get_or_create(cart=cart, customization=customization)
+    
+    if not created:
+        cart_item.quantity += 1
+        cart_item.save()
+    
+    return redirect('view_cart')
+
+
+
+
 
 from django.shortcuts import get_object_or_404, redirect
 
@@ -396,6 +465,23 @@ def decrease_cart_item(request, product_id):
     
     # Correct the variable name from CartItemt to CartItem
     cart_item = CartItem.objects.get(cart__user=user, product=product)
+    
+    if cart_item.quantity > 1:
+        cart_item.quantity -= 1
+        cart_item.save()
+    else:
+        cart_item.delete()
+    
+    return redirect('view_cart')
+from django.shortcuts import get_object_or_404, redirect
+from django.contrib.auth.decorators import login_required
+
+@login_required(login_url='login')
+def decrease_customization_from_cart(request, customization_id):
+    customization = get_object_or_404(Customization, pk=customization_id)
+    user = request.user
+    
+    cart_item = CartItem.objects.get(cart__user=user, customization=customization)
     
     if cart_item.quantity > 1:
         cart_item.quantity -= 1
@@ -457,11 +543,12 @@ def create_order(request):
         try:
             # Create a new order object
             order = Order.objects.create(user=user, total_amount=total_amount)
-
+            
             # Create order items for each cart item
             for cart_item in cart_items:
+                customization = CustomizationDetail.objects.get(id=cart_item.customization.id)
                 OrderItem.objects.create(
-                    customization=cart_item.customization,
+                    customization=customization,
                     order=order,
                     product=cart_item.product,
                     quantity=cart_item.quantity,
@@ -989,9 +1076,14 @@ def all_orders(request):
 @login_required
 def ordersummary(request):
     order = Order.objects.filter(user=request.user).latest('created_at')
-    return render(request, 'ordersummary.html', {'order': order})
+    order_items = order.orderitem_set.all()
+    customization_details = []
 
+    for item in order_items:
+        customization_detail = item.customization
+        customization_details.append(customization_detail)
 
+    return render(request, 'ordersummary.html', {'order': order, 'customization_details': customization_details})
 # views.py
 from django.shortcuts import render
 from .models import Order, OrderItem
@@ -1159,14 +1251,14 @@ def order_history(request):
     return render(request, 'order_history.html', context)
 from django.shortcuts import render, get_object_or_404
 
+from django.shortcuts import render
+from .models import Order
+
 def bill(request, order_id):
-    order = get_object_or_404(Order, id=order_id)
-    context = {
-        'order': order,
-    }
-    return render(request, 'bill.html', context)
+    order = Order.objects.get(id=order_id)
+    customization_details = order.orderitem_set.all().values('customization__strap_material', 'customization__strap_color', 'customization__dial_color', 'customization__case_material', 'customization__case_color', 'customization__engraving_text')
 
-
+    return render(request, 'bill.html', {'order': order, 'customization_details': customization_details})
 
 @login_required
 def panel(request):
@@ -2025,7 +2117,7 @@ from django.shortcuts import render, redirect, get_object_or_404
 from .models import CustomWatch, CustomizationDetail
 
 def customize_watch(request, product_id):
-    watch = get_object_or_404(WatchProduct, pk=product_id)
+    watch = get_object_or_404(CustomWatch, pk=product_id)
     if request.method == 'POST':
         strap_material = request.POST.get('strap_material')
         strap_color = request.POST.get('strap_color')
@@ -2054,64 +2146,31 @@ def customize_watch(request, product_id):
         # Create a new CartItem with the created customization and product
         cart_item, item_created = CartItem.objects.get_or_create(
             cart=cart,
-            product=watch,
             customization=customization,
         )
+        if not item_created:
+            cart_item.quantity += 1
+            cart_item.save()
         return redirect('view_cart')
     
     return render(request, 'customize_watch.html', {'watch': watch})
+from django.shortcuts import render
+from .models import OrderItem
 
-from django.shortcuts import redirect, get_object_or_404, render
-from django.contrib.auth.decorators import login_required
-from .models import CustomWatch, ShoppingCart, ShoppingCartItem, CustomizationDetail
+def display_order_details(request):
+    order_items = OrderItem.objects.exclude(lat=None, lng=None).select_related('order__user')
+    return render(request, 'order_details.html', {'order_items': order_items})
 
-@login_required(login_url='login')
-def add_to_shopping_cart(request, watch_id):
-    watch = get_object_or_404(CustomWatch, pk=watch_id)
+from django.http import JsonResponse
+from django.shortcuts import get_object_or_404
+from .models import Order, CustomUser, DeliveryAssignment
+
+def assign_delivery(request, order_id):
+    order = get_object_or_404(Order, pk=order_id)
     
-    
-    customization_detail = CustomizationDetail.objects.filter(watch=watch).latest('id')
-    
-    shopping_cart, created = ShoppingCart.objects.get_or_create(user=request.user)
-    shopping_cart.cartid = request.user.id # Set the cartid
-    shopping_cart.save() # Save the shopping cart with the new cartid
-    
-    shopping_cart_item, item_created = ShoppingCartItem.objects.get_or_create(
-        shopping_cart=shopping_cart, product=watch, customization=customization_detail
-    )
-    
-    if not item_created:
-        shopping_cart_item.quantity += 1
-        shopping_cart_item.save()
-    
-    return redirect('view_custom')
-
-@login_required(login_url='login')
-def remove_from_shopping_cart(request, watch_id):
-    watch = get_object_or_404(CustomWatch, pk=watch_id)
-    shopping_cart = ShoppingCart.objects.get(user=request.user)
-    try:
-        cart_item = shopping_cart.shoppingcartitem_set.get(product=watch)
-        if cart_item.quantity > 1:
-             cart_item.quantity -= 1
-             cart_item.save()
-        else:
-            cart_item.delete()
-    except ShoppingCartItem.DoesNotExist:
-        pass
-    
-    return redirect('view_shopping_cart.html')
-
-
-
-
-@login_required(login_url='login')
-def view_shopping_cart(request):
-    try:
-        cart = request.user.shoppingcart
-        cart_items = cart.shoppingcartitem_set.all()
-        return render(request, 'view_shopping_cart.html', {'cart_items': cart_items})
-    except ShoppingCart.DoesNotExist:
-        # Handle the case where the user doesn't have a shopping cart
-        return render(request, 'view_shopping_cart.html', {'cart_items': []})
-
+    delivery_boy = CustomUser.objects.filter(is_deliveryteam=True).first()
+    if delivery_boy:
+        assignment = DeliveryAssignment.objects.create(order=order, delivery_boy=delivery_boy)
+        return JsonResponse({'success': True, 'message': 'Delivery assigned successfully.'})
+    else:
+        return JsonResponse({'success': False, 'message': 'No delivery boy available.'})
