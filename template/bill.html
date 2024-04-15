@@ -3,104 +3,30 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Bill</title>
+    <title>Order Details</title>
+    <!-- Bootstrap CSS -->
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.0.2/dist/css/bootstrap.min.css" rel="stylesheet">
+    <!-- Custom CSS -->
     <style>
-        /* Global styles */
-        body {
-            font-family: Arial, sans-serif;
-            background-color: #f4f4f4;
-            margin: 0;
-            padding: 0;
-        }
-
         .container {
-            max-width: 800px;
-            margin: 0 auto;
             padding: 20px;
-            background-color: #fff;
-            border-radius: 10px;
-            box-shadow: 0 0 10px rgba(0, 0, 0, 0.1);
         }
-
         .header {
             text-align: center;
             margin-bottom: 20px;
         }
-
-        .order-details,
-        .customization-details,
-        .user-details {
-            margin-top: 30px;
-            border-top: 1px solid #ccc;
-            padding-top: 20px;
-        }
-
-        .user-details p {
-            margin-bottom: 10px;
-        }
-        <style>
-        /* Global styles */
-        body {
-            font-family: Arial, sans-serif;
-            background-color: #f4f4f4;
-            margin: 0;
-            padding: 0;
-        }
-
-        .container {
-            max-width: 800px;
-            margin: 0 auto;
-            padding: 20px;
-            background-color: #fff;
-            border-radius: 10px;
-            box-shadow: 0 0 10px rgba(0, 0, 0, 0.1);
-        }
-
-        .header {
-            text-align: center;
+        .order-details {
             margin-bottom: 20px;
         }
-
-        .order-details,
-        .customization-details,
-        .user-details {
-            margin-top: 30px;
-            border-top: 1px solid #ccc;
-            padding-top: 20px;
-        }
-
         .order-items {
-            margin-top: 30px;
-        }
-
-        .order-items ul {
-            list-style-type: none;
-            padding: 0;
-        }
-
-        .order-items li {
             margin-bottom: 20px;
-            border-bottom: 1px solid #ccc;
-            padding-bottom: 10px;
         }
-
-        .order-items li:last-child {
-            border-bottom: none;
-            margin-bottom: 0;
+        .customization-details {
+            margin-bottom: 20px;
         }
-
-        .customization-details,
         .user-details {
-            margin-top: 30px;
-            padding-top: 20px;
+            margin-bottom: 20px;
         }
-
-        .user-details p {
-            margin-bottom: 10px;
-        }
-
-    </style>
-
     </style>
 </head>
 <body>
@@ -125,29 +51,20 @@
                 {% endfor %}
             </ul>
         </div>
-        <!-- <div class="customization-details">
-            <h2>Watch Customization Details</h2>
-            <p><strong>Owner Name:</strong> {{ customization.owner_name }}</p>
-            <p><strong>Strap Material:</strong> {{ customization.strap_material }}</p>
-            <p><strong>Strap Color:</strong> {{ customization.strap_color }}</p>
-            <p><strong>Watch Color:</strong> {{ customization.watch_color }}</p>
-            <p><strong>Dial Shape:</strong> {{ customization.dial_shape }}</p>
-            <p><strong>Watch Size:</strong> {{ customization.watch_size }}</p>
-            <p><strong>Watch Hands Color:</strong> {{ customization.watch_hands_color }}</p>
-            <!-- Add more customization details as needed -->
-        <!-- </div>  -->
+        
         <div class="customization-details">
             <h2>Customization Details</h2>
             <ul>
-                {% for customization_detail in customization_details %}
-                    {% if customization_detail.customization__strap_material %}
+                {% for item in order.orderitem_set.all %}
+                    {% if item.customization %}
                     <li>
-                        <p><strong>Strap Material:</strong> {{ customization_detail.customization__strap_material }}</p>
-                        <p><strong>Strap Color:</strong> {{ customization_detail.customization__strap_color }}</p>
-                        <p><strong>Dial Color:</strong> {{ customization_detail.customization__dial_color }}</p>
-                        <p><strong>Case Material:</strong> {{ customization_detail.customization__case_material }}</p>
-                        <p><strong>Case Color:</strong> {{ customization_detail.customization__case_color }}</p>
-                        <p><strong>Engraving Text:</strong> {{ customization_detail.customization__engraving_text }}</p>
+                        <p><strong>Customized Product Name:</strong> {{ item.customization.watch.product_name }}</p>
+                        <p><strong>Strap Material:</strong> {{ item.customization.strap_material }}</p>
+                        <p><strong>Strap Color:</strong> {{ item.customization.strap_color }}</p>
+                        <p><strong>Dial Color:</strong> {{ item.customization.dial_color }}</p>
+                        <p><strong>Case Material:</strong> {{ item.customization.case_material }}</p>
+                        <p><strong>Case Color:</strong> {{ item.customization.case_color }}</p>
+                        <p><strong>Engraving Text:</strong> {{ item.customization.engraving_text }}</p>
                         <!-- Include other customization details as needed -->
                     </li>
                     {% endif %}
@@ -164,6 +81,5 @@
         </div>
     </div>
     <center><button onclick="window.print()">Print</button></center>
-
 </body>
 </html>

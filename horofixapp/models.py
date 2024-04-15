@@ -300,8 +300,9 @@ class Order(models.Model):
         ('Placed', 'Placed'),
         ('Processing', 'Processing'),
         ('Delivered', 'Delivered'),
+        ('Out for Delivery','Out for Delivery')
     ]
-    status = models.CharField(max_length=20, choices=status_choices, default='Placed')
+    delivery_status = models.CharField(max_length=20, choices=status_choices, default='Placed')
 
     def __str__(self):
         return f"Order {self.id} by {self.user.username}"
@@ -315,7 +316,7 @@ class OrderItem(models.Model):
     customization=models.ForeignKey(CustomizationDetail, on_delete=models.CASCADE,null=True)
     
 
-    product = models.ForeignKey(WatchProduct, on_delete=models.CASCADE)
+    product = models.ForeignKey(WatchProduct, on_delete=models.CASCADE,null=True)
     quantity = models.PositiveIntegerField(default=1)
     item_total = models.DecimalField(max_digits=10, decimal_places=2)
     order_date = models.DateField(auto_now_add=True)

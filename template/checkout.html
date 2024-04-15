@@ -114,9 +114,16 @@
     <p>Order Summary:</p>
     <ul>
         {% for item in cart_items %}
-        <li>{{ item.product.product_name }} x {{ item.quantity }}</li>
+            <li>
+                {% if item.product %}
+                    {{ item.product.product_name }} x {{ item.quantity }}
+                {% elif item.customization %}
+                    Customized {{ item.customization.watch.product_name }} x {{ item.quantity }}
+                {% endif %}
+            </li>
         {% endfor %}
     </ul>
+    
     <p>Total Amount: &#8377;<span id="total_item_amount">{{ total_amount }}</span></p>
 
     <button id="rzp-button1">Pay with Razorpay</button>

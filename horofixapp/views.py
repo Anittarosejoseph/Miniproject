@@ -188,7 +188,47 @@ def customer_product_view(request):
 
 # Django view to delete the product
 
+from django.shortcuts import render, redirect, get_object_or_404
+from .models import CustomWatch, CustomizationDetail
 
+def customize_watch(request, product_id):
+    watch = get_object_or_404(CustomWatch, pk=product_id)
+    if request.method == 'POST':
+        strap_material = request.POST.get('strap_material')
+        strap_color = request.POST.get('strap_color')
+        dial_color = request.POST.get('dial_color')
+        case_material = request.POST.get('case_material')
+        case_color = request.POST.get('case_color')
+        engraving_text = request.POST.get('engraving_text')
+        engraving_font = request.POST.get('engraving_font')
+        engraving_location = request.POST.get('engraving_location')
+        special_requests = request.POST.get('special_requests')
+        
+        customization = CustomizationDetail.objects.create(
+            watch=watch,
+            strap_material=strap_material,
+            strap_color=strap_color,
+            dial_color=dial_color,
+            case_material=case_material,
+            case_color=case_color,
+            engraving_text=engraving_text,
+            engraving_font=engraving_font,
+            engraving_location=engraving_location,
+            special_requests=special_requests,
+        )
+        cart, created = Cart.objects.get_or_create(user=request.user)
+        
+        # Create a new CartItem with the created customization and product
+        cart_item, item_created = CartItem.objects.get_or_create(
+            cart=cart,
+            customization=customization,
+        )
+        if not item_created:
+            cart_item.quantity += 1
+            cart_item.save()
+        return redirect('view_cart')
+    
+    return render(request, 'customize_watch.html', {'watch': watch})
 
 
 
@@ -529,7 +569,18 @@ from django.conf import settings
 import razorpay
 import json
 from django.views.decorators.csrf import csrf_exempt
-from .models import Cart, CartItem, Order, OrderItem
+from django.shortcuts import render
+from django.http import JsonResponse
+from django.conf import settings
+from django.views.decorators.csrf import csrf_exempt
+import razorpay
+from .models import Order, CartItem, CustomizationDetail, UserProfile
+from django.shortcuts import render
+from django.http import JsonResponse
+from django.conf import settings
+from django.views.decorators.csrf import csrf_exempt
+import razorpay
+from .models import Order, CartItem, CustomizationDetail, UserProfile
 
 @csrf_exempt
 def create_order(request):
@@ -538,22 +589,43 @@ def create_order(request):
         cart = user.cart
 
         cart_items = CartItem.objects.filter(cart=cart)
-        total_amount = sum(item.product.product_sale_price * item.quantity for item in cart_items)
-        
+        total_amount = 0  # Initialize total amount
+
         try:
+            # Calculate total amount
+            for item in cart_items:
+                if item.product:
+                    total_amount += item.product.product_sale_price * item.quantity
+                elif item.customization:
+                    total_amount += item.customization.watch.product_sale_price  * item.quantity
+
             # Create a new order object
             order = Order.objects.create(user=user, total_amount=total_amount)
             
             # Create order items for each cart item
-            for cart_item in cart_items:
-                customization = CustomizationDetail.objects.get(id=cart_item.customization.id)
-                OrderItem.objects.create(
+            for item in cart_items:
+                if item.product:
+                    product = item.product
+                    item_total = product.product_sale_price * item.quantity
+                    OrderItem.objects.create(
+                    
+                    order=order,
+                    product=product,
+                    quantity=item.quantity,
+                    item_total=item_total
+                )
+                elif item.customization:
+                    customization = item.customization
+                    product = customization.watch
+                    item_total = customization.watch.product_sale_price * item.quantity
+                    OrderItem.objects.create(
                     customization=customization,
                     order=order,
-                    product=cart_item.product,
-                    quantity=cart_item.quantity,
-                    item_total=cart_item.product.product_sale_price * cart_item.quantity
+                    
+                    quantity=item.quantity,
+                    item_total=item_total
                 )
+                
 
             # Initialize Razorpay client
             client = razorpay.Client(auth=(settings.RAZOR_KEY_ID, settings.RAZOR_KEY_SECRET))
@@ -576,19 +648,9 @@ def create_order(request):
             return JsonResponse({'order_id': order_data['id']})
 
         except Exception as e:
-            # Log the error for debugging purposes
-            print(f"Error creating order: {str(e)}")
-            
-            # Return an informative error response
-            return JsonResponse({'error': f'An error occurred while creating the order: {str(e)}'}, status=500)
-
-from django.shortcuts import render
-from .models import CartItem, CustomerProfile  # Import CartItem
-
-from django.http import JsonResponse
-from django.views.decorators.csrf import csrf_exempt
-import json
-from django.conf import settings
+            # Handle exceptions
+            print("Error creating order:", e)
+            return JsonResponse({'error': 'An error occurred while creating the order.'}, status=500)
 
 @csrf_exempt
 def checkout(request):
@@ -599,7 +661,14 @@ def checkout(request):
     if request.user.is_authenticated:
         user = request.user
         cart_items = CartItem.objects.filter(cart=user.cart)
-        total_amount = sum(item.product.product_sale_price * item.quantity for item in cart_items)
+        total_amount = 0  # Initialize total amount
+
+        for item in cart_items:
+            if item.product:
+                total_amount += item.product.product_sale_price * item.quantity
+            elif item.customization:
+                total_amount += item.customization.watch.product_sale_price * item.quantity
+
 
         try:
             # Try to access the user's name from the related CustomerProfile
@@ -625,6 +694,8 @@ def checkout(request):
         'full_name': full_name,
     }
     return render(request, 'checkout.html', context)
+
+from django.shortcuts import get_object_or_404
 
 from django.shortcuts import get_object_or_404
 
@@ -1794,7 +1865,91 @@ from django.contrib.auth.decorators import login_required
 
 
 
+from django.shortcuts import render
+from .models import Order, OrderItem
 
+from django.shortcuts import render
+from .models import Order
+
+def available_orders(request):
+    # Query the database for orders with payment_status = 1 along with related OrderItem objects
+    paid_orders = Order.objects.filter(payment_status=True).prefetch_related('orderitem_set__product', 'orderitem_set__customization')
+
+    # Pass paid_orders data to the template
+    return render(request, 'availableorders.html', {'available_orders': paid_orders})
+
+from django.shortcuts import render, redirect, get_object_or_404
+from django.contrib.auth.decorators import login_required
+from django.contrib import messages
+from django.core.mail import send_mail
+from django.conf import settings
+from django.views.decorators.cache import never_cache
+from .models import Order
+
+import random
+import logging
+
+logger = logging.getLogger(__name__)
+
+@never_cache
+@login_required(login_url='login')
+def delivery_update_status(request, order_id):
+    order = get_object_or_404(Order, pk=order_id)
+
+    if request.method == 'POST':
+        delivery_status = request.POST.get('delivery_status')
+
+        if delivery_status == 'Delivered':
+            otp = ''.join([str(random.randint(0, 9)) for _ in range(6)])
+            send_mail(
+                'Delivery Confirmation OTP',
+                f'Your OTP for order {order.id} is: {otp}',
+                settings.EMAIL_HOST_USER,
+                [order.user.email],
+                fail_silently=False,
+            )
+
+            # Store OTP and order ID in session for later verification
+            request.session['delivery_status_otp'] = otp
+            request.session['otp_order_id'] = str(order_id)
+
+            messages.info(request, 'OTP has been sent to the customer for delivery confirmation.')
+            return redirect('otp_verification', order_id=order_id)  # Redirect to OTP verification page with order_id
+
+        else:
+            order.delivery_status = delivery_status
+            order.save()
+            messages.success(request, 'Delivery status updated successfully.')
+            return redirect('available_orders')  # Redirect to the delivery boy dashboard
+
+    return render(request, "deliveryupdatestatus.html", {'order': order})
+@login_required(login_url='login')
+def otp_verification(request, order_id):
+    order = get_object_or_404(Order, pk=order_id)
+
+    if request.method == 'POST':
+        submitted_otp = request.POST.get('otp')
+        session_order_id = request.session.get('otp_order_id')
+
+        if str(order_id) == session_order_id and submitted_otp == request.session.get('delivery_status_otp'):
+            # OTP is correct, update the delivery status
+            order.delivery_status = 'Delivered'
+            order.save()
+
+            # Clear OTP and order ID from session
+            del request.session['delivery_status_otp']
+            del request.session['otp_order_id']
+
+            # Redirect to a success page or the delivery details page
+            messages.success(request, 'Order marked as delivered successfully.')
+            return redirect('available_orders')
+        else:
+            # OTP is incorrect, render the OTP verification page with error message
+            messages.error(request, 'Incorrect OTP. Please try again.')
+            return render(request, 'otp_verification.html', {'order': order, 'error_message': 'Incorrect OTP. Please try again.'})
+
+    else:
+        return render(request, 'otp_verification.html', {'order': order})
 from reportlab.pdfgen import canvas
 from io import BytesIO
 from django.utils import timezone
@@ -2113,47 +2268,7 @@ def custom_view(request, product_id):
     product = get_object_or_404(CustomWatch, pk=product_id)
     return render(request, 'custom_view.html', {'product': product})
 # views.py
-from django.shortcuts import render, redirect, get_object_or_404
-from .models import CustomWatch, CustomizationDetail
 
-def customize_watch(request, product_id):
-    watch = get_object_or_404(CustomWatch, pk=product_id)
-    if request.method == 'POST':
-        strap_material = request.POST.get('strap_material')
-        strap_color = request.POST.get('strap_color')
-        dial_color = request.POST.get('dial_color')
-        case_material = request.POST.get('case_material')
-        case_color = request.POST.get('case_color')
-        engraving_text = request.POST.get('engraving_text')
-        engraving_font = request.POST.get('engraving_font')
-        engraving_location = request.POST.get('engraving_location')
-        special_requests = request.POST.get('special_requests')
-        
-        customization = CustomizationDetail.objects.create(
-            watch=watch,
-            strap_material=strap_material,
-            strap_color=strap_color,
-            dial_color=dial_color,
-            case_material=case_material,
-            case_color=case_color,
-            engraving_text=engraving_text,
-            engraving_font=engraving_font,
-            engraving_location=engraving_location,
-            special_requests=special_requests,
-        )
-        cart, created = Cart.objects.get_or_create(user=request.user)
-        
-        # Create a new CartItem with the created customization and product
-        cart_item, item_created = CartItem.objects.get_or_create(
-            cart=cart,
-            customization=customization,
-        )
-        if not item_created:
-            cart_item.quantity += 1
-            cart_item.save()
-        return redirect('view_cart')
-    
-    return render(request, 'customize_watch.html', {'watch': watch})
 from django.shortcuts import render
 from .models import OrderItem
 

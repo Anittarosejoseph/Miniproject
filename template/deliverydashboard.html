@@ -15,7 +15,7 @@
       
       .sidebar {
         width: 250px;
-        background-color: #333;
+        background-color:blue;
         color: #fff;
         height: 100vh;
         position: fixed;
@@ -87,11 +87,11 @@
 <body>
   <div class="sidebar">
     <div class="sidebar-header">
-      <img src="{% static 'images/deliverboy.jpeg' %}" >
+      <img src="{% static 'images/client.jpg' %}" >
       <span><strong> Welcome, {{ user.fullName }}!</strong></span>
     </div>
     <ul class="sidebar-menu">
-      <li><a href="#"><i class="fas fa-home"></i> Home</a></li>
+      <li><a href="{% url 'available_orders' %}"><i class="fas fa-home"></i> Home</a></li>
       <li><a href="#"><i class="fas fa-bell"></i> Notifications</a></li>
       <li><a href="{% url 'assigned_orders' %}"><i class="fas fa-bell"></i> Orders</a></li>
       <li><a href="#"><i class="fas fa-bell"></i> Profile</a></li>

@@ -19,11 +19,13 @@ urlpatterns = [
     path('view_products/', views.view_products, name='view_products'),
     path('service/', views.service, name='service'),
     path('repair/', views.repair, name='repair'),
- 
+ path('availableorders/', views.available_orders, name='available_orders'),
+ path('deliveryupdatestatus/<int:order_id>/', views.delivery_update_status, name='delivery_update_status'),
     path('reset_password/', auth_views.PasswordResetView.as_view(), name="reset_password"),
     path('reset_password_sent/', auth_views.PasswordResetDoneView.as_view(), name="password_reset_done"),
     path('reset/<uidb64>/<token>/', auth_views.PasswordResetConfirmView.as_view(), name="password_reset_confirm"),
     path('reset_password_complete/', auth_views.PasswordResetCompleteView.as_view(), name="password_reset_complete"),
+path('otp-verification/<int:order_id>/', views.otp_verification, name='otp_verification'),
 
     path('customer_products/', views.customer_product_view, name='customer_products'),
     path('edit_product/<int:product_id>/', views.edit_product, name='edit_product'),

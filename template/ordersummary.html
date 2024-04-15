@@ -1,17 +1,107 @@
+{% load static %}
 <!DOCTYPE html>
 <html lang="en">
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Order Summary</title>
-    <!-- Bootstrap CSS -->
-    <link href="https://stackpath.bootstrapcdn.com/bootstrap/4.5.2/css/bootstrap.min.css" rel="stylesheet">
-    <style>
-        /* Custom CSS styles */
-        /* Add your custom CSS styles here */
-    </style>
+    <title>horofix</title>
+
+    <!-- Fonts style -->
+    <link href="https://fonts.googleapis.com/css2?family=Roboto:wght@400;500;700;900&display=swap" rel="stylesheet">
+  
+    <!-- Font Awesome style -->
+    <link href="{% static '/css/font-awesome.min.css' %}" rel="stylesheet" />
+
+    <!-- Custom styles for this template -->
+    <link href="{% static '/css/style.css' %}" rel="stylesheet" />
+    
+    <!-- Responsive style -->
+    <link href="{% static '/css/responsive.css' %}" rel="stylesheet" />
+    
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.0.2/dist/css/bootstrap.min.css" rel="stylesheet" integrity="sha384-EVSTQN3/azprG1Anm3QDgpJLIm9Nao0Yz1ztcQTwFspd3yD65VohhpuuCOmLASjC" crossorigin="anonymous">
+
+<style>
+  .product-details {
+  display: flex;
+  justify-content: space-between;
+  margin-top: 100px /* Aligns the content to the right */
+}
+
+.product-info-container {
+    width: 50%;
+}
+
+.product-specs {
+    width: 50%;
+}
+
+</style>  
 </head>
 <body>
+<div class="hero_area">
+    <header class="header_section">
+        <div class="container-fluid">
+            <nav class="navbar navbar-expand-lg custom_nav-container">
+                <a class="navbar-brand" href="index.html">
+                    <span>
+                        HandTime
+                    </span>
+                </a>
+
+                <button class="navbar-toggler" type="button" data-toggle="collapse" data-target="#navbarSupportedContent" aria-controls="navbarSupportedContent" aria-expanded="false" aria-label="Toggle navigation">
+                    <span class=""> </span>
+                </button>
+
+                <div class="collapse navbar-collapse" id="navbarSupportedContent">
+                    <ul class="navbar-nav  ">
+                        <li class="nav-item ">
+                            <a class="nav-link" href="{% url 'index' %}">Home</a>
+                        </li>
+                        <li class="nav-item">
+                            <a class="nav-link" href="{% url 'about' %}">About</a>
+                        </li>
+                        <li class="nav-item">
+                            <a class="nav-link" href="{% url 'customer_products' %}">Products</a>
+                        </li>
+                        <li class="nav-item">
+                            <a class="nav-link" href="testimonial.html">Testimonial</a>
+                        </li>
+                        <li class="nav-item">
+                            <a class="nav-link" href="contact.html">Contact Us</a>
+                        </li>
+
+                        <div class="user_optio_box">
+                
+                            {% if user.is_authenticated %}
+                              <li>Welcome,{{user.username}}</li>
+                                <a href="{% url 'logout' %}">
+                                  <i class="fa fa-sign-out" aria-hidden="true"></i> Logout
+                                </a>
+                            {% else %}
+                              <a href="{% url 'login' %}">
+                                <i class="fa fa-sign-in" aria-hidden="true"></i> Login
+                              </a>
+                            {% endif %}
+                              
+
+                            <li class="nav-item">
+                                <a class="nav-link" href="{% url 'Customer_Profile' %}">
+                                    <i class="fa fa-user" aria-hidden="true"></i>
+                                </a>
+                            </li>
+                            
+                            <!-- Remove the redundant closing tag below -->
+                            </li>
+                            
+                            
+                            </li>
+                        </div>
+                    </ul>
+                </div>
+            </nav>
+        </div>
+    </header>
+
     <div class="container">
         <h1 class="mt-4">Order Summary</h1>
 
@@ -21,40 +111,36 @@
                 <h2 class="card-title">Order Details</h2>
                 <p><strong>Order ID:</strong> {{ order.id }}</p>
                 <p><strong>Total Amount:</strong> {{ order.total_amount }}</p>
+                <td>{{ order.user.customerprofile.name }}</td>
+                <td>{{ order.user.customerprofile.phone }}</td>
+                <td>{{ order.user.customerprofile.street_address }}, {{ order.user.customerprofile.city }}, {{ order.user.customerprofile.pincode }}</td>
+                <td>{{ order.total_amount }}</td>
                 <p><strong>Payment Status:</strong> {% if order.payment_status %}Paid{% else %}Unpaid{% endif %}</p>
             </div>
         </div>
 
         <!-- Watch Customization Details -->
-        <!-- <div class="card mt-4">
+        <div class="card mt-4">
             <div class="card-body">
                 <h2 class="card-title">Watch Customization Details</h2>
-                {% if order.watch_customization %}
-                    <p><strong>Strap Material:</strong> {{ order.watch_customization.strap_material }}</p>
-                    <p><strong>Strap Color:</strong> {{ order.watch_customization.strap_color }}</p>
-                    <p><strong>Watch Color:</strong> {{ order.watch_customization.watch_color }}</p>
-                    Include other customization details as needed -->
-                <!-- {% else %}
-                    <p>No watch customization details found for this order.</p>
-                {% endif %}
+                {% for item in order.orderitem_set.all %}
+                    {% if item.customization %}
+                    <p><strong>Customized Product:</strong> {{ item.customization.watch.product_name }}</p>
+
+                        <p><strong>Customization:</strong></p>
+                        <ul>
+                            <li><strong>Strap Material:</strong> {{ item.customization.strap_material }}</li>
+                            <li><strong>Strap Color:</strong> {{ item.customization.strap_color }}</li>
+                            <li><strong>Dial Color:</strong> {{ item.customization.dial_color }}</li>
+                            <li><strong>Case Material:</strong> {{ item.customization.case_material }}</li>
+                            <li><strong>Case Color:</strong> {{ item.customization.case_color }}</li>
+                            <li><strong>Engraving Text:</strong> {{ item.customization.engraving_text }}</li>
+                            <!-- Add other customization details here -->
+                        </ul>
+                    {% endif %}
+                {% endfor %}
             </div>
-        </div> -->
-<!-- Watch Customization Details -->
-<!-- Watch Customization Details -->
-<div class="card mt-4">
-    <div class="card-body">
-        <h2 class="card-title">Watch Customization Details</h2>
-        {% for customization_detail in customization_details %}
-            <p><strong>Strap Material:</strong> {{ customization_detail.strap_material }}</p>
-            <p><strong>Strap Color:</strong> {{ customization_detail.strap_color }}</p>
-            <p><strong>Dial Color:</strong> {{ customization_detail.dial_color }}</p>
-            <p><strong>Case Material:</strong> {{ customization_detail.case_material }}</p>
-            <p><strong>Case Color:</strong> {{ customization_detail.case_color }}</p>
-            <p><strong>Engraving Text:</strong> {{ customization_detail.engraving_text }}</p>
-            <!-- Add other customization details here -->
-        {% endfor %}
-    </div>
-</div>
+        </div>
 
         <!-- User Details -->
         <div class="card mt-4">
@@ -71,10 +157,12 @@
             <div class="card-body">
                 <h2 class="card-title">Product Order Details</h2>
                 {% for item in order.orderitem_set.all %}
-                    <p><strong>Product:</strong> {{ item.product.product_name }}</p>
-                    <p><strong>Quantity:</strong> {{ item.quantity }}</p>
-                    <p><strong>Item Total:</strong> {{ item.item_total }}</p>
-                    <!-- Include other product order details as needed -->
+                    {% if not item.customization %}
+                        <p><strong>Product:</strong> {{ item.product.product_name }}</p>
+                        <p><strong>Quantity:</strong> {{ item.quantity }}</p>
+                        <p><strong>Item Total:</strong> {{ item.item_total }}</p>
+                        <!-- Include other product order details as needed -->
+                    {% endif %}
                 {% endfor %}
             </div>
         </div>
