@@ -348,24 +348,6 @@ def admin_order_list(request):
 from django.shortcuts import render, redirect, get_object_or_404
 from .models import Order, DeliveryTeam
 
-def assign_delivery_team(request, order_id):
-    order = get_object_or_404(Order, id=order_id)
-    delivery_teams = DeliveryTeam.objects.all()
-
-    if request.method == 'POST':
-        selected_delivery_team_id = request.POST.get('delivery_team')
-
-        if selected_delivery_team_id:
-            selected_delivery_team = get_object_or_404(DeliveryTeam, id=selected_delivery_team_id)
-
-            # Assign the selected delivery team to the order
-            order.delivery_team = selected_delivery_team
-            order.save()
-
-            return redirect('admin_order_list')
-
-    return render(request, 'assign_delivery_team.html', {'delivery_teams': delivery_teams, 'order_id': order_id})
-
 from django.shortcuts import render, get_object_or_404, redirect
 def assigned_orders(request):
     # Fetch all DeliveryAssignments
@@ -956,18 +938,22 @@ def remove_order_item(request, item_id):
 
     # Redirect back to the order summary page or any desired page
     return redirect('ordersummary')
+from django.core.mail import send_mail
+from django.shortcuts import render, redirect
+from django.conf import settings
+from .models import CustomUser, DeliveryTeam
 
 def delivery_team_registration(request):
     if request.method == 'POST':
-        name = request.POST.get('name')  # Make sure 'name' is present in your form
+        name = request.POST.get('name')
         username = request.POST.get('username')
         email = request.POST.get('email')
         phone = request.POST.get('phone')
         password = request.POST.get('password')
         team_name = request.POST.get('team_name')
         vehicle_number = request.POST.get('vehicle_number')
+        district = request.POST.get('deliveryLocation')  # Retrieve selected district
         pincode = request.POST.get('pincode')
-        city = request.POST.get('city')
 
         user_type = 'DELIVERYTEAM'
 
@@ -980,7 +966,8 @@ def delivery_team_registration(request):
             user.is_customer = False
             user.save()
 
-            delivery_team = DeliveryTeam(user=user, team_name=team_name, vehicle_number=vehicle_number, pincode=pincode, city=city)
+            # Create the DeliveryTeam instance and save it
+            delivery_team = DeliveryTeam(user=user, team_name=team_name, vehicle_number=vehicle_number, location=district, pincode=pincode)
             delivery_team.save()
 
             # Send a welcome email to the newly registered delivery team
@@ -994,6 +981,7 @@ def delivery_team_registration(request):
             return redirect('delivery_team_list')
     else:
         return render(request, 'deliveryteamreg.html')
+
 
 # views.py
 from django.http import JsonResponse
@@ -1012,6 +1000,33 @@ def deliveryindex(request):
     }   
     return render(request, 'deliveryindex.html')  
 from django.shortcuts import render
+from django.http import JsonResponse
+from django.shortcuts import get_object_or_404
+from .models import Order, DeliveryTeam, DeliveryAssignment, CustomerProfile
+
+def assign_delivery(request, order_id):
+    order = get_object_or_404(Order, pk=order_id)
+    user_profile = CustomerProfile.objects.get(user=order.user)
+    user_city = user_profile.city
+
+    # Get available delivery boys based on user's city
+    available_delivery_boys = DeliveryTeam.objects.filter(location__icontains=user_city)
+
+    if available_delivery_boys.exists():
+        # Assign the first available delivery boy to the order
+        delivery_boy = available_delivery_boys.first()
+        
+        # Assuming DeliveryAssignment has a delivery_boy field that is a ForeignKey to CustomUser
+        # Create a DeliveryAssignment object with the correct CustomUser instance
+        assignment = DeliveryAssignment.objects.create(order=order, delivery_boy=delivery_boy.user)
+
+        # Update the delivery status of the order
+        order.delivery_status = 'Placed'  # or any other status
+        order.save()
+
+        return JsonResponse({'success': True, 'message': 'Delivery assigned successfully.'})
+    else:
+        return JsonResponse({'success': False, 'message': 'No delivery boy available'})
 
 def delivery_team_list(request):
     # Your logic to retrieve data from the database goes here
@@ -1869,14 +1884,22 @@ from django.shortcuts import render
 from .models import Order, OrderItem
 
 from django.shortcuts import render
-from .models import Order
+from .models import DeliveryTeam, Order
 
 def available_orders(request):
-    # Query the database for orders with payment_status = 1 along with related OrderItem objects
-    paid_orders = Order.objects.filter(payment_status=True).prefetch_related('orderitem_set__product', 'orderitem_set__customization')
+    # Get the city of the user
+    user_city = request.user.customerprofile.city
+    
+    # Filter delivery teams based on the user's city
+    delivery_teams = DeliveryTeam.objects.filter(location=user_city)
+    
+    # Get orders where payment_status is true and delivery location matches the user's city
+    available_orders = Order.objects.filter(payment_status=True, delivery_location=user_city)
+    
+    # Pass available_orders data to the template
+    return render(request, 'availableorders.html', {'available_orders': available_orders})
 
-    # Pass paid_orders data to the template
-    return render(request, 'availableorders.html', {'available_orders': paid_orders})
+
 
 from django.shortcuts import render, redirect, get_object_or_404
 from django.contrib.auth.decorators import login_required
@@ -2276,16 +2299,10 @@ def display_order_details(request):
     order_items = OrderItem.objects.exclude(lat=None, lng=None).select_related('order__user')
     return render(request, 'order_details.html', {'order_items': order_items})
 
-from django.http import JsonResponse
-from django.shortcuts import get_object_or_404
-from .models import Order, CustomUser, DeliveryAssignment
+def available_orders(request):
+    # Query the database for orders with payment_status = 1 along with related OrderItem objects
+    paid_orders = Order.objects.filter(payment_status=True).prefetch_related('orderitem_set__product', 'orderitem_set__customization')
 
-def assign_delivery(request, order_id):
-    order = get_object_or_404(Order, pk=order_id)
-    
-    delivery_boy = CustomUser.objects.filter(is_deliveryteam=True).first()
-    if delivery_boy:
-        assignment = DeliveryAssignment.objects.create(order=order, delivery_boy=delivery_boy)
-        return JsonResponse({'success': True, 'message': 'Delivery assigned successfully.'})
-    else:
-        return JsonResponse({'success': False, 'message': 'No delivery boy available.'})
+    # Pass paid_orders data to the template
+    return render(request, 'availableorders.html', {'available_orders': paid_orders})
+

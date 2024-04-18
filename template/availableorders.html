@@ -98,7 +98,6 @@
                 </div>
             </nav>
             <main class="col-md-9 ms-sm-auto col-lg-10 px-md-4">
-                <!-- Main content goes here -->
                 <div class="table-responsive">
                     <table class="table table-striped">
                         <thead>
@@ -118,44 +117,42 @@
                         <tbody>
                             <!-- Loop through available_orders data -->
                             {% for order in available_orders %}
-                            {% for order_item in order.orderitem_set.all %}
-                            <tr>
-                                <td>{{ order.id }}</td>
-                                <!-- Fetch user details from CustomerProfile -->
-                                <td>{{ order.user.customerprofile.name }}</td>
-                                <td>{{ order.user.customerprofile.phone }}</td>
-                                <td>{{ order.user.customerprofile.street_address }}, {{ order.user.customerprofile.city }}, {{ order.user.customerprofile.pincode }}</td>
-                                <td>{{ order.total_amount }}</td>
-                                <td>
-                                    <ul>
-                                        <li>
-                                            {% if order_item.product %}
-                                                {{ order_item.product.product_name }} x {{ order_item.quantity }}
-                                            {% else %}
-                                                Customized {{ order_item.customization.watch.product_name }} x {{ order_item.quantity }}
-                                            {% endif %}
-                                        </li>
-                                    </ul>
-                                </td>
-                                
-                                <td>{{ order.total_amount }}</td>
-                                <td>{{ order.delivery_status }}</td>
-                                {% if order.delivery_status == 'Delivered' %}
-                                <td>
-                                    <!-- Delivery status is 'delivered', hide the edit button -->
-                                    <span>&#10003;</span>
-                                </td>
-                                <td><button class="btn btn-primary" disabled>Update Status</button></td>
-                                {% else %}
-                                <td></td>
-                                <td><a href="{% url 'delivery_update_status' order.id %}" class="btn btn-primary">Update Status</a></td>
-                                {% endif %}
-                                <td><!-- Actions column content --></td>
-                            </tr>
-                            {% endfor %}
+                                {% for order_item in order.orderitem_set.all %}
+                                    <tr>
+                                        <td>{{ order.id }}</td>
+                                        <!-- Fetch user details from CustomerProfile -->
+                                        <td>{{ order.user.customerprofile.name }}</td>
+                                        <td>{{ order.user.customerprofile.phone }}</td>
+                                        <td>{{ order.user.customerprofile.street_address }}, {{ order.user.customerprofile.city }}, {{ order.user.customerprofile.pincode }}</td>
+                                        <td>{{ order.total_amount }}</td>
+                                        <td>
+                                            <ul>
+                                                <li>
+                                                    {% if order_item.product %}
+                                                        {{ order_item.product.product_name }} x {{ order_item.quantity }}
+                                                    {% else %}
+                                                        Customized {{ order_item.customization.watch.product_name }} x {{ order_item.quantity }}
+                                                    {% endif %}
+                                                </li>
+                                            </ul>
+                                        </td>
+                                        <td>{{ order.total_amount }}</td>
+                                        <td>{{ order.delivery_status }}</td>
+                                        {% if order.delivery_status == 'Delivered' %}
+                                            <td>
+                                                <!-- Delivery status is 'delivered', hide the edit button -->
+                                                <span>&#10003;</span>
+                                            </td>
+                                            <td><button class="btn btn-primary" disabled>Update Status</button></td>
+                                        {% else %}
+                                            <td></td>
+                                            <td><a href="{% url 'delivery_update_status' order.id %}" class="btn btn-primary">Update Status</a></td>
+                                        {% endif %}
+                                        <td><!-- Actions column content --></td>
+                                    </tr>
+                                {% endfor %}
                             {% endfor %}
                         </tbody>
                     </table>
                 </div>
-            </main>
-            
+                

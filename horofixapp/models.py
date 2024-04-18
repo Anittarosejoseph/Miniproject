@@ -163,11 +163,12 @@ class Technician(models.Model):
     
  
 class DeliveryTeam(models.Model):
+    user = models.OneToOneField(CustomUser, on_delete=models.CASCADE)
+
     team_name = models.CharField(max_length=100, default='', null=True)  # Field for the delivery team's name
     vehicle_number = models.CharField(max_length=20, default='', null=True)  # Field for the vehicle number
-    user = models.OneToOneField(CustomUser, on_delete=models.CASCADE)
     pincode = models.CharField(max_length=50)
-    city = models.CharField(max_length=50, blank=True, null=True)  
+    location = models.CharField(max_length=100) 
 
     active = models.BooleanField(default=True)
 
@@ -175,7 +176,7 @@ class DeliveryTeam(models.Model):
         return f"{self.user.username} - {self.team_name}"
     def get_assigned_orders(self):
         return Order.objects.filter(delivery_team=self)
-    
+ 
 from django.db import models
 
 class WatchProduct(models.Model):
@@ -291,7 +292,8 @@ CustomUser = get_user_model()
 class Order(models.Model):
     user = models.ForeignKey(CustomUser, on_delete=models.CASCADE)
     products = models.ManyToManyField(WatchProduct, through='OrderItem')
-    
+    delivery_team = models.ForeignKey('DeliveryTeam', on_delete=models.SET_NULL, blank=True, null=True)
+
     total_amount = models.DecimalField(max_digits=10, decimal_places=2)
     payment_id = models.CharField(max_length=100, null=True, blank=True)
     payment_status = models.BooleanField(default=False)
@@ -307,7 +309,7 @@ class Order(models.Model):
     def __str__(self):
         return f"Order {self.id} by {self.user.username}"
 
-   
+    
 from django.db import models
 from django.db import models
 
@@ -391,7 +393,6 @@ class Thread(models.Model):
     objects = ThreadManager()
     class Meta:
         unique_together = ['first_person', 'second_person']
-
 
 class ChatMessage(models.Model):
     thread = models.ForeignKey(Thread, null=True, blank=True, on_delete=models.CASCADE, related_name='chatmessage_thread')

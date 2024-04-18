@@ -671,39 +671,39 @@ th.action-header {
    
     <div class="content">
        
-
-        <!-- Delivery Team List -->
-        <h1>Delivery Team List</h1>
-        <table>
-            <thead>
-                <tr>
-                    <th>User</th>
-                    <th>Username</th>
-                    <th>Email</th>
-                    <th>Phone</th>
-                    <th>Team Name</th>
-                    <th>Vehicle Number</th>
-                    <th>City</th>
-                    <th>Pincode</th>
-                    <th>Active</th>
-                </tr>
-            </thead>
-            <tbody>
-                {% for delivery_team in delivery_teams %}
+        <div class="content">
+            <!-- Delivery Team List -->
+            <h1>Delivery Team List</h1>
+            <table>
+                <thead>
                     <tr>
-                        <td>{{ delivery_team.user.customerprofile.name }}</td>
-                        <td>{{ delivery_team.user.username }}</td>
-                        <td>{{ delivery_team.user.email }}</td>
-                        <td>{{ delivery_team.user.phone }}</td>
-                        <td>{{ delivery_team.team_name }}</td>
-                        <td>{{ delivery_team.vehicle_number }}</td>
-                        <td>{{ delivery_team.city }}</td>
-                        <td>{{ delivery_team.pincode }}</td>
-                        <td>{{ delivery_team.active }}</td>
+                        <th>User</th>
+                        <th>Username</th>
+                        <th>Email</th>
+                        <th>Phone</th>
+                        <th>Team Name</th>
+                        <th>Vehicle Number</th>
+                        <th>City</th>
+                        <th>Pincode</th>
+                        <th>Active</th>
                     </tr>
-                {% endfor %}
-            </tbody>
-        </table>
-    </div>
-</body>
-</html>
+                </thead>
+                <tbody>
+                    {% for delivery_team in delivery_teams %}
+                        <tr>
+                            <td>{{ delivery_team.user.customerprofile.name }}</td>
+                            <td>{{ delivery_team.user.username }}</td>
+                            <td>{{ delivery_team.user.email }}</td>
+                            <td>{{ delivery_team.user.phone }}</td>
+                            <td>{{ delivery_team.team_name }}</td>
+                            <td>{{ delivery_team.vehicle_number }}</td>
+                           
+                            <td>{{ delivery_team.location }}</td>
+                                      <td>{{ delivery_team.pincode }}</td>
+                            <td>{{ delivery_team.active }}</td>
+                        </tr>
+                    {% endfor %}
+                </tbody>
+            </table>
+        </div>
+        
