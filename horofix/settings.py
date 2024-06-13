@@ -124,7 +124,7 @@ EMAIL_HOST = 'smtp.gmail.com'
 EMAIL_PORT = 587
 EMAIL_USE_TLS = True
 EMAIL_HOST_USER = 'anittarosejoseph2024a@mca.ajce.in'  # Replace with your Gmail email
-EMAIL_HOST_PASSWORD = 'dzbfspovlxdrnvjn'
+EMAIL_HOST_PASSWORD = 'xyz-abc-uvx-rgh' # Repalace with your App password
 
 
 
